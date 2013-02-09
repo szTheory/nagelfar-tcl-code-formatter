@@ -26,6 +26,9 @@ proc PluginSearchPath {} {
     lappend dirs [file join $::thisDir .. ..]
     lappend dirs [file join $::thisDir .. .. plugins]
     lappend dirs [file join $::thisDir .. plugins]
+    foreach d $::Nagelfar(pluginPath) {
+	lappend dirs $d
+    }
     return $dirs
 }
 

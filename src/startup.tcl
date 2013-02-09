@@ -52,10 +52,15 @@ proc usage {} {
  -quiet            : Suppress non-syntax output.
  -glob <pattern>   : Add matching files to scriptfiles to check.
  -plugin <plugin>  : Run with this plugin.
+ -plugin <file>    : Load plugin from file.
  -plugindump <plugin> : Print contents of plugin source
  -pluginlist       : List known plugins
+ -pluginpath <dir> : Configure plugin search path.
  -H                : Prefix each error line with file name.
- -exitcode         : Return status code 2 for any error or 1 for warning.}
+ -exitcode         : Return status code 2 for any error or 1 for warning.
+ -dbpicky          : Enable checking of syntax DB.
+ -pkgpicky         : Warn about redudant package require.
+ -trace <file>     : Output debug info to file}
     exit
 }
 
@@ -191,6 +196,8 @@ if {![info exists gurka]} {
     set pdbDir [file join $::dbDir packagedb]
     eval lappend apa [glob -nocomplain [file join $pdbDir *db*.tcl]]
 
+    set ::Nagelfar(pluginPath) {}
+
     foreach file $apa {
         if {[file isfile $file] && [file readable $file] && \
                 [lsearch $::Nagelfar(allDb) $file] == -1} {
@@ -323,6 +330,11 @@ if {![info exists gurka]} {
                 printPlugins
                 exit
             }
+	    -pluginpath {
+		incr i
+                set arg [lindex $argv $i]
+		lappend ::Nagelfar(pluginPath) $arg
+	    }
             -novar {
                 set ::Prefs(noVar) 1
             }
