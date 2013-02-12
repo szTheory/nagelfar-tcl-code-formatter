@@ -853,8 +853,8 @@ set ::syntax(pwd) 0
 set ::syntax(radiobutton) {x p*}
 set ::syntax(raise) {x x?}
 set ::syntax(read) {r 1 2}
-set ::syntax(regexp) {o* x x n*}
-set ::syntax(regsub) {o* x x x n?}
+set ::syntax(regexp) {o* re x n*}
+set ::syntax(regsub) {o* re x x n?}
 set ::syntax(rename) 2
 set ::syntax(return) {p* x?}
 set ::syntax(safe::interpAddToAccessPath) 2

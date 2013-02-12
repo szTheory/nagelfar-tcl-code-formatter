@@ -1851,6 +1851,20 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     incr i $used
                 }
 	    }
+	    re {
+		if {$mod ne ""} {
+		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
+                            syntax for $cmd."
+		}
+		if {([lindex $wordstatus $i] & 1) != 0} {
+		    # check only non constant
+		    set re [lindex $argv $i]
+		    if {[catch [list regexp -- $re "test"] msg]} {
+			errorMsg E $msg $index
+		    }
+		}
+		incr i
+	    }
 	    default {
 		echo "Unsupported token \"$token\" in syntax for \"$cmd\""
 	    }

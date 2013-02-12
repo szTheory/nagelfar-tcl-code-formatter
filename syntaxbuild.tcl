@@ -176,6 +176,7 @@ proc buildDb {ch} {
     # div Define implicit variable
     # e   Expression
     # E   Expression that should be in braces
+    # re  regexp
     # c   Code, checked in surrounding context
     #     If an integer is added to it, that number of arguments are added to
     #     the code to emulate a command prefix. (cg has this too)

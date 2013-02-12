@@ -1264,3 +1264,19 @@ test preferences-30.4 {
     set res [list [execTestFile -tab 5 -len 29]]
     lappend res [execTestFile -tab 5 -len 30]
 } -result {{%%Line   1: W Too long line} %%}
+
+
+test nagelfar-31.1 {
+    Regexp checking
+} -body {
+    createTestFile {
+	regexp {??} "test"
+	regexp {.*} "test"
+	regexp {(?:abc)test\1} "test"
+	regexp {(test1|value} "test"
+	regexp -- {-} "test"
+    }
+    execTestFile
+} -result {%%Line   2: E couldn't compile regular expression pattern: quantifier operand invalid
+Line   4: E couldn't compile regular expression pattern: invalid backreference number
+Line   5: E couldn't compile regular expression pattern: parentheses () not balanced}
