@@ -296,7 +296,16 @@ proc checkComment {str index knownVarsName} {
         if {[llength $rest] == 0} return
         set cmd [lindex $rest 0]
         set first [lindex $rest 1]
+
+	# let plugins see comments and define additional ones
+	set pluginComment [pluginHandleComment $cmd [lrange $rest 1 end]]
+        if {$pluginComment} {
+            # plugin Specific action
+            return
+        }
+
         set rest [lrange $rest 2 end]
+
         switch -- $cmd {
             syntax {
 #                decho "Syntax for '$first' : '$rest'"

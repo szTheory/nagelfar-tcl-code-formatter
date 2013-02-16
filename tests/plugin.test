@@ -791,3 +791,31 @@ test plugin-10.1 {
 
     execTestFile -flags {-plugin _testfile_.plugin.tcl -plugin _testfile_.plugin2.tcl}
 } -result {%%Line   4: E Unknown variable "test3"}
+
+test plugin-11.1 {
+    SyntaxComment hook
+} -body {
+    createTestFile {##Nagelfar Plugin : Deprecation Notice
+	set deprecated {}
+        proc syntaxComment {type opts} {
+	    if {$type eq "deprecated"} {
+                lappend ::deprecated [lindex $opts 0]
+		return true
+	    }
+	    return false
+	}
+        proc statementWords {words info} {
+	    if {[lindex $words 0] in $::deprecated} {
+		return [list warning "[lindex $words 0] is deprecated"]
+	    }
+	    return {}
+	}
+    } 2
+    createTestFile {
+	##nagelfar deprecated very_old
+        proc very_old {} {}
+
+	very_old
+    } 
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   5: W very_old is deprecated}

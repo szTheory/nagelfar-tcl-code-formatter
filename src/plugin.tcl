@@ -79,7 +79,7 @@ proc createPluginInterp {plugin} {
 
     # Set global variables
     foreach func {statementRaw statementWords earlyExpr lateExpr varWrite
-                  varRead
+                  varRead syntaxComment
     } {
 	if {[$pi eval info proc $func] ne ""} {
             # var names start with uppercase
@@ -93,7 +93,7 @@ proc createPluginInterp {plugin} {
 
 proc resetPluginData {} {
     foreach func {StatementRaw StatementWords EarlyExpr LateExpr VarWrite
-                  VarRead
+                  VarRead SyntaxComment
     } {
         set ::Nagelfar(pluginHooks$func) {}
         set ::Nagelfar(plugin$func) 0
@@ -321,4 +321,15 @@ proc pluginHandleVarRead {varName knownVarsName index} {
         PluginHandle $pi varRead $var outdata knownVars $index
         set var $outdata
     }
+}
+
+# This is called to let a plugin see syntax comments
+proc pluginHandleComment {type opts} {
+    set res false
+    foreach pi $::Nagelfar(pluginHooksSyntaxComment) {
+	if {[$pi eval syntaxComment $type $opts]} {
+	    set res true
+	}
+    }
+    return $res
 }

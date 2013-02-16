@@ -154,6 +154,14 @@ Write Header Hook
 If declared, called when writing a file with -header.
 Every Inline-comment returned is appended to the file.
 
+Read Inline Comments
+^^^^^^^^^^^^^^^^^^^^
+
+``proc syntaxComment {type opts} {}``
+
+If declared, receives any "##nagelfar <type> <opts...>" in the input.
+May return true to disable default action, e.g. if the type is plugin specific.
+
 .. _plugin-examples-label:
 
 Examples
@@ -396,3 +404,35 @@ Detect creative writing in namespace eval code.
          return [list warning "Writing $var without variable call"]
      }
  }
+
+Deprecation Notice
+^^^^^^^^^^^^^^^^^^
+
+Add deprecation warning to proc, and save info to Header.
+
+.. code:: tcl
+
+ ##Nagelfar Plugin : Deprecation Notice
+ set deprecated {}
+ proc syntaxComment {type opts} {
+     if {$type eq "deprecated"} {
+         lappend ::deprecated [lindex $opts 0]
+         return true
+     }
+     return false
+ }
+ proc statementWords {words info} {
+     if {[lindex $words 0] in $::deprecated} {
+         return [list warning "[lindex $words 0] is deprecated"]
+     }
+     return {}
+ }
+ proc writeHeader {} {
+    set res {}
+    foreach cmd [lsort -unique $deprecated] {
+        lappend res "##nagelfar deprecated $cmd"
+    }
+    return $res
+ }
+
+
