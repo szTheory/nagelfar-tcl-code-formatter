@@ -143,6 +143,14 @@ Variable Read Hook
 
 If declared, this receives any variable read from.
 
+Write Header Hook
+^^^^^^^^^^^^^^^^^
+
+``proc writeHeader {} {}``
+
+If declared, called when writing a file with -header.
+Every Inline-comment returned is appended to the file.
+
 .. _plugin-examples-label:
 
 Examples
@@ -225,7 +233,7 @@ Allow custom operator
  }
 
 Look for operator usage
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: tcl
 

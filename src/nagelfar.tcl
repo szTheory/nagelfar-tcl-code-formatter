@@ -4677,6 +4677,7 @@ proc doCheck {} {
             foreach item [lsort -dictionary [array names ::namespacePath]] {
                 puts $ch "\#\#nagelfar [list nspath $item] $::namespacePath($item)"
             }
+            pluginHandleWriteHeader $ch
             close $ch
         }
     }

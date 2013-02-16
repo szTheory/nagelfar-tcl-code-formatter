@@ -142,6 +142,22 @@ proc finalizePlugin {} {
     set ::Nagelfar(pluginInterp) ""
 }
 
+proc pluginHandleWriteHeader {ch} {
+    if {$::Nagelfar(pluginInterp) ne ""} {
+        set pi $::Nagelfar(pluginInterp)
+        if {[$pi eval info proc writeHeader] ne ""} {
+            set x [$pi eval writeHeader]
+            foreach value $x {
+                if {![regexp "^\#\#nagelfar\[^\n\]" $value]} {
+                    errorMsg E "Plugin $::Nagelfar(plugin) returned illegal comment" 0
+                } else {
+                    puts $ch $value
+                }
+            }
+        }
+    }
+}
+
 proc printPlugin {plugin} {
     set src [LocatePlugin $plugin]
     if {$src eq ""} {
