@@ -9,7 +9,7 @@ Plugins
 Introduction
 ------------
 
-Nagelfar allows you to set up a plugin that can hook up and affect the
+Nagelfar allows you to set up a list of plugins that can hook up and affect the
 checks in different stages.
 
 A plugin can be used for things like:
@@ -40,7 +40,8 @@ so when hooks receive "unparsed" data, those have been removed.
 Usage
 ^^^^^
 
-To activate a plugin, use ``-plugin <plugin>`` on the command line.
+To activate a plugin, use ``-plugin <plugin>`` on the command line. Repeat
+to load additional plugins in the specified order.
 
 Nagelfar searches for plugins (looking for names <plugin> and <plugin>.tcl) in
 the following places:
@@ -50,8 +51,9 @@ the following places:
 * <nagelfar source>/../..
 * <nagelfar source>/../../plugins
 * <nagelfar source>/../plugins
+* ``-pluginpath <dir>`` Option
 
-Currently only one plugin can be used, and it cannot be selected from the GUI.
+Currently the plugin cannot be selected from the GUI.
 
 Result of plugin procedures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -61,6 +63,7 @@ These are interpreted as keyword-value pairs, with the following keywords
 allowed.
 
 * replace : The value is used to replace the incoming value for further processing.
+	    If multiple plugins use replace only the last value is effective.
 * comment : The value is fed through inline comment parsing to affect surroundings.
 * error   : The value produces an error message.
 * warning : The value produces a warning message.

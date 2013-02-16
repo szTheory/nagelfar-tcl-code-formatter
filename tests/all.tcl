@@ -25,6 +25,8 @@ if {$argc > 0} {
 proc createTestFile {scr {filetype 0}} {
     if {$filetype == 2} {
         set ch [open _testfile_.plugin.tcl w]
+    } elseif {$filetype == 3} {
+        set ch [open _testfile_.plugin2.tcl w]
     } elseif {$filetype == 1} {
         set ch [open _testfile_.syntax w]
     } else {
@@ -101,6 +103,7 @@ proc cleanupTestFile {} {
     file delete -force _testfile2_
     file delete -force _testfile_.syntax
     file delete -force _testfile_.plugin.tcl
+    file delete -force _testfile_.plugin2.tcl
 }
 
 tcltest::testsDirectory $thisDir

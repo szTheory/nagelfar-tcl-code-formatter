@@ -318,7 +318,7 @@ if {![info exists gurka]} {
  	    -plugin {
                 incr i
                 set arg [lindex $argv $i]
-                set ::Nagelfar(plugin) $arg
+                lappend ::Nagelfar(plugin) $arg
             }
  	    -plugindump {
                 incr i
