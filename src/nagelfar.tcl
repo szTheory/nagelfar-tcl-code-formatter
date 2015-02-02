@@ -1132,10 +1132,10 @@ proc checkForCommentL {words wordstatus indices} {
     }
 }
 
-# A "macro" for checkCommand to print common error message
+# A "macro" for checkCommand/parseStatement to print common error message
 # It should not be called from anywhere else.
 proc WA {{debug {}}} {
-    upvar "cmd" cmd "index" index "argc" argc "argv" argv "indices" indices
+    upvar 1 "cmd" cmd "index" index "argc" argc "argv" argv "indices" indices
     errorMsg E "Wrong number of arguments ($argc) to \"$cmd\"$debug" $index
 
     set t 1
@@ -1168,8 +1168,10 @@ proc SplitToken {token tokName tokCountName typeName modName} {
 # Check a command that have a syntax defined in the database
 # 'firsti' says at which index in argv et.al. the arguments begin.
 # Returns the return type of the command
+# This is a helper for parseStatement, it should not be called from
+# anywhere but checkCommand/parseStatement
 proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
-    upvar "constantsDontCheck" constantsDontCheck "knownVars" knownVars
+    upvar 1 "constantsDontCheck" constantsDontCheck "knownVars" knownVars
 
     set argc [llength $argv]
     set syn $::syntax($cmd)
@@ -1178,7 +1180,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set type $::return($cmd)
         #puts T:$cmd:$type
     }
-#miffo    puts "Checking $cmd ([lindex $argv]) against syntax $syn"
+    #puts "Checking $cmd ([lindex $argv]) against syntax $syn"
 
     # Check if the syntax definition has multiple entries
     if {[string index [lindex $syn 0] end] == ":"} {
@@ -3074,7 +3076,7 @@ proc parseBody {body index knownVarsName {warnCommandSubst 0}} {
         }
     }
 
-#miffo    puts "Parsing a body with [llength $statements] stmts"
+    #puts "Parsing a body with [llength $statements] stmts"
     set type ""
     foreach statement $statements index $indices {
         if {[string match "#*" $statement]} {
