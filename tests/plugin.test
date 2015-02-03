@@ -14,7 +14,8 @@ test plugin-1.1 {
 
     execTestFile -plugin _testfile_.plugin.tcl
 } -returnCodes 1 -result {Bad plugin: _testfile_.plugin.tcl
-No plugins found.}
+Available plugins:
+Plugin "nfplugin" :  Check of Nagelfar's own source}
 
 test plugin-1.2 {
     Command line checks
@@ -42,7 +43,8 @@ test plugin-1.3 {
     execTestFile -plugin _testfile_.plugin2.tcl
 } -returnCodes 1 -result {Bad plugin: _testfile_.plugin2.tcl
 Available plugins:
-Plugin "_testfile_.plugin" :  Some info}
+Plugin "_testfile_.plugin" :  Some info
+Plugin "nfplugin" :  Check of Nagelfar's own source}
 
 test plugin-1.4 {
     Command line checks
@@ -56,7 +58,8 @@ test plugin-1.4 {
 
     execTestFile -flags -pluginlist
 } -result {Available plugins:
-Plugin "_testfile_.plugin" :  Some info}
+Plugin "_testfile_.plugin" :  Some info
+Plugin "nfplugin" :  Check of Nagelfar's own source}
 
 test plugin-2.1 {
     Plugin for late expr check
