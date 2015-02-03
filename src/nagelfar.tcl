@@ -41,14 +41,28 @@
 
 # Interpretation of knownVars:
 # Each key is a variable name, with a dict with the following possible fields:
-# knownVars $var known     : Variable is known to exist.
+# knownVars $var           : Existance means variable is known to exist.
 # knownVars $var local     : Variable is local in a procedure.
 # knownVars $var set       : A set of this variable has been seen.
-# knownVars $var read      : A read of this variable has been seen.
+# knownVars $var read      : A read of this variable seen before any set.
 # knownVars $var type      : The variable's type if known.
 # knownVars $var array     : The variable is an array
-# knownVars $var namespace : Variable belongs to this namespace.
+# knownVars $var namespace : Variable belongs to this namespace. (unless local)
 # knownVars $var upvar     : Variable is upvared from this variable.
+
+# Helper to initialise a knownVars element to defaults.
+# This helps make sure all fields that must exist do
+proc knownVar {knownVarsName var} {
+    upvar $knownVarsName knownVars
+    dict set knownVars $var local 0
+    dict set knownVars $var set   0
+    dict set knownVars $var read  0
+    dict set knownVars $var type  ""
+    # The array field can be unknown or boolean
+    dict set knownVars $var array ""
+    dict set knownVars $var namespace ""
+    dict set knownVars $var upvar     ""
+}
 
 # Moved out message handling to make it more flexible
 proc echo {str {tag {}}} {
@@ -870,13 +884,14 @@ proc parseVar {str len index iName knownVarsName} {
         } else {
             set full ""
         }
-        if {$full ne "" && [dict exists $knownVars $full "type"]} {
+        if {$full ne "" && [dict exists $knownVars $full]} {
             return [dict get $knownVars $full "type"]
         }
 	return ""
     }
     # FIXA: Use markVariable
-    if {[dict exists $knownVars $var array]} {
+    if {[dict exists $knownVars $var] &&
+	[dict get $knownVars $var array] ne ""} {
         if {$vararr != [dict get $knownVars $var array]} {
             if {$vararr} {
                 errorMsg E "Is array, was scalar" $index
@@ -885,13 +900,13 @@ proc parseVar {str len index iName knownVarsName} {
             }
         }
     }
-    if {![dict exists $knownVars $var known] && !$::Prefs(noVar)} {
+    if {![dict exists $knownVars $var] && !$::Prefs(noVar)} {
         if {[string match "*::*" $var]} {
             set tail [namespace tail $var]
             set ns [namespace qualifiers $var]
             #decho "'$var' '$ns' '$tail'"
-            if {![dict exists $knownVars $tail known] || \
-                    ![dict exists $knownVars $tail namespace] || \
+            if {![dict exists $knownVars $tail] || \
+                    [dict get $knownVars $tail local] || \
                     ([dict get $knownVars $tail namespace] ne $ns && \
                     [dict get $knownVars $tail namespace] ne "::$ns")} {
                 errorMsg E "Unknown variable \"$var\"" $index
@@ -900,17 +915,16 @@ proc parseVar {str len index iName knownVarsName} {
             errorMsg E "Unknown variable \"$var\"" $index
         }
     }
-    if {![dict exists $knownVars $var set]} {
+    if {[dict exists $knownVars $var] && ![dict get $knownVars $var set]} {
+	# It was read before it was set (within this scope)
         dict set knownVars $var read 1
-        # Why was this here?? FIXA
-        #if {[dict exists $knownVars $var local]} {
-        #    errorMsg E "Unknown variable \"$var\"" $index
-        #}
     }
-    if {$vararr && [dict exists $knownVars $var\($varindex\) "type"]} {
+    if {$vararr && [dict exists $knownVars $var\($varindex\)] &&
+	[dict get $knownVars $var\($varindex\) "type"] ne ""} {
         return [dict get $knownVars $var\($varindex\) "type"]
     }
-    if {[dict exists $knownVars $var "type"]} {
+    if {[dict exists $knownVars $var] &&
+	[dict get $knownVars $var "type"] ne ""} {
         return [dict get $knownVars $var "type"]
     }
     return ""
@@ -1789,7 +1803,8 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
     }
 
     # Check for scalar/array mismatch
-    if {[dict exists $knownVars $varBase array]} {
+    if {[dict exists $knownVars $varBase] &&
+	[dict get $knownVars $varBase array] ne ""} {
         set varReallyArray [expr {$varArray || $isArray eq "yes"}]
         if {$varReallyArray != [dict get $knownVars $varBase array]} {
             if {$varReallyArray} {
@@ -1804,24 +1819,24 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
 
     if {$check == 2} {
         set type ""
-	if {![dict exists $knownVars $varBase known]} {
+	if {![dict exists $knownVars $varBase]} {
 	    return 1
 	}
 	if {$varArray && ($varIndexWs & 1) && \
-                [dict exists $knownVars $varBase local]} {
-	    if {![dict exists $knownVars $var known]} {
+                [dict get $knownVars $varBase local]} {
+	    if {![dict exists $knownVars $var]} {
 		return 1
 	    }
 	}
-	if {[dict exists $knownVars $var "type"]} {
+	if {[dict get $knownVars $var "type"] ne ""} {
             set type [dict get $knownVars $var "type"]
         } else {
             set type [dict get $knownVars $varBase "type"]
         }
 	return 0
     } else {
-	if {![dict exists $knownVars $varBase known]} {
-	    dict set knownVars $varBase known 1
+	if {![dict exists $knownVars $varBase]} {
+	    knownVar knownVars $varBase
             if {[currentProc] ne ""} {
                 dict set knownVars $varBase local 1
             } else {
@@ -1848,10 +1863,10 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
         }
         # If the array index is constant, mark the whole name
 	if {$varArray && ($varIndexWs & 1)} {
-	    if {![dict exists $knownVars $var known]} {
-		dict set knownVars $var known 1
+	    if {![dict exists $knownVars $var]} {
+		knownVar knownVars $var
                 dict set knownVars $var "type" $type
-                if {[dict exists $knownVars $varBase local]} {
+                if {[dict get $knownVars $varBase local]} {
                     dict set knownVars $var local 1
                 }
                 dict set knownVars $var array 0
@@ -2085,9 +2100,7 @@ proc parseStatement {statement index knownVarsName} {
 	global { # Special check of "global" command
 	    foreach var $argv ws $wordstatus {
 		if {$ws & 1} {
-                    dict set knownVars $var known     1
-                    dict set knownVars $var namespace ""
-                    dict set knownVars $var "type"    ""
+		    knownVar knownVars $var
 		} else {
 		    errorMsg N "Non constant argument to $cmd: $var" $index
 		}
@@ -2117,8 +2130,7 @@ proc parseStatement {statement index knownVarsName} {
                             dict set knownVars $var namespace $ns
                         }
                         if {($ws1 & 1) || [string is wordchar $var]} {
-                            dict set knownVars $var known 1
-                            dict set knownVars $var "type" ""
+			    knownVar knownVars $var
                             if {$i < $argc - 1} {
                                 dict set knownVars $var set 1
                                 dict set knownVars $var array 0
@@ -2184,8 +2196,7 @@ proc parseStatement {statement index knownVarsName} {
                     # The variable name contains substitutions
                     errorMsg N "Suspicious upvar variable \"$var\"" $index
                 } else {
-                    dict set knownVars $var known 1
-                    dict set knownVars $var "type" ""
+		    knownVar knownVars $var
                     lappend constantsDontCheck $i
                     if {$other eq $var} { # Allow "upvar xx xx" construct
                         lappend constantsDontCheck [expr {$i - 1}]
@@ -2194,7 +2205,7 @@ proc parseStatement {statement index knownVarsName} {
                         # Is the other name a simple var subst?
                         if {[regexp {^\$([\w()]+)$}  $other -> other] || \
                             [regexp {^\${([^{}]*)}$} $other -> other]} {
-                            if {[dict exists $knownVars $other known]} {
+                            if {[dict exists $knownVars $other]} {
                                 if {$level == 1} {
                                     dict set knownVars $other upvar $var
                                 } elseif {$level eq "#0"} {
@@ -2771,7 +2782,7 @@ proc parseStatement {statement index knownVarsName} {
         # The constant is considered ok if within quotes.
         set i 0
         foreach ws $wordstatus var $argv {
-            if {[dict exists $knownVars $var known]} {
+            if {[dict exists $knownVars $var]} {
                 if {($ws & 7) == 1 && [lsearch $constantsDontCheck $i] == -1} {
                     errorMsg W "Found constant \"$var\" which is also a\
                             variable." [lindex $indices $i]
@@ -2784,9 +2795,8 @@ proc parseStatement {statement index knownVarsName} {
 }
 
 # Split a script into individual statements
-proc splitScript {script index statementsName indicesName knownVarsName} {
+proc splitScript {script index statementsName indicesName} {
     upvar $statementsName statements $indicesName indices
-    upvar $knownVarsName knownVars
 
     set statements {}
     set indices {}
@@ -3063,7 +3073,7 @@ proc parseBody {body index knownVarsName {warnCommandSubst 0}} {
         set statements $::Nagelfar(cacheStatements,$body)
         set indices $::Nagelfar(cacheIndices,$body)
     } else {
-        splitScript $body $index statements indices knownVars
+        splitScript $body $index statements indices
     }
     # Unescaped newline in command substitution body is probably wrong
     if {$warnCommandSubst && [llength $statements] > 1} {
@@ -3121,15 +3131,11 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
             # Reset to avoid further messages
             set seenDefault 0
         }
-        dict set knownVars $var known 1
+	knownVar knownVars $var
         dict set knownVars $var local 1
         dict set knownVars $var set   1
         SplitToken [lindex $syn $i] _ _ type _
-        if {$type ne ""} {
-            dict set knownVars $var "type" $type
-        } else {
-            dict set knownVars $var "type" ""
-        }
+	dict set knownVars $var "type" $type
     }
 
     # Sanity check of argument names
@@ -3151,8 +3157,7 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
 
 # Create a syntax definition from args list, and given the info
 # about variables in the body.
-proc parseArgsToSyn {name procArgs indexArgs syn knownVarsName} {
-    upvar $knownVarsName knownVars
+proc parseArgsToSyn {name procArgs indexArgs syn knownVars} {
 
     if {[catch {llength $procArgs}]} {
         # This is reported elsewhere
@@ -3161,7 +3166,7 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVarsName} {
 
     # Build a syntax description for the procedure.
     # Parse the arguments.
-    set upvar 0
+    set upvared 0
     set unlim 0
     set min 0
     set newsyntax {}
@@ -3170,16 +3175,16 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVarsName} {
         set type x
 
         # Check for any upvar in the proc
-        if {[dict exists $knownVars $var "upvar"]} {
-            set other [dict get $knownVars $var "upvar"]
-            if {[dict exists $knownVars $other read]} {
+        if {[dict get $knownVars $var upvar] ne ""} {
+            set other [dict get $knownVars $var upvar]
+            if {[dict get $knownVars $other read]} {
                 set type v
-            } elseif {[dict exists $knownVars $other set]} {
+            } elseif {[dict get $knownVars $other set]} {
                 set type n
             } else {
                 set type l
             }
-            set upvar 1
+            set upvared 1
         }
         if {$var eq "args"} {
             set unlim 1
@@ -3192,7 +3197,7 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVarsName} {
         lappend newsyntax $type
     }
 
-    if {!$upvar} {
+    if {!$upvared} {
         if {$unlim} {
             set newsyntax [list r $min]
         } elseif {$min == [llength $procArgs]} {
@@ -3381,7 +3386,7 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
     set ::instrumenting([lindex $indices 2]) 1
 
     set newSyn [parseArgsToSyn $name $argList [lindex $indices 1] \
-            $syn knownVars]
+            $syn $knownVars]
     if {$storeIt} {
         set syntax($name) $newSyn
     }
@@ -3398,9 +3403,9 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
     # I.e. anyone with set == 1 and namespace == "" should be
     # added to known globals.
     foreach var [dict keys $knownVars] {
-	if {![dict exists $knownVars $var namespace]} continue
         if {[dict get $knownVars $var namespace] != ""} continue
-	if {[dict exists $knownVars $var set]} {
+        if {[dict get $knownVars $var local]} continue
+	if {[dict get $knownVars $var set]} {
 #	    decho "Set global $var in proc $name."
 	    if {[lsearch $knownGlobals $var] == -1} {
 		lappend knownGlobals $var
@@ -3552,10 +3557,8 @@ proc parseScript {script} {
     set knownVars {}
     array set ::knownAliases {}
     foreach g $knownGlobals {
-	dict set knownVars $g known 1
-	dict set knownVars $g set   1
-	dict set knownVars $g namespace ""
-	dict set knownVars $g type      ""
+	knownVar knownVars $g
+	dict set knownVars $g set 1
     }
     set script [buildLineDb $script]
     set ::instrumenting(script) $script
@@ -3598,10 +3601,10 @@ proc parseScript {script} {
     }
     # Update known globals.
     foreach var [dict keys $knownVars] {
-	if {![dict exists $knownVars $var namespace]} continue
         if {[dict get $knownVars $var namespace] != ""} continue
+        if {[dict get $knownVars $var local]} continue
 	# Check if it has been set.
-	if {[dict exists $knownVars $var set]} {
+	if {[dict get $knownVars $var set]} {
 	    if {[lsearch $knownGlobals $var] == -1} {
 		lappend knownGlobals $var
 	    }

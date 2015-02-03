@@ -23,7 +23,7 @@ interp alias slave puts {} NoPuts
 proc doSplitScript {body} {
     slave eval [list set ::body $body]
     slave eval {set ::body [buildLineDb $::body]}
-    slave eval {splitScript $::body 0 ::statements ::indices ::knownVars}
+    slave eval {splitScript $::body 0 ::statements ::indices}
     return [slave eval set ::statements]
 }
 
