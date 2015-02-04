@@ -162,6 +162,13 @@ misctests/test.html: misctests/test.tcl misctests/htmlize.tcl \
 misctest: misctests/test.result misctests/test.html
 
 #----------------------------------------------------------------
+# Web pages
+#----------------------------------------------------------------
+
+web:
+	scp Nagelfar.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/index.html
+
+#----------------------------------------------------------------
 # Generating database
 #----------------------------------------------------------------
 
