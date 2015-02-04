@@ -55,6 +55,7 @@ It currently has at least these elements:
 namespace : Current namespace
 caller    : Current procedure
 file      : Current file
+vars      : Dictionary where each key is a known variable in current scope
 
 <ul>Raw Statement Hook</ul>
 

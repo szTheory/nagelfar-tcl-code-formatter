@@ -509,3 +509,25 @@ test plugin-6.1 {
 } -result {%%Call: hugg -> lindex
 Call: hugg -> mugg
 Call: mugg -> hugg}
+
+test plugin-7.1 {
+    Info dict, vars
+} -body {
+    createTestFile {##Nagelfar Plugin : Some info
+        proc statementWords {words info} {
+            set res {}
+	    if {[dict exists $info vars apa]} {
+                lappend res error
+                lappend res "apa variable forbidden"
+	    }
+            return $res
+        }
+    } 2
+    createTestFile {
+        list gurka
+        set apa 5
+        list gurka
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   4: E apa variable forbidden}

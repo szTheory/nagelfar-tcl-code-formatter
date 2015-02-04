@@ -192,7 +192,8 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
     set outdata $indata
     set info [list namespace [currentNamespace] \
                       caller [currentProc] \
-                      file $::currentFile]
+                      file $::currentFile \
+		      vars $knownVars]
 
     set x [$::Nagelfar(pluginInterp) eval [list $what $indata $info]]
 
