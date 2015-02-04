@@ -9,7 +9,7 @@ A plugin can be used for things like:
 
 See further examples below.
 
-<ul>Generic rules</ul>
+<u>Generic rules</u>
 
 A plugin is a Tcl script file that must start with the verbatim sequence
 "##Nagelfar Plugin :". A plugin is sourced and used in its own safe
@@ -24,21 +24,21 @@ access to stdout as well.
 Note that backslash-newline is always removed at an early stage in Nagelfar,
 so when hooks receive "unparsed" data, those have been removed.
 
-<ul>Result of plugin procedures</ul>
+<u>Result of plugin procedures</u>
 
 Each hookup procedure returns a list with an even number of elements.
 These are interpreted as keyword-value pairs, with the following keywords
 allowed.
 
-replace : The value is used to replace the incoming value for further processing.
-comment : The value is fed through inline comment parsing to affect surroundings.
-error   : The value produces an error message.
-warning : The value produces a warning message.
-note    : The value produces a note message.
+ replace : The value is used to replace the incoming value for further processing.
+ comment : The value is fed through inline comment parsing to affect surroundings.
+ error   : The value produces an error message.
+ warning : The value produces a warning message.
+ note    : The value produces a note message.
 
 To do nothing, return an empty list.
 
-<ul>Finalizing checking</ul>
+<u>Finalizing checking</u>
 
 proc finalizePlugin {} { }
 
@@ -47,23 +47,23 @@ of checking.
 
 The return value from finalizePlugin may only contain messages.
 
-<ul>Information dictionary</ul>
+<u>Information dictionary</u>
 
 Each hook procedure receives an information dictionary as one argument.
 It currently has at least these elements:
 
-namespace : Current namespace
-caller    : Current procedure
-file      : Current file
-vars      : Dictionary where each key is a known variable in current scope
+ namespace : Current namespace
+ caller    : Current procedure
+ file      : Current file
+ vars      : Dictionary where each key is a known variable in current scope
 
-<ul>Raw Statement Hook</ul>
+<u>Raw Statement Hook</u>
 
 proc statementRaw {stmt info} { }
 
 If declared, this receives each statement unparsed.
 
-<ul>Statement Words Hook</ul>
+<u>Statement Words Hook</u>
 
 proc statementWords {words info} { }
 
@@ -74,13 +74,13 @@ in the words.
 Many checks can be done in a simple way here since you have direct access to
 the command word and the number of arguments.
 
-<ul>Raw Expression Hook</ul>
+<u>Raw Expression Hook</u>
 
 proc earlyExpr {exp info} { }
 
 If declared, this receives any expression unparsed.
 
-<ul>Late Expression Hook</ul>
+<u>Late Expression Hook</u>
 
 proc lateExpr {exp info} { }
 
@@ -89,7 +89,7 @@ command substitutions have been replaced by "${_____}". It is still
 basically the same expression and this allows a handler that
 knows fewer syntax rules.
 
-<ul>Examples</ul>
+<u>Examples</u>
 
 Here are some examples. Some are somewhat silly from a practical point
 of view but hopefully informative.

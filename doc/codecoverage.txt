@@ -1,10 +1,9 @@
-<ul>Code Coverage</ul>
+<u>Code Coverage</u>
 
 Nagelfar has support for doing simple code coverage analysis.
 
-
 Instrument each file:
-nagelfar.tcl -instrument apa.tcl
+ nagelfar.tcl -instrument apa.tcl
 
 That creates apa.tcl_i
 
@@ -30,7 +29,7 @@ Coverage data is accumulated in the log file so multiple tests can
 be run.  Make sure the log file is deleted before a rerun.
 
 Create a markup file for displaying result:
-nagelfar.tcl -markup apa.tcl
+ nagelfar.tcl -markup apa.tcl
 
 This reads coverage data from apa.tcl_log and creates apa.tcl_m. The markup
 file contains markers in blocks that were not run.
@@ -41,7 +40,7 @@ diff tool, like eskil:
 eskil -noparse apa.tcl apa.tcl_m
 
 
-<ul>Example</ul>
+<u>Example</u>
 
 Nagelfar's testsuite has code like this to automatically run the
 instrumented file:
@@ -83,7 +82,7 @@ clean:
 	@rm -f $(LOGFILES) $(IFILES) $(MFILES)
 
 
-<ul>Naming conventions</ul>
+<u>Naming conventions</u>
 
 When xxx is instrumented, result is called xxx_i.
 

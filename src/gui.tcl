@@ -951,6 +951,7 @@ proc makeDocWin {fileName} {
 
     # Set up tags
     $t tag configure ul -underline 1
+    $t tag configure u -underline 1
 
     if {![file exists $::docDir/$fileName]} {
         $t insert end "ERROR: Could not find doc file "

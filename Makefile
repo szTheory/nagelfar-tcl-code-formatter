@@ -32,7 +32,7 @@ TCLSH86  = ~/tcl/install/bin/tclsh8.6
 
 all: base
 
-base: nagelfar.tcl setup misctest db
+base: nagelfar.tcl setup misctest doc db
 
 #----------------------------------------------------------------
 # Setup symbolic links from the VFS to the real files
@@ -165,8 +165,14 @@ misctest: misctests/test.result misctests/test.html
 # Web pages
 #----------------------------------------------------------------
 
+doc: doc/doc.html
+
+doc/doc.html : doc/*.txt doc/htmlize.tcl
+	cd doc; ./htmlize.tcl
+
 web:
 	scp Nagelfar.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/index.html
+	scp doc/doc.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/doc.html
 
 #----------------------------------------------------------------
 # Generating database

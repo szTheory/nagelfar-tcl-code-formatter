@@ -54,7 +54,7 @@ editor. You can edit and save the file.
 FEEDBACK
 
 Bugs and suggestions can be added to the trackers at:
-http://nagelfar.berlios.de/
+http://nagelfar.sourceforge.net/
 
 You can also mail peter.spjuth@gmail.com
 (I also accept beer and teddybears, or just a note saying you use the

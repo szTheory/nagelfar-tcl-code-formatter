@@ -8,7 +8,7 @@ a separate file instead of your source if that is not suitable.
 A comment should start with "##nagelfar" to be recognised as special.
 The comment must be a valid Tcl list.
 
-<ul>Ignoring messages</ul>
+<u>Ignoring messages</u>
 
 ##nagelfar ignore ?string?
 ##nagelfar filter ?string?
@@ -33,7 +33,7 @@ set apa [expr 1 + 2]
 Nagelfar also recognises "# PRAGMA: nocheck", which is equivalent to
 "##nagelfar ignore", and ignores messages on the next line.
 
-<ul>Specifying variables</ul>
+<u>Specifying variables</u>
 
 ##nagelfar variable name ?type?
 
@@ -46,7 +46,7 @@ Example:
 ##nagelfar variable apaName varName
 set hejsan [set $apaName]
 
-<ul>Specifying implicit variables</ul>
+<u>Specifying implicit variables</u>
 
 ##nagelfar implictvarcmd pattern var ?var ...?
 
@@ -61,7 +61,7 @@ Example:
 dict with fileStat {}
 dostuffwith $name $size $value
 
-<ul>Syntax database</ul>
+<u>Syntax database</u>
 
 ##nagelfar syntax cmd tokens
 ##nagelfar subcmd cmd subcmds
@@ -91,7 +91,7 @@ Copy syntax from command
 For more examples, use the database browser to see how the comments
 would look like for the commands known in the database.
 
-<ul>Package handling</ul>
+<u>Package handling</u>
 
 To mark a package as known, use the following. Any subsequent
 package require for this package will assume it is already there.
