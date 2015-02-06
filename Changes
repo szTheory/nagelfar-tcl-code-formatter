@@ -1,3 +1,5 @@
+Version 1.2.1
+
 2015-02-06
  Fixed detection of missing $ with an array.
  
