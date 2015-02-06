@@ -1,6 +1,6 @@
 # Automatically generated syntax database.
 
-lappend ::dbInfo {Tcl 8.6.1 unix, Tk 8.6.1 x11}
+lappend ::dbInfo {Tcl 8.6.3 unix, Tk 8.6.3 x11}
 set ::dbTclVersion 8.6
 set ::knownGlobals {argc argv argv0 auto_index auto_path env errorCode errorInfo tcl_interactive tcl_library tcl_nonwordchars tcl_patchLevel tcl_pkgPath tcl_platform tcl_rcFileName tcl_version tcl_wordchars tk_library tk_patchLevel tk_strictMotif tk_version}
 set ::knownCommands {
@@ -386,6 +386,7 @@ tcl::prefix::all
 tcl::prefix::longest
 tcl::prefix::match
 tcl::string::bytelength
+tcl::string::cat
 tcl::string::compare
 tcl::string::equal
 tcl::string::first
@@ -410,6 +411,7 @@ tcl::string::wordstart
 tcl::tm::path
 tcl::unsupported::assemble
 tcl::unsupported::disassemble
+tcl::unsupported::getbytecode
 tcl::unsupported::inject
 tcl::unsupported::representation
 tclListValidFlags
@@ -1390,7 +1392,7 @@ set ::subCmd(option) {add clear get readfile}
 set ::subCmd(package) {forget ifneeded names prefer present provide require unknown vcompare versions vsatisfies}
 set ::subCmd(selection) {clear get handle own}
 set ::subCmd(self) {call caller class filter method namespace next object target}
-set ::subCmd(string) {bytelength compare equal first index is last length map match range repeat replace reverse tolower totitle toupper trim trimleft trimright wordend wordstart}
+set ::subCmd(string) {bytelength cat compare equal first index is last length map match range repeat replace reverse tolower totitle toupper trim trimleft trimright wordend wordstart}
 set {::subCmd(string is)} {alnum alpha ascii boolean control digit double entier false graph integer list lower print punct space true upper wideinteger wordchar xdigit}
 set ::subCmd(tcl::prefix) {all longest match}
 set ::subCmd(tk) {appname busy caret fontchooser inactive scaling useinputmethods windowingsystem}

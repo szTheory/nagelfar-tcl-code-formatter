@@ -788,6 +788,10 @@ proc buildDb {ch} {
             set option(chan\ puts) [list -nonewline]
         }            
     }
+    # Send cannot return info in some versions
+    if {![info exists option(send)]} {
+        set option(send) "-- -async -displayof"
+    }
 
     # The default for options is not to take a value unless 'p' is
     # used in the syntax definition.
