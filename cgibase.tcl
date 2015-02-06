@@ -1,10 +1,12 @@
 #!/bin/env tclsh
 
+# map specail chars for HTML
 proc m {str} {
     set map {< &lt; > &gt; & &amp;}
     return [string map $map $str]
 }
 
+# Start of output
 proc cgiInit {} {
     puts "Content-type: text/html"
     puts ""
@@ -14,11 +16,13 @@ proc cgiInit {} {
     puts "</head>"
     puts "<body>"
 }
+# End of output
 proc cgiEnd {} {
     puts "</body>"
     puts "</html>"
 }
 
+# Helper to get debug info in output
 proc cgiDebug {} {
     puts "<h2>Debug info</h2>"
     puts "Detected Tcl version [info patchlevel]<p>"
@@ -36,6 +40,7 @@ proc cgiDebug {} {
     puts "</li></ul>"
 }
 
+# Decode the POST query string
 proc cgiDecode {str} {
     # rewrite "+" back to space
     # protect \ from quoting another '\'
@@ -51,6 +56,7 @@ proc cgiDecode {str} {
     return [subst -novar -nocommand $str]
 }
 
+# Generate a table combining source and messages
 proc cgiResultTable {lines result} {
     puts "<h2>Experimental Result Table</h2>"
     puts {<table cellpadding="2" cellspacing="0" border="1">}
@@ -65,7 +71,9 @@ proc cgiResultTable {lines result} {
     set n 1
     foreach line $lines {
         set line [Text2Html $line]
-        if {[regexp {^([^#]*)(#.*)$} $line -> pre post]} {
+        if {[regexp {^\s*#} $line]} {
+            set line "<span style=\"color: #b22222\">$line</span>"
+        } elseif {[regexp {^([^#]*)(;\#.*)$} $line -> pre post]} {
             set line "$pre<span style=\"color: #b22222\">$post</span>"
         }
         puts [format "<span style=\"color: #808080\">%3d</span>  %s" $n $line]
@@ -93,6 +101,7 @@ proc cgiResultTable {lines result} {
     puts "</table>"
 }
 
+# Main CGI function, this is called from the end of the script.
 proc cgiMain {} {
     cgiInit
 
@@ -147,6 +156,7 @@ set ::CgiDb {
     # Include syntaxdb here
 }
 
+# Prepare to run nagelfar embedded
 set ::Nagelfar(embedded) 1
 set _nagelfar_test 1
 set gurka 1
