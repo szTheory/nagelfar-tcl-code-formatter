@@ -209,6 +209,7 @@ proc flushMsg {} {
             }
         }
     }
+    initMsg
 }
 
 # Report any unbalanced braces in comments that have been noticed
@@ -331,7 +332,7 @@ proc checkComment {str index knownVarsName} {
             }
             variable {
                 set type [join $rest]
-                markVariable $first 1 "" 1 $index unknown knownVars type
+                markVariable $first 1 "" 1n $index unknown knownVars type
             }
             alias {
                 set ::knownAliases($first) $rest
@@ -873,6 +874,8 @@ proc parseVar {str len index iName knownVarsName} {
     if {$var == ""} {
         return ""
     }
+
+    # MIFFO: variable read plugin
 
     if {[string match ::* $var]} {
 	# Skip qualified names until we handle namespace better. FIXA
@@ -1655,6 +1658,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 }
 		while {$i < $ei} {
 		    if {$tok eq "v"} {
+                        # MIFFO: variable read plugin
 			# Check the variable
                         if {[string match ::* [lindex $argv $i]]} {
                             # Skip qualified names until we handle
@@ -1685,6 +1689,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                             }
                         }
 		    } else {
+                        # MIFFO: variable plugin ?????
 			markVariable [lindex $argv $i] \
                                 [lindex $wordstatus $i] [lindex $wordtype $i] 0 \
                                 [lindex $indices $i] $isArray knownVars ""
@@ -1749,6 +1754,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 # Central function to handle known variable names.
 # If check is 2, check if it is known, return 1 if unknown
 # If check is 1, mark the variable as known and set
+# If check is 1n, mark the variable as known and set, but do not trigger plugin
 # If check is 0, mark the variable as known
 proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
     upvar $knownVarsName knownVars
@@ -1756,6 +1762,14 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
         upvar $typeName type
     } else {
         set type ""
+    }
+    if {$check eq "1n"} {
+        set check 1
+    } elseif {$check == 1} {
+        # Allow a plugin to have a look at the variable written
+        if {$::Nagelfar(pluginVarWrite)} {
+            pluginHandleVarWrite var knownVars $index
+        }
     }
 
     set varBase $var
@@ -2225,6 +2239,7 @@ proc parseStatement {statement index knownVarsName} {
 	    # number of arguments.
 	    if {$argc == 1} {
                 # Check the variable
+                # MIFFO: variable read plugin
                 if {[string match ::* [lindex $argv 0]]} {
                     # Skip qualified names until we handle
                     # namespace better. FIXA
@@ -3284,7 +3299,7 @@ proc addImplicitVariablesNs {cmd index knownVarsName} {
     foreach var $impVar {
         set varName [lindex $var 0]
         set type    [lindex $var 1]
-        markVariable $varName 1 "" 1 \
+        markVariable $varName 1 "" 1n \
                 $index unknown knownVars type
     }
 }
@@ -3301,7 +3316,7 @@ proc addImplicitVariablesCmd {cmd index knownVarsName} {
         foreach var $impVar {
             set varName [lindex $var 0]
             set type    [lindex $var 1]
-            markVariable $varName 1 "" 1 \
+            markVariable $varName 1 "" 1n \
                     $index unknown knownVars type
         }
     }
@@ -4336,6 +4351,8 @@ proc doCheck {} {
             close $ch
         }
     }
+    finalizePlugin
+    flushMsg
     if {$::Nagelfar(gui)} {
         if {[info exists ::Nagelfar(resultWin)]} {
             set result [$::Nagelfar(resultWin) get 1.0 end-1c]
@@ -4354,5 +4371,4 @@ proc doCheck {} {
         normalCursor
         progressUpdate -1
     }
-    finalizePlugin
 }

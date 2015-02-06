@@ -492,7 +492,7 @@ test plugin-6.1 {
             foreach item [lsort -dictionary [array names ::callGraph]] {
                 puts "Call: $item"
             }
-            return
+            return [list note "Call graph generated"]
         }
     } 2
     createTestFile {
@@ -508,7 +508,8 @@ test plugin-6.1 {
     execTestFile -plugin _testfile_.plugin.tcl
 } -result {%%Call: hugg -> lindex
 Call: hugg -> mugg
-Call: mugg -> hugg}
+Call: mugg -> hugg
+Line   1: N Call graph generated}
 
 test plugin-7.1 {
     Info dict, vars
@@ -531,3 +532,31 @@ test plugin-7.1 {
 
     execTestFile -plugin _testfile_.plugin.tcl
 } -result {%%Line   4: E apa variable forbidden}
+
+test plugin-8.1 {
+    Plugin for variable write
+} -body {
+    createTestFile {##Nagelfar Plugin : Some info
+        proc varWrite {var info} {
+            lappend ::allVars $var
+            return [list note "Saw write '$var'"]
+        }
+    } 2
+    createTestFile {
+        set apa 1
+        set bepa [expr {1 + $apa}]
+        foreach {a b c d} $apa break
+        lappend x $b
+        array names apa
+        array set gurka {}
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   2: N Saw write 'apa'
+Line   3: N Saw write 'bepa'
+Line   4: N Saw write 'a'
+Line   4: N Saw write 'b'
+Line   4: N Saw write 'c'
+Line   4: N Saw write 'd'
+Line   5: N Saw write 'x'
+Line   7: N Saw write 'gurka'}

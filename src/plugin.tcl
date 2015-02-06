@@ -80,6 +80,7 @@ proc createPluginInterp {plugin} {
     set ::Nagelfar(pluginStatementWords) [expr {[$pi eval info proc statementWords] ne ""}]
     set ::Nagelfar(pluginEarlyExpr) [expr {[$pi eval info proc earlyExpr] ne ""}]
     set ::Nagelfar(pluginLateExpr) [expr {[$pi eval info proc lateExpr] ne ""}]
+    set ::Nagelfar(pluginVarWrite) [expr {[$pi eval info proc varWrite] ne ""}]
 
     return $pi
 }
@@ -89,6 +90,7 @@ proc initPlugin {} {
     set ::Nagelfar(pluginStatementWords) 0
     set ::Nagelfar(pluginEarlyExpr) 0
     set ::Nagelfar(pluginLateExpr) 0
+    set ::Nagelfar(pluginVarWrite) 0
     set ::Nagelfar(pluginInterp) ""
 
     if {$::Nagelfar(plugin) ne ""} {
@@ -130,6 +132,7 @@ proc finalizePlugin {} {
     set ::Nagelfar(pluginStatementWords) 0
     set ::Nagelfar(pluginEarlyExpr) 0
     set ::Nagelfar(pluginLateExpr) 0
+    set ::Nagelfar(pluginVarWrite) 0
     set ::Nagelfar(pluginInterp) ""
 }
 
@@ -267,4 +270,13 @@ proc pluginHandleLateExpr {expName knownVarsName index} {
     } else {
         errorMsg E "Plugin $::Nagelfar(plugin) returned malformed replacement from lateExpr" $index
     }
+}
+
+# This is called to let a plugin react to a variable write
+proc pluginHandleVarWrite {varName knownVarsName index} {
+    upvar 1 $varName var $knownVarsName knownVars
+    if {!$::Nagelfar(pluginVarWrite)} return
+
+    PluginHandle varWrite $var outdata knownVars $index
+    set var $outdata
 }

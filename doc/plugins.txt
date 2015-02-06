@@ -89,6 +89,12 @@ command substitutions have been replaced by "${_____}". It is still
 basically the same expression and this allows a handler that
 knows fewer syntax rules.
 
+<u>Variable Write Hook</u>
+
+proc varWrite {var info} { }
+
+If declared, this receives any variable written to.
+
 <u>Examples</u>
 
 Here are some examples. Some are somewhat silly from a practical point
