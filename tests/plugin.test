@@ -477,7 +477,7 @@ test plugin-5.3 {
 } -result {%%}
 
 test plugin-6.1 {
-    Plugin finalize
+    Plugin finalize, used for a call graph
 } -body {
     createTestFile {##Nagelfar Plugin : Create a call graph
         proc statementWords {words info} {
@@ -510,6 +510,59 @@ test plugin-6.1 {
 Call: hugg -> mugg
 Call: mugg -> hugg
 Line   1: N Call graph generated}
+
+test plugin-6.2 {
+    Plugin finalize, multi-plugin for global check
+} -body {
+    createTestFile {##Nagelfar Plugin : Check globals
+        set ::data {}
+        proc statementWords {words info} {
+            if {[lindex $words 0] ne "global"} return
+            set caller [dict get $info caller]
+            foreach var [lrange $words 1 end] {
+                dict set ::data $caller $var 1
+            }
+            return
+        }
+        proc varWrite {var info} {
+            set caller [dict get $info caller]
+            dict unset ::data $caller $var
+            return
+        }
+        proc varRead {var info} {
+            set caller [dict get $info caller]
+            dict unset ::data $caller $var
+            return
+        }
+        proc finalizePlugin {} {
+            set res {}
+            foreach caller [dict keys $::data] {
+                foreach var [dict keys [dict get $::data $caller]] {
+                    lappend res warning "Unused global '$var' in proc '$caller'"
+                }
+            }
+            lappend res note "Globals checked by plugin"
+            return $res
+        }
+    } 2
+    createTestFile {
+        proc mugg {x} {
+            global apa bepa cepa
+            set apa 1
+            list $cepa
+            set cepa 1
+        }
+        proc hugg {x} {
+            global x y z
+            mugg $x
+            set z $z
+        }
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   1: W Unused global 'bepa' in proc 'mugg'
+Line   1: W Unused global 'y' in proc 'hugg'
+Line   1: N Globals checked by plugin}
 
 test plugin-7.1 {
     Info dict, vars

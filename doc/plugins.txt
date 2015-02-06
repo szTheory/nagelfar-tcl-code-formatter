@@ -176,3 +176,34 @@ proc statementWords {words info} {
     }
     return $res
 }
+
+##Nagelfar Plugin : Check for unused globals
+set ::data {}
+proc statementWords {words info} {
+    if {[lindex $words 0] ne "global"} return
+    set caller [dict get $info caller]
+    foreach var [lrange $words 1 end] {
+        dict set ::data $caller $var 1
+    }
+    return
+}
+proc varWrite {var info} {
+    set caller [dict get $info caller]
+    dict unset ::data $caller $var
+    return
+}
+proc varRead {var info} {
+    set caller [dict get $info caller]
+    dict unset ::data $caller $var
+    return
+}
+proc finalizePlugin {} {
+    set res {}
+    foreach caller [dict keys $::data] {
+        foreach var [dict keys [dict get $::data $caller]] {
+            lappend res warning "Unused global '$var' in proc '$caller'"
+        }
+    }
+    lappend res note "Globals checked by plugin"
+    return $res
+}
