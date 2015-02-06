@@ -123,3 +123,19 @@ test packages-4.1 {
     }
     execTestFile -flags -pkgpicky
 } -result {%%Line   4: E Wrong number of arguments (1) to "vfs::mk4::Mount"}
+
+test packages-5.1 {
+    Test with included sqlite3 package definition, through autodetect
+} -body {
+    createTestFile {
+        package require sqlite3
+        sqlite3 db apa.db
+        db eval {SQLY STUFF}
+        db onecolumn {SQLY STUFF} c
+        db eval {SQLY STUFF} v {
+            set apa v
+        }
+    }
+    execTestFile -flags -pkgpicky
+} -result {%%Line   5: E Wrong number of arguments (3) to "db onecolumn"
+Line   7: W Found constant "v" which is also a variable.}

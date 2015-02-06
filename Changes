@@ -1,4 +1,7 @@
 2015-02-06
+ Added definition file for package "sqlite3"
+
+2015-02-06
  Added plugin hook for variable write.
  Added plugin hook for variable read.
 
