@@ -1,5 +1,6 @@
 2015-02-06
  Added plugin hook for variable write.
+ Added plugin hook for variable read.
 
 2015-02-06
  Allow passing script and db as data to an embedded Nagelfar.

@@ -95,6 +95,12 @@ proc varWrite {var info} { }
 
 If declared, this receives any variable written to.
 
+<u>Variable Read Hook</u>
+
+proc varRead {var info} { }
+
+If declared, this receives any variable read from.
+
 <u>Examples</u>
 
 Here are some examples. Some are somewhat silly from a practical point

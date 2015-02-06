@@ -875,7 +875,10 @@ proc parseVar {str len index iName knownVarsName} {
         return ""
     }
 
-    # MIFFO: variable read plugin
+    # Allow a plugin to have a look at the variable read
+    if {$::Nagelfar(pluginVarRead)} {
+        pluginHandleVarRead var knownVars $index
+    }
 
     if {[string match ::* $var]} {
 	# Skip qualified names until we handle namespace better. FIXA
@@ -1658,17 +1661,21 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 }
 		while {$i < $ei} {
 		    if {$tok eq "v"} {
-                        # MIFFO: variable read plugin
 			# Check the variable
-                        if {[string match ::* [lindex $argv $i]]} {
+                        set var [lindex $argv $i]
+                        # Allow a plugin to have a look at the variable read
+                        if {$::Nagelfar(pluginVarRead)} {
+                            pluginHandleVarRead var knownVars $index
+                        }
+                        if {[string match ::* $var]} {
                             # Skip qualified names until we handle
                             # namespace better. FIXA
-                        } elseif {[markVariable [lindex $argv $i] \
+                        } elseif {[markVariable $var \
                                 [lindex $wordstatus $i] [lindex $wordtype $i] \
                                 2 [lindex $indices $i] $isArray \
                                 knownVars vtype]} {
                             if {!$::Prefs(noVar)} {
-                                errorMsg E "Unknown variable \"[lindex $argv $i]\""\
+                                errorMsg E "Unknown variable \"$var\""\
                                         [lindex $indices $i]
                             }
 			}
@@ -1689,7 +1696,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                             }
                         }
 		    } else {
-                        # MIFFO: variable plugin ?????
+                        # Mark it as just known. This does not trigger plugin
 			markVariable [lindex $argv $i] \
                                 [lindex $wordstatus $i] [lindex $wordtype $i] 0 \
                                 [lindex $indices $i] $isArray knownVars ""
@@ -2239,15 +2246,19 @@ proc parseStatement {statement index knownVarsName} {
 	    # number of arguments.
 	    if {$argc == 1} {
                 # Check the variable
-                # MIFFO: variable read plugin
-                if {[string match ::* [lindex $argv 0]]} {
+                set var [lindex $argv 0]
+                # Allow a plugin to have a look at the variable read
+                if {$::Nagelfar(pluginVarRead)} {
+                    pluginHandleVarRead var knownVars $index
+                }
+                if {[string match ::* $var]} {
                     # Skip qualified names until we handle
                     # namespace better. FIXA
-                } elseif {[markVariable [lindex $argv 0] \
+                } elseif {[markVariable $var \
                         [lindex $wordstatus 0] [lindex $wordtype 0] \
                         2 [lindex $indices 0] known knownVars wtype]} {
                     if {!$::Prefs(noVar)} {
-                        errorMsg E "Unknown variable \"[lindex $argv 0]\""\
+                        errorMsg E "Unknown variable \"$var\""\
                                 [lindex $indices 0]
                     }
                 }
@@ -4351,6 +4362,7 @@ proc doCheck {} {
             close $ch
         }
     }
+    initMsg
     finalizePlugin
     flushMsg
     if {$::Nagelfar(gui)} {

@@ -538,7 +538,6 @@ test plugin-8.1 {
 } -body {
     createTestFile {##Nagelfar Plugin : Some info
         proc varWrite {var info} {
-            lappend ::allVars $var
             return [list note "Saw write '$var'"]
         }
     } 2
@@ -547,8 +546,8 @@ test plugin-8.1 {
         set bepa [expr {1 + $apa}]
         foreach {a b c d} $apa break
         lappend x $b
-        array names apa
         array set gurka {}
+        array names gurka
     }
 
     execTestFile -plugin _testfile_.plugin.tcl
@@ -559,4 +558,29 @@ Line   4: N Saw write 'b'
 Line   4: N Saw write 'c'
 Line   4: N Saw write 'd'
 Line   5: N Saw write 'x'
-Line   7: N Saw write 'gurka'}
+Line   6: N Saw write 'gurka'}
+
+test plugin-9.1 {
+    Plugin for variable read
+} -body {
+    createTestFile {##Nagelfar Plugin : Some info
+        proc varRead {var info} {
+            return [list note "Saw read '$var'"]
+        }
+    } 2
+    createTestFile {
+        set apa 1
+        set bepa [expr {1 + $apa}]
+        foreach {a b c d} $bepa break
+        set a
+        lappend x $b
+        array set gurka {}
+        array names gurka
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   3: N Saw read 'apa'
+Line   4: N Saw read 'bepa'
+Line   5: N Saw read 'a'
+Line   6: N Saw read 'b'
+Line   8: N Saw read 'gurka'}

@@ -81,6 +81,7 @@ proc createPluginInterp {plugin} {
     set ::Nagelfar(pluginEarlyExpr) [expr {[$pi eval info proc earlyExpr] ne ""}]
     set ::Nagelfar(pluginLateExpr) [expr {[$pi eval info proc lateExpr] ne ""}]
     set ::Nagelfar(pluginVarWrite) [expr {[$pi eval info proc varWrite] ne ""}]
+    set ::Nagelfar(pluginVarRead) [expr {[$pi eval info proc varRead] ne ""}]
 
     return $pi
 }
@@ -91,6 +92,7 @@ proc initPlugin {} {
     set ::Nagelfar(pluginEarlyExpr) 0
     set ::Nagelfar(pluginLateExpr) 0
     set ::Nagelfar(pluginVarWrite) 0
+    set ::Nagelfar(pluginVarRead) 0
     set ::Nagelfar(pluginInterp) ""
 
     if {$::Nagelfar(plugin) ne ""} {
@@ -133,6 +135,7 @@ proc finalizePlugin {} {
     set ::Nagelfar(pluginEarlyExpr) 0
     set ::Nagelfar(pluginLateExpr) 0
     set ::Nagelfar(pluginVarWrite) 0
+    set ::Nagelfar(pluginVarRead) 0
     set ::Nagelfar(pluginInterp) ""
 }
 
@@ -278,5 +281,14 @@ proc pluginHandleVarWrite {varName knownVarsName index} {
     if {!$::Nagelfar(pluginVarWrite)} return
 
     PluginHandle varWrite $var outdata knownVars $index
+    set var $outdata
+}
+
+# This is called to let a plugin react to a variable read
+proc pluginHandleVarRead {varName knownVarsName index} {
+    upvar 1 $varName var $knownVarsName knownVars
+    if {!$::Nagelfar(pluginVarRead)} return
+
+    PluginHandle varRead $var outdata knownVars $index
     set var $outdata
 }
