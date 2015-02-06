@@ -1,0 +1,11 @@
+Files in 1.2.1 release:
+
+nagelfar121.tar.gz is the complete distribution.
+
+nagelfar121.kit is a platform independent starkit, executable
+by tclkit or by tclsh in many Tcl installations.
+
+Standalone executables for a few platforms are available
+consisting of starpacks (tclkit+starkit wrapped in one).
+
+Any of the files can be unwrapped by sdx to get the source.

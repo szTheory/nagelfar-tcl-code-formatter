@@ -248,3 +248,6 @@ release: force distrib wrap wrapexe
 	@mv nagelfar.solaris.gz nagelfar$(VERSION).solaris.gz
 	@cp nagelfar.kit nagelfar`date +%Y%m%d`.kit
 	@cp nagelfar.kit nagelfar$(VERSION).kit
+
+upload:
+	rsync -e ssh README nagelfar$(VERSION).tar.gz nagelfar$(VERSION).kit nagelfar$(VERSION).linux.gz nagelfar$(VERSION).win.zip nagelfar_sh$(VERSION).win.zip nagelfar$(VERSION).solaris.gz pspjuth@frs.sourceforge.net:/home/frs/project/nagelfar/Rel_$(VERSION)/
