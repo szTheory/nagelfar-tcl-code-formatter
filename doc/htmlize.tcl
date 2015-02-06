@@ -27,32 +27,32 @@ foreach label $labels file $files {
     set lastbreak 0
     set pre 0
     while {[gets $ch line] != -1} {
-	set thisbreak 0
-	set line [string trimright $line]
-	if {$line eq ""} {
-	    set line "<p>"
-	    set thisbreak 1
-	    if {$pre} {
-		set line "</pre>"
-	    }
-	    set pre 0
-	}
-	# Handle some known markup
-	set map { \\u003c &lt; \\u003e &gt; }
-	set line [string map $map $line]
-	# Handle embedded backslash-subst
-	#set line [subst -nocommand -novar $line]
-	# 
-	if {[string index $line 0] eq " " && !$lastbreak && !$pre} {
-	    set line "<br>$line"
-	}
-	if {[string index $line 0] in {\# % $ *} || $pre} {
-	    if {!$pre} {
-		set line "<pre>$line"
-	    }
-	    set pre 1
-	}
-	
+        set thisbreak 0
+        set line [string trimright $line]
+        if {$line eq ""} {
+            set line "<p>"
+            set thisbreak 1
+            if {$pre} {
+                set line "</pre>"
+            }
+            set pre 0
+        }
+        # Handle some known markup
+        set map { \\u003c &lt; \\u003e &gt; }
+        set line [string map $map $line]
+        # Handle embedded backslash-subst
+        #set line [subst -nocommand -novar $line]
+        # 
+        if {[string index $line 0] eq " " && !$lastbreak && !$pre} {
+            set line "<br>$line"
+        }
+        if {[string index $line 0] in {\# % $ *} || $pre} {
+            if {!$pre} {
+                set line "<pre>$line"
+            }
+            set pre 1
+        }
+        
 	puts $cho $line
 	set lastbreak $thisbreak
     }
