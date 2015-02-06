@@ -1,4 +1,7 @@
 2015-02-06
+ Fixed detection of missing $ with an array.
+ 
+2015-02-06
  Added definition file for package "sqlite3"
 
 2015-02-06

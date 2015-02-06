@@ -314,7 +314,7 @@ proc checkComment {str index knownVarsName} {
                 set ::subCmd($first) $rest
             }
             subcmd+ {
-                eval [list lappend ::subCmd($first)] $rest
+                eval [list lappend "::subCmd($first)"] $rest
             }
             package {
                 if {$first eq "known"} {
@@ -1824,7 +1824,7 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
     }
 
     # Check for scalar/array mismatch
-    if {[dict exists $knownVars $varBase] &&
+    if {$check != 2 && [dict exists $knownVars $varBase] &&
 	[dict get $knownVars $varBase array] ne ""} {
         set varReallyArray [expr {$varArray || $isArray eq "yes"}]
         if {$varReallyArray != [dict get $knownVars $varBase array]} {
@@ -1843,13 +1843,15 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
 	if {![dict exists $knownVars $varBase]} {
 	    return 1
 	}
+        # A local array with a constant index?
 	if {$varArray && ($varIndexWs & 1) && \
                 [dict get $knownVars $varBase local]} {
 	    if {![dict exists $knownVars $var]} {
 		return 1
 	    }
 	}
-	if {[dict get $knownVars $var "type"] ne ""} {
+	if {[dict exists $knownVars $var] &&
+            [dict get $knownVars $var "type"] ne ""} {
             set type [dict get $knownVars $var "type"]
         } else {
             set type [dict get $knownVars $varBase "type"]
@@ -2808,9 +2810,20 @@ proc parseStatement {statement index knownVarsName} {
         # The constant is considered ok if within quotes.
         set i 0
         foreach ws $wordstatus var $argv {
-            if {[dict exists $knownVars $var]} {
+            # is it an array?
+            set varBase $var
+            set ix [string first "(" $var]
+            if {$ix != -1} {
+                incr ix -1
+                set varBase [string range $var 0 $ix]
+                # Check if the base is free from substitutions
+                if {($ws & 1) == 0 && [regexp {^(::)?(\w+(::)?)+$} $varBase]} {
+                    set ws [expr {$ws | 1}]
+                }
+            }
+            if {[dict exists $knownVars $varBase]} {
                 if {($ws & 7) == 1 && [lsearch $constantsDontCheck $i] == -1} {
-                    errorMsg W "Found constant \"$var\" which is also a\
+                    errorMsg W "Found constant \"$varBase\" which is also a\
                             variable." [lindex $indices $i]
                 }
             }
@@ -4063,7 +4076,7 @@ proc loadDatabases {{addDb {}}} {
                     _ipset ::subCmd($first) $rest
                 }
                 subcmd+ {
-                    eval [list _iplappend ::subCmd($first)] $rest
+                    eval [list _iplappend "::subCmd($first)"] $rest
                 }
                 package {
                     if {$first eq "known"} {

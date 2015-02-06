@@ -310,6 +310,9 @@ proc updateDbSelection {{fromVar -fromgui}} {
 
 # A little helper to make a scrolled window
 # It returns the name of the scrolled window
+##nagelfar syntax Scroll x x x p*
+##nagelfar option Scroll -listvariable -height -width -selectmode -wrap -font -linemap
+##nagelfar option Scroll\ -listvariable v
 proc Scroll {dir class w args} {
     switch -- $dir {
         both {

@@ -31,4 +31,6 @@
 
 ##nagelfar syntax ctext::setHighlightTcl x
 ##nagelfar syntax textSearch::enableSearch x p*
+##nagelfar option textSearch::enableSearch -label
+##nagelfar option textSearch::enableSearch\ -label v
 ##nagelfar syntax textSearch::searchMenu x

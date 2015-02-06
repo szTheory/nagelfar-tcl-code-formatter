@@ -541,7 +541,7 @@ test nagelfar-7.5 {
 
 test nagelfar-8.1 {
     Variable handling
-} -constraints knownbug -body {
+} -body {
     createTestFile {
         proc hej {x y} {
             global item
@@ -549,7 +549,7 @@ test nagelfar-8.1 {
         }
     }
     execTestFile
-} -result {should detect missing dollar}
+} -result {%%Line   4: W Found constant "item" which is also a variable.}
 
 test nagelfar-8.2 {
     Variable handling, -novar flag
