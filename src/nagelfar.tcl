@@ -3969,6 +3969,7 @@ proc loadDatabases {{addDb {}}} {
     interp alias {} _ipsource loadinterp source
     interp alias {} _ipexists loadinterp info exists
     interp alias {} _ipset    loadinterp set
+    interp alias {} _ipeval   loadinterp eval
     interp alias {} _iplappend loadinterp lappend
     interp alias {} _iparray  loadinterp array
     if {$addDb ne ""} {
@@ -3977,14 +3978,28 @@ proc loadDatabases {{addDb {}}} {
         set dbs $::Nagelfar(db)
     }
 
+    set intDb [info exists ::Nagelfar(dbContents)]
+    if {$intDb} {
+        set dbs [list $::Nagelfar(dbContents)]
+    }
+
     foreach f $dbs {
         # FIXA: catch?
-        _ipsource $f
+        if {$intDb} {
+            _ipeval $f
+        } else {
+            _ipsource $f
+        }
 
         # Support inline comments in db file
-        set ch [open $f r]
-        set data [read $ch]
-        close $ch
+        if {$intDb} {
+            set data $f
+            set f "_internal_"
+        } else {
+            set ch [open $f r]
+            set data [read $ch]
+            close $ch
+        }
         if {[string first "##nagelfar" $data] < 0} continue
         set lines [split $data \n]
         set commentlines [lsearch -all $lines "*##nagelfar*"]
@@ -4161,7 +4176,8 @@ proc lookForPackageDb {pName i} {
 
 # Execute the checks
 proc doCheck {} {
-    if {[llength $::Nagelfar(db)] == 0} {
+    set intDb [info exists ::Nagelfar(dbContents)]
+    if {!$intDb && [llength $::Nagelfar(db)] == 0} {
         if {$::Nagelfar(gui)} {
             tk_messageBox -title "Nagelfar Error" -type ok -icon error \
                     -message "No syntax database file selected"
@@ -4172,7 +4188,7 @@ proc doCheck {} {
         }
     }
 
-    set int [info exists ::Nagelfar(checkEdit)]
+    set int [info exists ::Nagelfar(scriptContents)]
 
     if {!$int && [llength $::Nagelfar(files)] == 0} {
         errEcho "No files to check"
@@ -4219,7 +4235,7 @@ proc doCheck {} {
     set ::Nagelfar(exitstatus) 0
     if {$int} {
         initMsg
-        parseScript $::Nagelfar(checkEdit)
+        parseScript $::Nagelfar(scriptContents)
         flushMsg
     } else {
         foreach f $::Nagelfar(files) {

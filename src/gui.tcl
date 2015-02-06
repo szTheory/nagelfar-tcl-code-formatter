@@ -855,9 +855,9 @@ proc checkEditWin {} {
     set w $::Nagelfar(editWin)
 
     set script [$w get 1.0 end]
-    set ::Nagelfar(checkEdit) $script
+    set ::Nagelfar(scriptContents) $script
     doCheck
-    unset ::Nagelfar(checkEdit)
+    unset ::Nagelfar(scriptsContents)
 }
 
 ######

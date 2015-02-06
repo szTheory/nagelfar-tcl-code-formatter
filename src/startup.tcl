@@ -83,19 +83,34 @@ proc StartUp {} {
 }
 
 # Procedure to perform a check when embedded.
-proc synCheck {fpath dbPath} {
-    set ::Nagelfar(files) [list $fpath]
+# If iscontents is set fpath and dbPath contains the file contents, not names
+proc synCheck {fpath dbPath {iscontents 0}} {
+    if {$iscontents} {
+        set ::Nagelfar(scriptContents) $fpath
+        set ::Nagelfar(files) {}
+    } else {
+        set ::Nagelfar(files) [list $fpath]
+    }
     set ::Nagelfar(allDb) {}
     set ::Nagelfar(allDbView) {}
     set ::Nagelfar(allDb) [list $dbPath]
     set ::Nagelfar(allDbView) [list [file tail $dbPath] "(app)"]
-    set ::Nagelfar(db) [list $dbPath]
+    if {$iscontents} {
+        set ::Nagelfar(dbContents) $dbPath
+        set ::Nagelfar(db) {}
+    } else {
+        set ::Nagelfar(db) [list $dbPath]
+    }
     set ::Nagelfar(embedded) 1
     set ::Nagelfar(chkResult) ""
     # FIXA: Allow control of plugin when embedded?
     set ::Nagelfar(plugin) ""
     initPlugin
     doCheck
+    if {$iscontents} {
+        unset ::Nagelfar(scriptContents)
+        unset ::Nagelfar(dbContents)
+    }
     return $::Nagelfar(chkResult)
 }
 

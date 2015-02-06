@@ -1,3 +1,6 @@
+2015-02-06
+ Allow passing script and db as data to an embedded Nagelfar.
+
 2015-02-04
  Provide variable information to plugins.
 
