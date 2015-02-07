@@ -15,7 +15,11 @@ puts $cho "  <meta http-equiv=\"content-type\""
 puts $cho " content=\"text/html; charset=ISO-8859-1\">"
 puts $cho "</head>"
 puts $cho "<body>"
-puts $cho "<h1><a href=\"index.html\">Nagelfar</a> - Documentation</h1>"
+puts $cho {<a href="http://sourceforge.net">}
+puts $cho {<img style="float:right; padding-right:10px;padding-top:2px;"}
+puts $cho {     src="http://sourceforge.net/sflogo.php?group_id=695858&type=13"}
+puts $cho {     alt="SourceForge.net" /></a>}
+puts $cho {<h1><a href="index.html">Nagelfar</a> - Documentation</h1>}
 foreach label $labels {
     puts $cho "<a href=\"#Nagelfar$label\">$label</a><br>"
 }

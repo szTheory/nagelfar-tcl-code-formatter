@@ -168,7 +168,7 @@ misctest: misctests/test.result misctests/test.html
 web/htdocs/index.html : Nagelfar.html
 	cp Nagelfar.html web/htdocs/index.html
 
-web/htdocs/doc.html : doc/*.txt doc/htmlize.tcl
+web/htdocs/doc.html : doc/*.txt doc/doc.html doc/htmlize.tcl
 	cd doc; ./htmlize.tcl
 	cp doc/doc.html web/htdocs/
 
