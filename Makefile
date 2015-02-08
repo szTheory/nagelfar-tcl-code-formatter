@@ -32,7 +32,7 @@ TCLSH86  = ~/tcl/install/bin/tclsh8.6
 
 all: base
 
-base: nagelfar.tcl setup misctest doc web db
+base: nagelfar.tcl setup misctest web db
 
 #----------------------------------------------------------------
 # Setup symbolic links from the VFS to the real files
@@ -165,25 +165,19 @@ misctest: misctests/test.result misctests/test.html
 # Web pages
 #----------------------------------------------------------------
 
-web/htdocs/index.html : Nagelfar.html
-	cp Nagelfar.html web/htdocs/index.html
-
-web/htdocs/doc.html : doc/*.txt doc/doc.html doc/htmlize.tcl
-	cd doc; ./htmlize.tcl
-	cp doc/doc.html web/htdocs/
+web/htdocs/index.html : websrc/index.rst
+	make -C websrc html
+	@mkdir -p web/htdocs
+	cp -r $(wildcard websrc/_build/html/*) web/htdocs
 
 web/cgi-bin/cginf.tcl: nagelfar.tcl syntaxdb.tcl cgibase.tcl cgibuild.tcl
 	@mkdir -p web/cgi-bin
 	./cgibuild.tcl
 
-web: web/cgi-bin/cginf.tcl web/htdocs/doc.html web/htdocs/index.html
+web: web/cgi-bin/cginf.tcl web/htdocs/index.html
 
 webt: web
-	scp -r web/* pspjuth@web.sourceforge.net:/home/project-web/nagelfar/
-#	scp Nagelfar.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/index.html
-#	scp doc/doc.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/doc.html
-#	scp cginf.tcl pspjuth@web.sourceforge.net:/home/project-web/nagelfar/cgi-bin/
-#	scp check.html pspjuth@web.sourceforge.net:/home/project-web/nagelfar/htdocs/
+	rsync -e ssh -r web/htdocs web/cgi-bin pspjuth@web.sourceforge.net:/home/project-web/nagelfar/
 
 #----------------------------------------------------------------
 # Generating database
