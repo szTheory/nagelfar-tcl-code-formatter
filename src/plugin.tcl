@@ -199,6 +199,7 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
     set info [list namespace [currentNamespace] \
                       caller [currentProc] \
                       file $::currentFile \
+                      firstpass $::Nagelfar(firstpass) \
 		      vars $knownVars]
 
     set x [$::Nagelfar(pluginInterp) eval [list $what $indata $info]]
@@ -218,9 +219,9 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
                     checkComment $line $index knownVars
                 }
             }
-            error   { errorMsg E $value $index }
-            warning { errorMsg W $value $index }
-            note    { errorMsg N $value $index }
+            error   {if {!$::Nagelfar(firstpass)} {errorMsg E $value $index}}
+            warning {if {!$::Nagelfar(firstpass)} {errorMsg W $value $index}}
+            note    {if {!$::Nagelfar(firstpass)} {errorMsg N $value $index}}
             default {
                 errorMsg E "Plugin $::Nagelfar(plugin) returned bad keyword '$cmd' from $what" $index
             }

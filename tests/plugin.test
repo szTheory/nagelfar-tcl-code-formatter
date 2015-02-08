@@ -476,6 +476,50 @@ test plugin-5.3 {
     execTestFile -plugin _testfile_.plugin.tcl
 } -result {%%}
 
+test plugin-5.4 {
+    Plugin for words statement check
+} -body {
+    createTestFile {##Nagelfar Plugin : Sqlite handler
+        proc statementWords {words info} {
+            # We are only interested in calls to "db eval <sql> ?<code>?"
+            if {[lindex $words 0] ne "db"} return
+            if {[lindex $words 1] ne "eval"} return
+            if {[llength $words] < 3} return
+            set sql [lindex $words 2]
+            set res {}
+            # Looking for variable reads
+            foreach {_ var} [regexp -all -inline {[$:](\w+)} $sql] {
+                if {![dict exists $info vars $var]} {
+                    lappend res warning
+                    lappend res "Unknown variable \"$var\""
+                }
+            }
+            # Simple "parser" assuming a certain format to detect variables set
+            if {[llength $words] == 4} {
+                if {[regexp {SELECT (.*) FROM} [lindex $words 2] -> vars]} {
+                    foreach var [regexp -all -inline {\w+} $vars] {
+                        lappend res comment
+                        lappend res "##nagelfar variable $var"
+                    }
+                }
+            }
+            return $res
+        }
+    } 2
+    createTestFile {
+        ##nagelfar syntax db s x*
+        ##nagelfar syntax db\ eval 1: x 2: x c : x n c
+        db eval { SELECT rowid,name,start FROM SQLYSTUFF } {
+            list $rowid $nam
+        }
+        db eval {UPDATE tasks SET user = $u, initial = :v WHERE rowid = $start}
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   5: E Unknown variable "nam"
+Line   7: W Unknown variable "u"
+Line   7: W Unknown variable "v"}
+
 test plugin-6.1 {
     Plugin finalize, used for a call graph
 } -body {

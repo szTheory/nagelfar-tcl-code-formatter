@@ -55,6 +55,7 @@ It currently has at least these elements:
  namespace : Current namespace
  caller    : Current procedure
  file      : Current file
+ firstpass : True during first scan of code. False during full check.
  vars      : Dictionary where each key is a known variable in current scope
 
 <u>Raw Statement Hook</u>
