@@ -1,0 +1,23 @@
+{% extends "!layout.html" %}
+
+{% block rootrellink %}
+ <li><a href="{{ pathto('index') }}">home</a>|&nbsp;</li>
+ <li><a href="{{ pathto('search') }}">search</a>|&nbsp;</li>
+ <li><a href="https://sourceforge.net/projects/nagelfar/">project page</a>|&nbsp;</li>
+ <li><a href="https://sourceforge.net/projects/nagelfar/files/">download</a></li>
+{% endblock %}
+
+{% block relbar1 %}
+<a href="http://sourceforge.net">
+<img style="float:right; padding-right:10px;padding-top:2px;"
+     src="http://sourceforge.net/sflogo.php?group_id=695858&type=13"
+     alt="SourceForge.net" /></a>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="{{ pathto('index') }}"><h1>Nagelfar</h1></a>
+</div>
+{{ super() }}
+{% endblock %}
+
+{# put the sidebar before the body #}
+{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{% block sidebar2 %}{% endblock %}
