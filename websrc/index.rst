@@ -9,10 +9,16 @@ Welcome to Nagelfar's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    features              
    plugins
+   syntaxdatabases
+   syntaxtokens
+   call-by-name
+   inlinecomments
+   messages
+   codecoverage
    changes
 
 

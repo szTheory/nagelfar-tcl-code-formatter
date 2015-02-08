@@ -924,6 +924,10 @@ proc insertTaggedText {w file} {
     set data [read $ch]
     close $ch
 
+    # Disable tag handling since current doc files are just text
+    $w insert end $data
+    return
+
     set tags {}
     while {$data != ""} {
         if {[regexp {^([^<]*)<(/?)([^>]+)>(.*)$} $data -> pre sl tag post]} {

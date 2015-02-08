@@ -25,7 +25,7 @@ USAGE
 This tool is both a command line tool and a GUI tool.
 
 Typical usage:
-nagelfar.tcl \u003ctcl-file\u003e
+nagelfar.tcl <tcl-file>
 
 For a usage summary:
 nagelfar.tcl -h
@@ -65,11 +65,11 @@ GENERATE HEADERS
 
 You can generate a header file to help checking multiple files.
 
-nagelfar.tcl -header \u003cout-file\u003e \u003cfile1\u003e \u003cfile2\u003e
+nagelfar.tcl -header <out-file> <file1> <file2>
 
 You can then check file1 and get it to recognise procs from file2 too:
 
-nagelfar.tcl \u003cout-file\u003e \u003cfile1\u003e
+nagelfar.tcl <out-file> <file1>
 
 
 PACKAGE DATABASES

@@ -37,6 +37,22 @@ access to stdout as well.
 Note that backslash-newline is always removed at an early stage in Nagelfar,
 so when hooks receive "unparsed" data, those have been removed.
 
+Usage
+^^^^^
+
+To activate a plugin, use ``-plugin <plugin>`` on the command line.
+
+Nagelfar searches for plugins (looking for names <plugin> and <plugin>.tcl) in
+the following places:
+
+* . (Current directory)
+* ./plugins
+* <nagelfar source>/../..
+* <nagelfar source>/../../plugins
+* <nagelfar source>/../plugins
+
+Currently only one plugin can be used, and it cannot be selected from the GUI.
+
 Result of plugin procedures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

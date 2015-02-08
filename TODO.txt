@@ -1,3 +1,6 @@
+Select plugins from GUI.
+Select multiple plugins.
+
 Syntaxflagga för "globalt variabelnamn" (-variable).
 Skippa "Suspiscious variable name" för dessa.
 

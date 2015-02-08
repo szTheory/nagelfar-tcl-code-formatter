@@ -32,7 +32,7 @@ TCLSH86  = ~/tcl/install/bin/tclsh8.6
 
 all: base
 
-base: nagelfar.tcl setup misctest web db
+base: nagelfar.tcl setup misctest web doc db
 
 #----------------------------------------------------------------
 # Setup symbolic links from the VFS to the real files
@@ -162,10 +162,28 @@ misctests/test.html: misctests/test.tcl misctests/htmlize.tcl \
 misctest: misctests/test.result misctests/test.html
 
 #----------------------------------------------------------------
+# Documentation
+#----------------------------------------------------------------
+
+RSTFILES = $(wildcard websrc/*.rst)
+
+doc/plugins.txt : $(RSTFILES)
+	make -C websrc text
+	cp websrc/_build/text/plugins.txt doc
+	cp websrc/_build/text/codecoverage.txt doc
+	cp websrc/_build/text/messages.txt doc
+	cp websrc/_build/text/call-by-name.txt doc
+	cp websrc/_build/text/inlinecomments.txt doc
+	cp websrc/_build/text/syntaxtokens.txt doc
+	cp websrc/_build/text/syntaxdatabases.txt doc
+
+doc: doc/plugins.txt
+
+#----------------------------------------------------------------
 # Web pages
 #----------------------------------------------------------------
 
-web/htdocs/index.html : websrc/index.rst
+web/htdocs/index.html : $(RSTFILES)
 	make -C websrc html
 	@mkdir -p web/htdocs
 	cp -r $(wildcard websrc/_build/html/*) web/htdocs
