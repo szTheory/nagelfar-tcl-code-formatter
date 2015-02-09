@@ -381,6 +381,24 @@ test tokens-10.1 {
     execTestFile
 } -result {%%Line   7: E Wrong number of arguments (2) to "mylrange"}
 
+test tokens-10.2 {
+    Definition of command token, as possibly used in coroutine
+} -body {
+    createTestFile {
+        # Possible redefinition of coro:
+        ##nagelfar syntax coroutine dc x x*
+        coroutine apa x y
+        apa
+        apa bepa
+        # A coroutine can only take one arg, this should stricly give an error
+        apa bepa cepa
+        # Generated name will give warning using dc
+        set chan xxx
+        coroutine dechunk$chan ::apply lambda $chan command
+    }
+    execTestFile -s syntaxdb86.tcl
+} -result {%%Line  11: N Non constant definition "dechunk$chan". Skipping.}
+
 test tokens-11.1 {
     Definition of procedure token
 } -body {

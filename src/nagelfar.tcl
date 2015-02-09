@@ -110,7 +110,7 @@ proc Text2Html {data} {
 
 # Standard error message.
 # severity : How severe a message is E/W/N for Error/Warning/Note
-proc errorMsg {severity msg i} {
+proc errorMsg {severity msg i {notAllowedinFirst 0}} {
     #echo "$msg"
     if {$::Prefs(html)} {
         set msg [Text2Html $msg]
@@ -126,6 +126,10 @@ proc errorMsg {severity msg i} {
     }
 
     set ::Nagelfar(currentMessage) ""
+    # Stop some messages in first pass
+    if {$::Nagelfar(firstpass) && $notAllowedinFirst} {
+        return
+    }
     switch $severity {
         E {}
         W { if {$::Prefs(severity) == "E"} return }
@@ -286,9 +290,7 @@ proc checkComment {str index knownVarsName} {
     if {[string match "##nagelfar *" $str]} {
         set rest [string range $str 11 end]
         if {[catch {llength $rest}]} {
-            if {!$::Nagelfar(firstpass)} {
-                errorMsg N "Bad list in ##nagelfar comment" $index
-            }
+            errorMsg N "Bad list in ##nagelfar comment" $index 1
             return
         }
         if {[llength $rest] == 0} return
@@ -322,9 +324,7 @@ proc checkComment {str index knownVarsName} {
                 } elseif {$first eq "require"} {
                     lookForPackageDb $rest $index
                 } else {
-                    if {!$::Nagelfar(firstpass)} {
-                        errorMsg N "Bad type in ##nagelfar comment" $index
-                    }
+                    errorMsg N "Bad type in ##nagelfar comment" $index 1
                 }
             }
             option {
@@ -372,9 +372,7 @@ proc checkComment {str index knownVarsName} {
                 }
             }
             default {
-                if {!$::Nagelfar(firstpass)} {
-                    errorMsg N "Bad type in ##nagelfar comment" $index
-                }
+                errorMsg N "Bad type in ##nagelfar comment" $index 1
                 return
             }
         }
@@ -915,10 +913,10 @@ proc parseVar {str len index iName knownVarsName} {
                     [dict get $knownVars $tail local] || \
                     ([dict get $knownVars $tail namespace] ne $ns && \
                     [dict get $knownVars $tail namespace] ne "::$ns")} {
-                errorMsg E "Unknown variable \"$var\"" $index
+                errorMsg E "Unknown variable \"$var\"" $index 1
             }
         } else {
-            errorMsg E "Unknown variable \"$var\"" $index
+            errorMsg E "Unknown variable \"$var\"" $index 1
         }
     }
     if {[dict exists $knownVars $var] && ![dict get $knownVars $var set]} {
@@ -1156,7 +1154,7 @@ proc checkForCommentL {words wordstatus indices} {
 # It should not be called from anywhere else.
 proc WA {{debug {}}} {
     upvar 1 "cmd" cmd "index" index "argc" argc "argv" argv "indices" indices
-    errorMsg E "Wrong number of arguments ($argc) to \"$cmd\"$debug" $index
+    errorMsg E "Wrong number of arguments ($argc) to \"$cmd\"$debug" $index 1
 
     set t 1
     set line [calcLineNo $index]
@@ -1341,7 +1339,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 #decho "$tok $tokCount $mod"
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     errorMsg N "Non constant definition \"[lindex $argv $i]\".\
-                            Skipping." [lindex $indices $i]
+                            Skipping." [lindex $indices $i] 1
                 } else {
                     set copyFrom [string range $mod 1 end]
                     set name [lindex $argv $i]
@@ -1378,6 +1376,9 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                                 CopyCmdInDatabase $copyFrom $name
                             } else {
                                 lappend ::knownCommands $name
+                                if {![info exists ::syntax($name)]} {
+                                    set ::syntax($name) "x*"
+                                }
                             }
                         }
                         if {$tok eq "do" && ![info exists ::syntax($name)]} {
@@ -1676,7 +1677,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                                 knownVars vtype]} {
                             if {!$::Prefs(noVar)} {
                                 errorMsg E "Unknown variable \"$var\""\
-                                        [lindex $indices $i]
+                                        [lindex $indices $i] 1
                             }
 			}
 		    } elseif {$tok eq "n"} {
@@ -1752,7 +1753,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 	}
     }
     # Have we used up all arguments?
-    if {$i != $argc && !$::Nagelfar(firstpass)} {
+    if {$i != $argc} {
 	WA
     }
     return $type
@@ -2261,7 +2262,7 @@ proc parseStatement {statement index knownVarsName} {
                         2 [lindex $indices 0] known knownVars wtype]} {
                     if {!$::Prefs(noVar)} {
                         errorMsg E "Unknown variable \"$var\""\
-                                [lindex $indices 0]
+                                [lindex $indices 0] 1
                     }
                 }
             } elseif {$argc == 2} {
@@ -2641,9 +2642,7 @@ proc parseStatement {statement index knownVarsName} {
             if {([lindex $wordstatus 0] & 1) && \
                     [string match "ev*" [lindex $argv 0]]} {
                 if {$argc < 3} {
-                    if {!$::Nagelfar(firstpass)} { # Messages in second pass
-                        WA
-                    }
+                    WA
                     return
                 }
                 set arg1const [expr {[lindex $wordstatus 1] & 1}]
@@ -2668,10 +2667,8 @@ proc parseStatement {statement index knownVarsName} {
                     parseBody [lindex $argv 2] [lindex $indices 2] knownVars
                     popNamespace
                 } else {
-                    if {!$::Nagelfar(firstpass)} { # Messages in second pass
-                        errorMsg N "Only braced namespace evals are checked." \
-                                [lindex $indices 0]
-                    }
+                    errorMsg N "Only braced namespace evals are checked." \
+                            [lindex $indices 0] 1
                 }
             } elseif {([lindex $wordstatus 0] & 1) && \
                     [string match "im*" [lindex $argv 0]]} {
@@ -3152,9 +3149,7 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
     upvar $knownVarsName knownVars
 
     if {[catch {llength $procArgs}]} {
-        if {!$::Nagelfar(firstpass)} {
-            errorMsg E "Argument list is not a valid list" $indexArgs
-        }
+        errorMsg E "Argument list is not a valid list" $indexArgs 1
         set procArgs {}
     }
     # Do not loop $syn in the foreach command since it can be shorter
@@ -3165,8 +3160,8 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
         set var [lindex $a 0]
         if {[llength $a] > 1} {
             set seenDefault 1
-        } elseif {$seenDefault && !$::Nagelfar(firstpass) && $var ne "args"} {
-            errorMsg N "Non-default arg after default arg" $indexArgs
+        } elseif {$seenDefault && $var ne "args"} {
+            errorMsg N "Non-default arg after default arg" $indexArgs 1
             # Reset to avoid further messages
             set seenDefault 0
         }
@@ -3280,11 +3275,9 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVars} {
         if {$prevunlim != $unlim || \
                 ($prevunlim == 0 && $prevmax != [llength $procArgs]) \
                 || $prevmin != $min} {
-            if {!$::Nagelfar(firstpass)} { # Messages in second pass
-                errorMsg W "Procedure \"$name\" does not match previous definition" \
-                        $indexArgs
-                contMsg "Previous '$syn'  New '$newsyntax'"
-            }
+            errorMsg W "Procedure \"$name\" does not match previous definition" \
+                    $indexArgs 1
+            contMsg "Previous '$syn'  New '$newsyntax'"
             set newsyntax $syn
         } else {
             # It matched.  Does the new one seem better?

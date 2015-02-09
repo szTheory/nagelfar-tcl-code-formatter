@@ -219,9 +219,9 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
                     checkComment $line $index knownVars
                 }
             }
-            error   {if {!$::Nagelfar(firstpass)} {errorMsg E $value $index}}
-            warning {if {!$::Nagelfar(firstpass)} {errorMsg W $value $index}}
-            note    {if {!$::Nagelfar(firstpass)} {errorMsg N $value $index}}
+            error   {errorMsg E $value $index 1}
+            warning {errorMsg W $value $index 1}
+            note    {errorMsg N $value $index 1}
             default {
                 errorMsg E "Plugin $::Nagelfar(plugin) returned bad keyword '$cmd' from $what" $index
             }

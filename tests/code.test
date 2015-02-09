@@ -13,6 +13,7 @@ slave eval set _nagelfar_test 1
 slave eval source $file
 slave eval loadDatabases
 slave eval {set ::currentFile ""}
+slave eval [list set ::Nagelfar(firstpass) 0]
 
 proc NoPuts {args} {
     set ::SlavePuts $args
