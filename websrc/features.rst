@@ -10,7 +10,7 @@ Features
 * Plugins. Even more extendible through plugins that can hook up at certain
   points in the check flow and do custom checking.
 * Severity level filter and glob matching filters to remove errors
-  known to be ok.
+  known to be OK.
 * View and edit the checked source directly in Nagelfar.
 * Inline comments can help Nagelfar do a better job.
 * Code coverage instrumentation.  Provides help for simple code coverage

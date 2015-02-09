@@ -30,7 +30,7 @@ indentation style.
 "Found non indented close brace that did not end statement. This may
 indicate a brace mismatch."
 
-A close brace that is not indented should normally end the preceeding
+A close brace that is not indented should normally end the preceding
 statement. See also above.
 
 "Close brace first in statement."

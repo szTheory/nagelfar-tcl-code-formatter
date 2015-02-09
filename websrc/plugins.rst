@@ -298,9 +298,9 @@ In code like this, using the sqlite3 package:
  db eval {UPDATE tasks SET user = $u, initial = 320 WHERE rowid = $g}
 
 Nagelfar cannot know that rowid and name are existing variables and will
-giva an error. A plugin can parse the SQL and provide this info.
+give an error. A plugin can parse the SQL and provide this info.
 
-Similarily Nagelfar does not know that the SQL code can contain variable
+Similarly Nagelfar does not know that the SQL code can contain variable
 references. Checking those can also be done.
 
 .. code:: tcl

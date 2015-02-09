@@ -3,7 +3,7 @@ Call By Name
 
 A common source of false warnings have to do with call-by-name.
 
-When analysing a procedure, Nagelfar will detect "upvar" usage and
+When analyzing a procedure, Nagelfar will detect "upvar" usage and
 set up a syntax description accordingly.
 Example, the following procedure:
 

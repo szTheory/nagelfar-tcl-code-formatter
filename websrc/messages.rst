@@ -31,7 +31,7 @@ or just that you have a different indentation style.
 indicate a brace mismatch.``
 
 A close brace that is not indented should normally end the
-preceeding statement. See also above.
+preceding statement. See also above.
 
 ``Close brace first in statement.``
 

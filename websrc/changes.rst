@@ -10,7 +10,7 @@ Changes in v1.2.1 (2015-02-07):
 Changes in v1.2 (2013-01-04):
 
 * Added handling of databases for packages. Databases for a few packages like Snit are included.
-* Autoload package definition on package require.
+* Auto-load package definition on package require.
 * New plugin system to allow lots of possibilities.
 * Handle "dict for" better.
 * Handle "try" better.
@@ -23,9 +23,9 @@ Changes in v1.1.12 (2011-11-27):
 
 * Added checks for array/scalar mixup.
 * More 8.6 support, more of tcloo handled.
-* Command line -s search builtin database too.
-* Command line -H added to preceed messages with file name.
-* Recognise namespace idiom ${ns}::var as non-suspicious.
+* Command line -s search built-in database too.
+* Command line -H added to precede messages with file name.
+* Recognize namespace idiom ${ns}::var as non-suspicious.
 
 Changes in v1.1.11 (2010-09-30):
 
@@ -40,7 +40,7 @@ Changes in v1.1.10 (2010-05-17):
 
 * Include 8.6 database. Much support to make OO checking possible. Not convenient yet though.
 * More 8.5 commands in database. Including msgcat.
-* Added html output option.
+* Added HTML output option.
 * Added support for partial command tokens, for better checking of callbacks.
 * Added note when encountering newline in command subst.
 * Added note when encountering expr in an expression.
@@ -108,7 +108,7 @@ Changes in v1.1.5 (2006-10-15):
 * Fixed namespace resolution bug. [Bug 8538]
 * Check namespace eval better. [Bug 8539]
 * Fixed bad close brace alignment warning. [Bug 8537]
-* Recognise FRINK style inline comments. [FR 2540]
+* Recognize FRINK style inline comments. [FR 2540]
 * Allow level in inline filter comments.
 
 Changes in v1.1.4 (2006-07-05):
@@ -151,7 +151,7 @@ Changes in v1.1 (2004-12-22):
 * Added support for code coverage instrumentation.
 * Added -strictappend option to enforce setting a var before
   (l)appending to it.
-* Bugfixes in variable and upvar handling.
+* Bug fixes in variable and upvar handling.
 * Added option to backup file when saving from Edit Window.
 * Thanks to Uwe Koloska for suggestions and fixes.
 
@@ -192,11 +192,11 @@ Changes in v1.0b2 (2004-02-09):
 
 Changes in v1.0b1 (2004-01-29):
 
-* Recognise if 0 {...} as a comment.
+* Recognize if 0 {...} as a comment.
 * Added a check for bad comments in constant lists.
 * Added a 2-pass proc checking to improve things when procs are used
   before they are defined in a file.
-* Optimised, improved speed by about 35%.
+* Optimized, improved speed by about 35%.
 
 Changes in v0.9 (2003-12-11):
 
@@ -207,7 +207,7 @@ Changes in v0.9 (2003-12-11):
 
 Changes in v0.8 (2003-08-14):
 
-* Bugfixes in options checking and proc checking.
+* Bug fixes in options checking and proc checking.
 * GUI polishing.
 
 Changes in v0.7 (2003-07-23):

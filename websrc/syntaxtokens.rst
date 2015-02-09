@@ -44,7 +44,7 @@ Modifiers
 These apply to some of the tokens.
 
 * ? Zero or One
-* * Zero or more
+* \* Zero or more
 * . One or nothing at all
 
 * A * after an x swallows all the rest and must be last.
