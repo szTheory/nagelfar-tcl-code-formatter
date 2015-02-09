@@ -19,8 +19,7 @@ Tokens
 * e Expression
 * E Expression that should be in braces
 
-* d Definition. That arg defines a new command.
-  If followed by =cmd, it copies syntax from cmd.
+* dc Define new command, if followed by =cmd, it copies syntax from cmd.
 
 * c  Code, checked in surrounding context
 * cg Code, checked in global context
