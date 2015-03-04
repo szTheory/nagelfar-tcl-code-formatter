@@ -67,6 +67,7 @@ test oo-3.1 {
 } -constraints runin86 -body {
     createTestFile {
         oo::class create Base {
+            variable apa
             constructor {n} {
                 my variable id
                 set id $n
@@ -76,12 +77,13 @@ test oo-3.1 {
                 return $id
             }
             method xx {} {
+                set [my varname apa] x
                 return [my id x]
             }
         }
     }
     execTestFile -s syntaxdb86.tcl
-} -result {%%Line  12: E Wrong number of arguments (2) to "_obj,Base id"}
+} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Base id"}
 
 test oo-4.1 {
     tcloo, variable
@@ -129,7 +131,9 @@ test oo-5.1 {
             self s x
             superclass gugge
             unexport x x
-            destructor { }
+            destructor { 
+                list $apa $bepa $cepa
+            }
 
             method Upper {} {
 

@@ -913,7 +913,11 @@ proc parseVar {str len index iName knownVarsName} {
                     [dict get $knownVars $tail local] || \
                     ([dict get $knownVars $tail namespace] ne $ns && \
                     [dict get $knownVars $tail namespace] ne "::$ns")} {
-                errorMsg E "Unknown variable \"$var\"" $index 1
+                if {[currentProc] eq ""} {
+                    # We cannot check namespace variables in a proc.
+                    # TBD: Can we ever?
+                    errorMsg E "Unknown variable1 \"$var\"" $index 1
+                }
             }
         } else {
             errorMsg E "Unknown variable \"$var\"" $index 1
@@ -1167,20 +1171,29 @@ proc WA {{debug {}}} {
     }
 }
 
-proc SplitToken {token tokName tokCountName typeName modName} {
-    upvar 1 $tokName tok $tokCountName tokCount $typeName type $modName mod
+proc SplitToken {token tokName tokCountName typeName modName lenName} {
+    upvar 1 $tokName tok $tokCountName tokCount $typeName type $modName mod \
+            $lenName len
     set mod ""
     set tokCount ""
     set type ""
     set tok _baad_
-    # Type in parenthesis
-    if {[regexp {^(\w+)\((.*)\)$} $token -> tok type]} return
-    # Type in parenthesis, with modifier
-    if {[regexp {^(\w+)\((.*)\)(\W.*)$} $token -> tok type mod]} return
-    # Normal format
-    if {[regexp {^(\w+?)(\d*)(\W.*)?$} $token -> tok tokCount mod]} return
-    #echo "Unsupported token $token in syntax for $cmd"
-    return
+    set len 1
+    if {[regexp {^(\w+)\((.*)\)$} $token -> tokL type]} {
+        # Type in parenthesis
+    } elseif {[regexp {^(\w+)\((.*)\)(\W.*)$} $token -> tokL type mod]} {
+        # Type in parenthesis, with modifier
+    } elseif {[regexp {^(\w+?)(\d*)(\W.*)?$} $token -> tokL tokCount mod]} {
+        # Normal format
+    } else {
+        #echo "Unsupported token '$token'"
+        return
+    }
+    set tok $tokL
+    switch $tokL {
+        dp - dm - dmp { set len 3 }
+        dk - p - cv { set len 2 }
+    }
 }
 
 # Check a command that have a syntax defined in the database
@@ -1253,9 +1266,11 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set i 0
         set last [llength $syn]
         foreach token $syn {
+            SplitToken $token _ _ _ mod tokLen
             incr i
-            if {[string length $token] <= 1} {
-                incr minargs
+
+            if {$mod eq ""} {
+                incr minargs $tokLen
             } else {
                 set last $i
             }
@@ -1275,7 +1290,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set token [lindex $syn 0]
         set syn [lrange $syn 1 end]
 
-        SplitToken $token tok tokCount _ mod
+        SplitToken $token tok tokCount _ mod tokLen
         # Is it optional and there can't be any optional?
         if {$mod ne "" && !$anyOptional} {
             continue
@@ -1302,9 +1317,11 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 
 		# x* matches anything up to the end.
 		if {$mod eq "*"} {
-                    checkForCommentL [lrange $argv $i end] \
-                            [lrange $wordstatus $i end] \
-                            [lrange $indices $i end]
+                    if {$tok != "xComm"} {
+                        checkForCommentL [lrange $argv $i end] \
+                                [lrange $wordstatus $i end] \
+                                [lrange $indices $i end]
+                    }
 		    set i $argc
 		    break
 		}
@@ -1389,6 +1406,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 incr i
             }
             dk -
+            dd -
             dp -
             dm -
             dmp { # Define proc and/or method
@@ -1396,7 +1414,12 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
                             syntax for $cmd."
 		}
-                if {$tok eq "dk"} { # Two args
+                if {$tok eq "dd"} { # One arg
+                    if {$i > ($argc - 1)} {
+                        break
+                    }
+                    set iplus2 [expr {$i + 0}]
+                } elseif {$tok eq "dk"} { # Two args
                     if {$i > ($argc - 2)} {
                         break
                     }
@@ -1421,7 +1444,14 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 lappend constantsDontCheck $i
                 set isProc [expr {$tok eq "dp" || $tok eq "dmp"}]
                 set isMethod [expr {$tok eq "dm" || $tok eq "dmp"}]
-                if {$tok eq "dk"} { # Two args
+                if {$tok eq "dd"} { # One args
+                    set procArgV [lrange $argv $i $iplus2]
+                    set indicesV [lrange $indices $i $iplus2]
+                    set constructorCmd "[currentObjectOrig] destructor"
+                    set procArgV [linsert $procArgV 0 ::$constructorCmd {}]
+                    set indicesV [linsert $indicesV 0 [lindex $indices $i] [lindex $indices $i]]
+                    incr i 1
+                } elseif {$tok eq "dk"} { # Two args
                     set procArgV [lrange $argv $i $iplus2]
                     set indicesV [lrange $indices $i $iplus2]
                     set constructorCmd "[currentObjectOrig] new"
@@ -1521,9 +1551,11 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     } elseif {$tok eq "cl"} {
                         #puts "Checking '$body' in local context"
                         # Check in local context
-                        set dummyVars {}
-                        addImplicitVariablesNs $cmd [lindex $indices $i] dummyVars
-                        parseBody $body [lindex $indices $i] dummyVars
+                        if {![info exists locCtxVars]} {
+                            set locCtxVars {}
+                        }
+                        addImplicitVariablesNs $cmd [lindex $indices $i] locCtxVars
+                        parseBody $body [lindex $indices $i] locCtxVars
                     } else {
                         parseBody $body [lindex $indices $i] knownVars
                     }
@@ -1543,15 +1575,17 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 if {$i > ($argc - 2)} {
                     break
                 }
-                set dummyVars {}
+                if {![info exists locCtxVars]} {
+                    set locCtxVars {}
+                }
 		if {([lindex $wordstatus $i] & 1) != 0} {
                     # Constant var list, parse it to get all vars
                     parseArgs [lindex $argv $i] [lindex $indices $i] "" \
-                            dummyVars
+                            locCtxVars
                 } else {
                     # Non constant var list, what to do? FIXA
                 }
-                addImplicitVariablesNs $cmd [lindex $indices $i] dummyVars
+                addImplicitVariablesNs $cmd [lindex $indices $i] locCtxVars
                 # Handle Code part
                 incr i
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
@@ -1574,7 +1608,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 
                     # Check in local context
                     #puts "Cmd '$cmd' NS '[currentNamespace]'"
-                    parseBody $body [lindex $indices $i] dummyVars
+                    parseBody $body [lindex $indices $i] locCtxVars
                 }
 		incr i
 	    }
@@ -2150,11 +2184,9 @@ proc parseStatement {statement index knownVarsName} {
                         }
                     }
                     if {$ns ne "__unknown__"} {
-                        if {$ws1 & 1} {
-                            dict set knownVars $var namespace $ns
-                        }
                         if {($ws1 & 1) || [string is wordchar $var]} {
 			    knownVar knownVars $var
+                            dict set knownVars $var namespace $ns
                             if {$i < $argc - 1} {
                                 dict set knownVars $var set 1
                                 dict set knownVars $var array 0
@@ -2494,8 +2526,17 @@ proc parseStatement {statement index knownVarsName} {
             set i 0
             if {$argc > 2} {
                 set max [expr {$argc - 2}]
-                set i [llength [checkOptions $cmd $argv $wordstatus $indices\
-                       0 $max]]
+                set oSyn [checkOptions $cmd $argv $wordstatus $indices \
+                        0 $max]
+                set i [llength $oSyn]
+                if {[lsearch -not $oSyn "x"] >= 0} {
+                    # There is some special flag in there, probably a var
+                    set old_swsyntax $::syntax(switch)
+                    lappend oSyn xComm*
+                    set ::syntax(switch) $oSyn
+                    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+                    set ::syntax(switch) $old_swsyntax
+                }
             }
             if {[lindex $wordstatus $i] & 1 == 1} {
                 # First argument to switch is constant, suspiscious
@@ -3168,7 +3209,11 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
 	knownVar knownVars $var
         dict set knownVars $var local 1
         dict set knownVars $var set   1
-        SplitToken [lindex $syn $i] _ _ type _
+        SplitToken [lindex $syn $i] tok _ type _ _
+        if {$type eq "" && $tok in {v n l}} {
+            # The token indicates a variable name
+            set type varName
+        }
 	dict set knownVars $var "type" $type
     }
 
@@ -3258,8 +3303,7 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVars} {
             }
         } else {
             foreach token $syn {
-                SplitToken $token tok tokCount _ mod
-                set n [expr {$tok == "p" ? 2 : 1}]
+                SplitToken $token tok tokCount _ mod n
                 if {$mod == ""} {
                     incr prevmin $n
                     incr prevmax $n
@@ -3435,14 +3479,13 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
     # I.e. anyone with set == 1 and namespace == "" should be
     # added to known globals.
     foreach var [dict keys $knownVars] {
-        if {[dict get $knownVars $var namespace] != ""} continue
         if {[dict get $knownVars $var local]} continue
-	if {[dict get $knownVars $var set]} {
-#	    decho "Set global $var in proc $name."
-	    if {[lsearch $knownGlobals $var] == -1} {
-		lappend knownGlobals $var
-	    }
-	}
+	if {![dict get $knownVars $var set]} continue
+        set ns [dict get $knownVars $var namespace]
+#        decho "Set global $var in ns $ns in proc $name."
+        if {$ns eq "" && [lsearch $knownGlobals $var] == -1} {
+            lappend knownGlobals $var
+        }
     }
     return $newSyn
 }

@@ -171,3 +171,16 @@ test proc-3.4 {
     }
     execTestFile
 } -result {%%Line   2: E Argument list is not a valid list}
+
+test proc-4.1 {
+    Procedure checking, updated syntax def
+} -body {
+    createTestFile {
+        ##nagelfar syntax xx dm
+        proc xx {name arg body} {
+            return $body
+        }
+    }
+    execTestFile
+} -result {%%}
+

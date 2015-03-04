@@ -923,6 +923,21 @@ test nagelfar-20.3 {
     execTestFile
 } -result {%%Line   9: N Switch pattern "others" could be a mistaken "default"}
 
+test nagelfar-20.4 {
+    switch
+} -body {
+    createTestFile {
+        set y {1 5}
+        switch -regexp -matchvar m -- $y {
+            x {
+                # m should be known
+                list $m
+            }
+        }
+    }
+    execTestFile
+} -result {%%}
+
 test nagelfar-21.1 {
     Embedded
 } -body {

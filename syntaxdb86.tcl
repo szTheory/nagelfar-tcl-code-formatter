@@ -743,6 +743,7 @@ set {::syntax(_stdclass_oo create)} {dc=_obj,_stdclass_oo x?}
 set {::syntax(_stdclass_oo destroy)} 0
 set {::syntax(_stdclass_oo new)} 0
 set {::syntax(_stdclass_oo variable)} n*
+set {::syntax(_stdclass_oo varname)} v
 set ::syntax(after) {r 1}
 set ::syntax(append) {n x*}
 set ::syntax(apply) {x x*}
@@ -951,7 +952,7 @@ set {::syntax(oo::class create)} {do=_stdclass_oo cn?}
 set {::syntax(oo::class create::class)} x
 set {::syntax(oo::class create::constructor)} dk
 set {::syntax(oo::class create::deletemethod)} {x x*}
-set {::syntax(oo::class create::destructor)} c
+set {::syntax(oo::class create::destructor)} dd
 set {::syntax(oo::class create::export)} {x x*}
 set {::syntax(oo::class create::filter)} {o? x*}
 set {::syntax(oo::class create::forward)} {x x x*}
@@ -1044,6 +1045,7 @@ set {::syntax(string trimright)} {r 1 2}
 set {::syntax(string wordend)} 2
 set {::syntax(string wordstart)} 2
 set ::syntax(subst) {o* x}
+set ::syntax(switch) x*
 set ::syntax(tcl::Lassign) {r 1}
 set ::syntax(tcl::Lempty) 1
 set ::syntax(tcl::Lget) 2
@@ -1253,6 +1255,7 @@ set {::syntax(zlib stream inflate)} p*
 
 set {::return(_stdclass_oo create)} _obj,_stdclass_oo
 set {::return(_stdclass_oo new)} _obj,_stdclass_oo
+set {::return(_stdclass_oo varname)} varName
 set ::return(button) _obj,button
 set ::return(canvas) _obj,canvas
 set ::return(checkbutton) _obj,checkbutton
@@ -1366,7 +1369,7 @@ set ::subCmd(_obj,ttk::scrollbar) {cget configure delta fraction get identify in
 set ::subCmd(_obj,ttk::separator) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
-set ::subCmd(_stdclass_oo) {create new destroy variable}
+set ::subCmd(_stdclass_oo) {create new destroy variable varname}
 set ::subCmd(array) {anymore donesearch exists get names nextelement set size startsearch statistics unset}
 set ::subCmd(binary) {decode encode format scan}
 set {::subCmd(binary decode)} {base64 hex uuencode}
@@ -1637,8 +1640,8 @@ set {::option(string map)} -nocase
 set {::option(string match)} -nocase
 set ::option(subst) {-nobackslashes -nocommands -novariables}
 set ::option(switch) {-- -exact -glob -indexvar -matchvar -nocase -regexp}
-set {::option(switch -indexvar)} x
-set {::option(switch -matchvar)} x
+set {::option(switch -indexvar)} n
+set {::option(switch -matchvar)} n
 set {::option(tcl::prefix match)} {-error -exact -message}
 set {::option(tcl::prefix match -error)} x
 set {::option(tcl::prefix match -message)} x

@@ -166,6 +166,7 @@ proc buildDb {ch} {
     # dc Define with copy, if followed by =cmd, it copies syntax from cmd.
     # do Define object, if followed by =cmd, it copies syntax from cmd.
     # dk Define constructor (args+body)
+    # dd Define destructor (just body)
     # dp Define procedure (name+args+body)
     # dm Define method (name+args+body)
     # dmp Define metod/procedure (name+args+body)
@@ -359,7 +360,9 @@ proc buildDb {ch} {
     set syntax(string\ wordend)   2
     set syntax(string\ wordstart) 2
     set syntax(subst)           "o* x"
+    # "switch" is handled specially, but is added here to not disturb header gen
     set special(switch) 1
+    set syntax(switch)          "x*"
     set syntax(tell)             1
     set syntax(time)            "c x?"
     set syntax(trace)           "s x x*"
@@ -432,8 +435,8 @@ proc buildDb {ch} {
         set syntax(apply)      "x x*"
         set syntax(source)     "p* x"
         set option(interp\ invokehidden\ -namespace) 1
-        set option(switch\ -matchvar) x
-        set option(switch\ -indexvar) x
+        set option(switch\ -matchvar) n
+        set option(switch\ -indexvar) n
     }
 
     # Things added in 8.6
@@ -511,7 +514,7 @@ proc buildDb {ch} {
         set syntax(oo::class\ create::constructor) dk ;# Define constructor
         set syntax(oo::class\ create::superclass)  di ;# Define inheritance
         set syntax(oo::class\ create::method) "dm"    ;# Define method 
-        set syntax(oo::class\ create::destructor) c
+        set syntax(oo::class\ create::destructor) dd  ;# Define destructor
         set syntax(oo::class\ create::export) x
         set syntax(oo::class\ create::class) x
         set syntax(oo::class\ create::deletemethod) "x x*"
@@ -524,13 +527,15 @@ proc buildDb {ch} {
         set syntax(oo::class\ create::unexport) "x x*"
 
         set syntax(_stdclass_oo) "s x*"
-        set subCmd(_stdclass_oo) "create new destroy variable"
+        set subCmd(_stdclass_oo) "create new destroy variable varname"
         set syntax(_stdclass_oo\ create) "dc=_obj,_stdclass_oo x?"
         set return(_stdclass_oo\ create) _obj,_stdclass_oo
         set syntax(_stdclass_oo\ new) 0
         set return(_stdclass_oo\ new) _obj,_stdclass_oo
         set syntax(_stdclass_oo\ destroy) 0
         set syntax(_stdclass_oo\ variable) n*
+        set syntax(_stdclass_oo\ varname) v
+        set return(_stdclass_oo\ varname) varName
         set syntax(info\ object) "s x x*"
         set syntax(info\ class)  "s x x*"
         set syntax(oo::copy)     "x x?"

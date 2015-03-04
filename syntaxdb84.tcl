@@ -500,6 +500,7 @@ set {::syntax(string trimright)} {r 1 2}
 set {::syntax(string wordend)} 2
 set {::syntax(string wordstart)} 2
 set ::syntax(subst) {o* x}
+set ::syntax(switch) x*
 set ::syntax(tcl::Lassign) {r 1}
 set ::syntax(tcl::Lempty) 1
 set ::syntax(tcl::Lget) 2

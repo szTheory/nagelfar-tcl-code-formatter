@@ -153,9 +153,15 @@ test namespace-3.4 {
 } -body {
     createTestFile {
         namespace eval nspace {
+            variable apa 1
             set rundir "rdir"
         }
         puts "$nspace::rundir"
+        puts "$nspace::apa"
+        proc apa x {
+            puts "$nspace::rundir"
+            puts "$nspace::apa"
+        }
     }
     execTestFile
 } -result {%%}

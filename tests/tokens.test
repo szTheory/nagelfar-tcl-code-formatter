@@ -316,6 +316,19 @@ test tokens-7.9 {
     execTestFile
 } -result {%%Line   4: E Unknown variable "apa"}
 
+test tokens-7.10 {
+    Code token, cv optional
+} -body {
+    createTestFile {
+        set apa 1
+        ##nagelfar syntax gurka x cv x cv? c
+        gurka hej v list hugga v2 list list
+        gurka hej v list hugga list
+    }
+    execTestFile
+} -result {%%}
+
+
 test tokens-8.1 {
     Subcommand token
 } -body {
@@ -587,3 +600,16 @@ test tokens-16.3 {
 } -result {%%Line   7: E Wrong number of arguments (3) to "_obj,apa"
 Line   8: E Wrong number of arguments (2) to "_obj,qupa"
 Line  13: E Wrong number of arguments (4) to "bepa"}
+
+test tokens-16.4 {
+    Token with type, implicit
+} -body {
+    createTestFile {
+        ##nagelfar syntax bepa v
+        
+        proc bepa {h} {
+            set $h x
+        }
+    }
+    execTestFile
+} -result {%%}
