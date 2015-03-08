@@ -371,13 +371,17 @@ Detect creative writing in namespace eval code.
            foreach {var _} [lindex $words 1 end] {
                set ::known(${ns}::$var) 1
            }
-           return
-       }
-       if {$cmd in {set incr append lappend}} {
-           set var [lindex $words 1]
-           if {![info exists ::known(${ns}::$var)]} {
-               return [list warning "Writing $var without variable call"]
-           }
        }
        return
+   }
+   proc varWrite {var info} {
+       set caller [dict get $info caller]
+       # Code in proc is not interesting
+       if {$caller ne ""} return
+       set ns [dict get $info namespace]
+       # Global is not interesting
+       if {$ns eq "" || $ns eq "::"} return
+       if {![info exists ::known(${ns}::$var)]} {
+           return [list warning "Writing $var without variable call"]
+       }
    }
