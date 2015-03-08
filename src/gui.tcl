@@ -802,6 +802,12 @@ proc editFile {filename lineNo} {
             $w insert end $data
         }
     }
+    # Disable Save if there is no file
+    if {![info exists ::Nagelfar(editFile)] || $::Nagelfar(editFile) eq ""} {
+        .fv.m.mf entryconfigure "Save" -state disabled
+    } else {
+        .fv.m.mf entryconfigure "Save" -state normal
+    }
 
     $w tag remove hl 1.0 end
     $w tag add hl $lineNo.0 $lineNo.end
@@ -817,6 +823,10 @@ proc editFile {filename lineNo} {
 }
 
 proc saveFile {} {
+    if {![info exists ::Nagelfar(editFile)]} {
+        # Gracefully handle if this happens
+        return
+    }
     if {[tk_messageBox -parent .fv -title "Save File" -type okcancel \
             -icon question \
             -message "Save file\n$::Nagelfar(editFile)"] != "ok"} {
