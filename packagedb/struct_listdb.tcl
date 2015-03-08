@@ -34,17 +34,17 @@ set ::subcmd(struct::list::list) {
     swap
 }
 
-set ::syntax(struct::list::list\ assign) {r 2}
+set ::syntax(struct::list::list\ assign) {x n n*}
 set ::syntax(struct::list::list\ dbJoin) {r 0}
 set ::syntax(struct::list::list\ dbJoinKeyed) {r 0}
-set ::syntax(struct::list::list\ delete) 2
+set ::syntax(struct::list::list\ delete) "v x"
 set ::syntax(struct::list::list\ equal) 2
 set ::syntax(struct::list::list\ filter) 2
-set ::syntax(struct::list::list\ filterfor) 3
+set ::syntax(struct::list::list\ filterfor) "n x e"
 set ::syntax(struct::list::list\ firstperm) 1
 set ::syntax(struct::list::list\ flatten) {r 0}
 set ::syntax(struct::list::list\ fold) 3
-set ::syntax(struct::list::list\ foreachperm) 3
+set ::syntax(struct::list::list\ foreachperm) "n x c"
 set ::syntax(struct::list::list\ iota) 1
 set ::syntax(struct::list::list\ lcsInvert) 3
 set ::syntax(struct::list::list\ lcsInvert2) 4
@@ -52,17 +52,17 @@ set ::syntax(struct::list::list\ lcsInvertMerge) 3
 set ::syntax(struct::list::list\ lcsInvertMerge2) 4
 set ::syntax(struct::list::list\ longestCommonSubsequence) {r 2 3}
 set ::syntax(struct::list::list\ longestCommonSubsequence2) {r 2 3}
-set ::syntax(struct::list::list\ map) 2
-set ::syntax(struct::list::list\ mapfor) 3
+set ::syntax(struct::list::list\ map) "x c1"
+set ::syntax(struct::list::list\ mapfor) "n x c"
 set ::syntax(struct::list::list\ nextperm) 1
 set ::syntax(struct::list::list\ permutations) 1
 set ::syntax(struct::list::list\ repeat) {r 2}
 set ::syntax(struct::list::list\ repeatn) {r 1}
 set ::syntax(struct::list::list\ reverse) 1
-set ::syntax(struct::list::list\ shift) 1
+set ::syntax(struct::list::list\ shift) v
 set ::syntax(struct::list::list\ shuffle) 1
 set ::syntax(struct::list::list\ split) {r 2}
-set ::syntax(struct::list::list\ swap) 3
+set ::syntax(struct::list::list\ swap) "v x x"
 
 set ::syntax(struct::list) $::syntax(struct::list::list)
 set ::subcmd(struct::list) $::subcmd(struct::list::list)

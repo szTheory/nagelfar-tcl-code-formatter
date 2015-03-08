@@ -1,5 +1,5 @@
 # This syntax definition for the inifile package in TclLib
-# package require inifile 0.2.3
+# package require inifile 0.2.5
 # Contributed by Ruediger Haertel
 
 set ::syntax(ini::close) 1
