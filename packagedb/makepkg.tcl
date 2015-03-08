@@ -1,4 +1,5 @@
 # This is a utility to create the basis of a package database by extraction
+# It does "package require" on it and sees what it gets.
 # Use it like this:
 # tclsh packagedb/makepkg.tcl <pkgname>
 
