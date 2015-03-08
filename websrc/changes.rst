@@ -3,7 +3,13 @@ Changes
 
 Changes in v1.2.2 (2015-03-08):
 
-* Various bug fixes.
+* Various bug fixes:
+* Handle switch's variable options.
+* Handle instance variables in a destructor.
+* Handle standard varname method in tcloo.
+* Do not consider "-" strange in command name.
+* Removed note about unaligned brace in some reasonable cases.
+* Handle multiple cv/cl args to a command with a common context.
 
 Changes in v1.2.1 (2015-02-07):
 
