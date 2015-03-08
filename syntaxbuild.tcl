@@ -292,22 +292,14 @@ proc buildDb {ch} {
     set syntax(interp\ invokehidden) "x o* x x*"
     set syntax(join)            "r 1 2"
     set syntax(lappend)         "n x*"
-    if {[catch {lindex apa 0 0}]} {
-        set syntax(lindex)       2        ;# Pre 8.4
-    } else {
-        set syntax(lindex)      "r 2"
-    }
+    set syntax(lindex)          "r 1"
     set syntax(linsert)         "r 3"
     set syntax(list)            "r 0"
     set syntax(llength)          1
     set syntax(load)            "r 1 3"
     set syntax(lrange)           3
     set syntax(lreplace)        "r 3"
-    if {[catch {lsearch -all -glob apa bepa}]} {
-        set syntax(lsearch)     "o? x x"  ;# Pre 8.4
-    } else {
-        set syntax(lsearch)     "o* x x"
-    }
+    set syntax(lsearch)         "o* x x"
     set syntax(lset)            "n x x x*"
     set syntax(lsort)           "o* x"
     # "namespace" is handled specially

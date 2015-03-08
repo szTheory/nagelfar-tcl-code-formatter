@@ -411,7 +411,7 @@ set ::syntax(join) {r 1 2}
 set ::syntax(label) {x p*}
 set ::syntax(labelframe) {x p*}
 set ::syntax(lappend) {n x*}
-set ::syntax(lindex) {r 2}
+set ::syntax(lindex) {r 1}
 set ::syntax(linsert) {r 3}
 set ::syntax(list) {r 0}
 set ::syntax(listbox) {x p*}
