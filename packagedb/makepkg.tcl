@@ -7,7 +7,7 @@ set script {
     if {[catch { package require %pkg% }]} exit
     puts "PkgVersion: [package require %pkg%]"
     set ::tcl_interactive 1
-    #set ::syntaxbuild_allnamespace 1
+    set ::syntaxbuild_allnamespace 1
     source syntaxbuild.tcl
     if {"%pkg%" ni $::kP} {
         lappend ::kP %pkg%

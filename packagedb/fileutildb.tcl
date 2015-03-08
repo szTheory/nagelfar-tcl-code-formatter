@@ -6,10 +6,14 @@ set ::syntax(fileutil::fileType) 1
 set ::syntax(fileutil::find) {r 0 2}
 set ::syntax(fileutil::findByPattern) {r 1}
 set ::syntax(fileutil::foreachLine) 3
+set ::syntax(fileutil::fullnormalize) 1
 set ::syntax(fileutil::grep) {r 1 2}
 set ::syntax(fileutil::insertIntoFile) {r 0}
 set ::syntax(fileutil::install) {r 0}
 set ::syntax(fileutil::jail) 2
+set ::syntax(fileutil::lexnormalize) 1
+set ::syntax(fileutil::relative) 2
+set ::syntax(fileutil::relativeUrl) 2
 set ::syntax(fileutil::removeFromFile) {r 0}
 set ::syntax(fileutil::replaceInFile) {r 0}
 set ::syntax(fileutil::stripN) 2
