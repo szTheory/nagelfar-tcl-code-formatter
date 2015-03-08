@@ -183,7 +183,7 @@ doc: doc/plugins.txt
 # Web pages
 #----------------------------------------------------------------
 
-web/htdocs/index.html : $(RSTFILES) misctests/test.html
+web/htdocs/index.html : $(RSTFILES)
 	make -C websrc html
 	@mkdir -p web/htdocs
 	cp -r $(wildcard websrc/_build/html/*) web/htdocs

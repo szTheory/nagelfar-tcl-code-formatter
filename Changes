@@ -1,4 +1,5 @@
 2015-03-08
+ Do not consider - strange in command name.
  Removed note about unaligned brace in some reasonable cases.
 
 2015-03-04
