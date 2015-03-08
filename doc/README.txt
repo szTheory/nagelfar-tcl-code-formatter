@@ -103,13 +103,3 @@ Option to enforce not using "then".
 Make a GUI to help working with the database builder.  It should
 be possible to add packages that should be included in the db.
 
-
-BUGS
-
-The close brace alignment check should match against the line
-with the opening brace, not the start of the command:
-    cmd xx yy \
-        apa {
-            hejsan
-        }
-Line  4: Close brace not aligned with line 1 (4 8)

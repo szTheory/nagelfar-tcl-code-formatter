@@ -2888,6 +2888,8 @@ proc splitScript {script index statementsName indicesName} {
     # alignedBraceIx stores the position of any close braced encountered that
     # is indented the same as the statement being parsed
     set alignedBraceIx -1
+    # openBraceIx stores the position of the last open brace at end of line
+    set openBraceIx -1
     # Bracelevel is used to switch parsing style depending on where we are
     # brace-balance wise. This is to quickly parse large brace-enclosed blocks
     # like a proc body.
@@ -3040,14 +3042,19 @@ proc splitScript {script index statementsName indicesName} {
                 # Extra checking if the last line of the statement was
                 # a close brace.
                 if {$closeBraceIndent != -1} {
+                    # Check if the close brace is aligned with start of command
                     set tmp [wasIndented $index]
                     if {$tmp != $closeBraceIndent} {
-                        # Only do this if there is a free open brace
-                        if {[regexp "\{\n" $tryline]} {
-                            errorMsg N "Close brace not aligned with line\
+                        set tmp2 [wasIndented $openBraceIx]
+                        # Matching last open brace is ok too
+                        if {$openBraceIx == -1 || $closeBraceIndent != $tmp2} {
+                            # Only do this if there is a free open brace
+                            if {[regexp "\{\n" $tryline]} {
+                                errorMsg N "Close brace not aligned with line\
                                     [calcLineNo $index]\
                                     ($tmp $closeBraceIndent)" \
-                                    $closeBraceIx
+                                        $closeBraceIx
+                            }
                         }
                     }
                 }
@@ -3076,6 +3083,7 @@ proc splitScript {script index statementsName indicesName} {
         # common case it's probably not worth complicating it.
         if {[string range $tryline end-2 end] eq " \{\n" && \
                     [info complete [string range $tryline 0 end-2]]} {
+            set openBraceIx [expr {[string length $tryline] + $index - 1}]
             set bracelevel 1
         }
     }

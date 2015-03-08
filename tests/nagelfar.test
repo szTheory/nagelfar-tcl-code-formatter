@@ -588,12 +588,17 @@ test nagelfar-9.1 {
 
 test nagelfar-10.1 {
     Brace alignment
-} -constraints {
-    knownbug
 } -body {
+    # Avoid warning on some styles where alignment is done against
+    # open brace rather than command.
     createTestFile "
-        cmd xx yy \\
+        list xx yy \\
             apa {
+               hejsan
+            }
+        list xx yy \\
+            apa \\
+            {
                hejsan
             }
     "
