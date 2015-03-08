@@ -331,3 +331,34 @@ references. Checking those can also be done.
      }
      return $res
  }
+
+Namespace eval check
+^^^^^^^^^^^^^^^^^^^^
+
+Detect creative writing in namespace eval code.
+
+.. code:: tcl
+
+ ##Nagelfar Plugin : Namespace eval check
+ proc statementWords {words info} {
+     set caller [dict get $info caller]
+     # Code in proc is not interesting
+     if {$caller ne ""} return
+     set ns [dict get $info namespace]
+     # Global is not interesting
+     if {$ns eq "" || $ns eq "::"} return
+     set cmd [lindex $words 0]
+     if {$cmd eq "variable"} {
+         foreach {var _} [lindex $words 1 end] {
+             set ::known(${ns}::$var) 1
+         }
+         return
+     }
+     if {$cmd in {set incr append lappend}} {
+         set var [lindex $words 1]
+         if {![info exists ::known(${ns}::$var)]} {
+             return [list warning "Writing $var without variable call"]
+         }
+     }
+     return
+ }

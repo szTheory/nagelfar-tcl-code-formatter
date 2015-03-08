@@ -520,6 +520,59 @@ test plugin-5.4 {
 Line   7: W Unknown variable "u"
 Line   7: W Unknown variable "v"}
 
+test plugin-5.5 {
+    Plugin for words statement check
+} -body {
+    createTestFile {##Nagelfar Plugin : Namespace eval check
+        proc statementWords {words info} {
+            set caller [dict get $info caller]
+            # Code in proc is not interesting
+            if {$caller ne ""} return
+
+            set ns [dict get $info namespace]
+            # Global is not interesting
+            if {$ns eq "" || $ns eq "::"} return
+
+            set cmd [lindex $words 0]
+
+            if {$cmd eq "variable"} {
+                foreach {var _} [lindex $words 1 end] {
+                    set ::known(${ns}::$var) 1
+                }
+                return
+            }
+
+            if {$cmd in {set incr append lappend}} {
+                set var [lindex $words 1]
+                if {![info exists ::known(${ns}::$var)]} {
+                    return [list warning "Writing $var without variable call"]
+                }
+            }
+            return
+        }
+    } 2
+    createTestFile {
+        proc mugg {x} {
+            set hej 1
+        }
+        set hej 1
+        namespace eval apa {
+            variable hopp
+            proc mugg {x} {
+                set hej 1
+            }
+            set hej 1
+            set hopp 1
+            namespace eval bepa {
+                variable hej
+                set hej 2
+            }
+        }
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line  11: W Writing hej without variable call}
+
 test plugin-6.1 {
     Plugin finalize, used for a call graph
 } -body {
