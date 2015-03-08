@@ -2,6 +2,6 @@ The following places needs changes when bumping revision number.
 
 src/prologue.tcl : version
 Makefile : VERSION
-Nagelfar.html : Download and Changes
+websrc/changes.rst : Changes
 Changes : Note new release
 README : Version in release notes

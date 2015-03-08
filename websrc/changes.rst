@@ -1,6 +1,10 @@
 Changes
 ========
 
+Changes in v1.2.2 (2015-03-08):
+
+* Various bug fixes.
+
 Changes in v1.2.1 (2015-02-07):
 
 * Extended plugins with hooks for variable read and write.
