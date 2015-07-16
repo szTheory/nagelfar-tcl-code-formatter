@@ -7,7 +7,12 @@ proc statementWords {words info} {
     # WA and checkCommand is bit dirty and must assume certain callers.
     # This checks that.
     if {$callee in {WA checkCommand}} {
-	if {$caller ni {checkCommand parseStatement}} {
+	if {$caller ni {checkCommand parseStatement checkSpecial}} {
+	    return [list error "$callee called from bad place"]
+	}
+    }
+    if {$callee in {checkSpecial}} {
+	if {$caller ni {parseStatement}} {
 	    return [list error "$callee called from bad place"]
 	}
     }

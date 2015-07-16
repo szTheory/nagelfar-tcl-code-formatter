@@ -1983,6 +1983,673 @@ proc lookForCommand {cmd ns index} {
     return ""
 }
 
+# Check for commands with special syntax that cannot be handled be checkCommand
+# Returns 1 if command has been handled, 2 if fully done with command
+# This is a helper for parseStatement, it should not be called from
+# anywhere but parseStatement
+proc checkSpecial {cmd index argv wordstatus wordtype indices} {
+    #cmd index argv wordstatus wordtype indices
+    upvar 1 "constantsDontCheck" constantsDontCheck "knownVars" knownVars
+    upvar 1 "noConstantCheck" noConstantCheck "type" type
+
+    set argc [llength $argv]
+
+    switch -glob -- $cmd {
+	.* { # FIXA, check code in any -command.
+             # Even widget commands should be checked.
+	     # Maybe in checkOptions ?
+	    return 2
+	}
+	global { # Special check of "global" command
+	    foreach var $argv ws $wordstatus {
+		if {$ws & 1} {
+		    knownVar knownVars $var
+		} else {
+		    errorMsg N "Non constant argument to $cmd: $var" $index
+		}
+	    }
+            set noConstantCheck 1
+	}
+	variable { # Special check of "variable" command
+            set currNs [currentNamespace]
+            # Special case in oo::class create
+            if {[string match "oo::class create*" $currNs]} {
+                #echo "Var: in $currNs"
+                foreach var $argv ws $wordstatus {
+                    lappend ::implicitVarNs($currNs) $var
+                }
+            } else {
+                set i 0
+                foreach {var val} $argv {ws1 ws2} $wordstatus {
+                    set ns [currentNamespace]
+                    if {[regexp {^(.*)::([^:]+)$} $var -> root var]} {
+                        set ns $root
+                        if {[string match "::*" $ns]} {
+                            set ns [string range $ns 2 end]
+                        }
+                    }
+                    if {$ns ne "__unknown__"} {
+                        if {($ws1 & 1) || [string is wordchar $var]} {
+			    knownVar knownVars $var
+                            dict set knownVars $var namespace $ns
+                            if {$i < $argc - 1} {
+                                dict set knownVars $var set 1
+                                dict set knownVars $var array 0
+                                # FIXA: What if it is an array element?
+                                # Should the array be marked?
+                            }
+                            lappend constantsDontCheck $i
+                        } else {
+                            errorMsg N "Non constant argument to $cmd: $var" \
+                                    $index
+                        }
+                    }
+                    incr i 2
+                }
+            }
+	}
+	upvar { # Special check of "upvar" command
+            if {$argc < 2} {
+                WA
+                return 2
+            }
+            set level [lindex $argv 0]
+            set oddA [expr {$argc % 2 == 1}]
+            set hasLevel 0
+            if {[lindex $wordstatus 0] & 1} {
+                # Is it a level ?
+                if {[regexp {^[\\\#0-9]} $level]} {
+                    if {!$oddA} {
+                        WA
+                        return 2
+                    }
+                    set hasLevel 1
+                } else {
+                    if {$oddA} {
+                        WA
+                        return 2
+                    }
+                    set level 1
+                }
+            } else {
+                # Assume it is not a level unless odd number of args.
+                if {$oddA} {
+                    # Warn here? FIXA
+                    errorMsg N "Non constant level to $cmd: \"$level\"" $index
+                    set hasLevel 1
+                    set level ""
+                } else {
+                    set level 1
+                }
+            }
+            if {$hasLevel} {
+                set tmp [lrange $argv 1 end]
+                set tmpWS [lrange $wordstatus 1 end]
+                set i 2
+            } else {
+                set tmp $argv
+                set tmpWS $wordstatus
+                set i 1
+            }
+
+	    foreach {other var} $tmp {wsO wsV} $tmpWS {
+                if {($wsV & 1) == 0} {
+                    # The variable name contains substitutions
+                    errorMsg N "Suspicious upvar variable \"$var\"" $index
+                } else {
+		    knownVar knownVars $var
+                    lappend constantsDontCheck $i
+                    if {$other eq $var} { # Allow "upvar xx xx" construct
+                        lappend constantsDontCheck [expr {$i - 1}]
+                    }
+                    if {($wsO & 1) == 0} {
+                        # Is the other name a simple var subst?
+                        if {[regexp {^\$([\w()]+)$}  $other -> other] || \
+                            [regexp {^\${([^{}]*)}$} $other -> other]} {
+                            if {[dict exists $knownVars $other]} {
+                                if {$level == 1} {
+                                    dict set knownVars $other upvar $var
+                                } elseif {$level eq "#0"} {
+                                    # FIXA: level #0 for global
+                                    dict set knownVars $other upvar $var
+                                    dict set knownVars $var set 1 ;# FIXA?
+                                }
+                            }
+                        }
+                    }
+                }
+		incr i 2
+	    }
+	}
+	set { # Special check of "set" command
+	    # Set gets a different syntax string depending on the
+	    # number of arguments.
+            set wtype ""
+	    if {$argc == 1} {
+                # Check the variable
+                set var [lindex $argv 0]
+                # Allow a plugin to have a look at the variable read
+                if {$::Nagelfar(pluginVarRead)} {
+                    pluginHandleVarRead var knownVars $index
+                }
+                if {[string match ::* $var]} {
+                    # Skip qualified names until we handle
+                    # namespace better. FIXA
+                } elseif {[markVariable $var \
+                        [lindex $wordstatus 0] [lindex $wordtype 0] \
+                        2 [lindex $indices 0] known knownVars wtype]} {
+                    if {!$::Prefs(noVar)} {
+                        errorMsg E "Unknown variable \"$var\""\
+                                [lindex $indices 0] 1
+                    }
+                }
+            } elseif {$argc == 2} {
+                set wtype [lindex $wordtype 1]
+                markVariable [lindex $argv 0] \
+                        [lindex $wordstatus 0] [lindex $wordtype 0] \
+                        1 [lindex $indices 0] known \
+                        knownVars wtype
+            } else {
+		WA
+	    }
+            lappend constantsDontCheck 0
+            set type $wtype
+	}
+	foreach - lmap { # Special check of "foreach" and "lmap" commands
+            # Check that we are in at least 8.6 for lmap
+            if {$cmd eq "lmap" && ![info exists ::syntax(lmap)]} {
+                errorMsg N "MOOO" $index
+                set thisCmdHasBeenHandled 0
+            } else {
+                if {$argc < 3 || ($argc % 2) == 0} {
+                    WA
+                    return 2
+                }
+                for {set i 0} {$i < $argc - 1} {incr i 2} {
+                    if {[lindex $wordstatus $i] == 0} {
+                        errorMsg W "Non constant variable list to foreach\
+                            statement." [lindex $indices $i]
+                        # FIXA, maybe abort here?
+                    }
+                    lappend constantsDontCheck $i
+                    foreach var [lindex $argv $i] {
+                        markVariable $var 1 "" 1 $index known knownVars ""
+                    }
+                }
+                # FIXA: Experimental foreach check...
+                # A special case for looping over constant lists
+                set varsAdded {}
+                foreach {varList valList} [lrange $argv 0 end-1] \
+                        {varWS valWS} [lrange $wordstatus 0 end-1] {
+                    if {($varWS & 1) && ($valWS & 1)} {
+                        set fVars {}
+                        foreach fVar $varList {
+                            set ::foreachVar($fVar) {}
+                            lappend fVars apaV($fVar)
+                            lappend varsAdded $fVar
+                        }
+                        ##nagelfar ignore Non constant variable list to foreach
+                        foreach $fVars $valList {
+                            foreach fVar $varList {
+                                ##nagelfar variable apaV
+                                lappend ::foreachVar($fVar) $apaV($fVar)
+                            }
+                        }
+                    }
+                }
+
+                if {([lindex $wordstatus end] & 1) == 0} {
+                    errorMsg W "No braces around body in foreach\
+                            statement." $index
+                }
+                set ::instrumenting([lindex $indices end]) 1
+                set type [parseBody [lindex $argv end] [lindex $indices end] \
+                                  knownVars]
+                # Clean up
+                foreach fVar $varsAdded {
+                    catch {unset ::foreachVar($fVar)}
+                }
+            }
+        }
+	if { # Special check of "if" command
+	    if {$argc < 2} {
+		WA
+		return 2
+	    }
+            set old_ifsyntax $::syntax(if)
+	    # Build a syntax string that fits this if statement
+	    set state expr
+	    set ifsyntax {}
+            foreach arg $argv ws $wordstatus index $indices {
+		switch -- $state {
+                    skip {
+                        # This will behave bad with "if 0 then then"...
+                        lappend ifsyntax xComm
+			if {$arg ne "then"} {
+                            set state else
+			}
+                        continue
+                    }
+		    then {
+			set state body
+			if {$arg eq "then"} {
+			    lappend ifsyntax x
+			    continue
+			}
+		    }
+		    else {
+			if {$arg eq "elseif"} {
+			    set state expr
+			    lappend ifsyntax x
+			    continue
+			}
+			set state lastbody
+			if {$arg eq "else"} {
+			    lappend ifsyntax x
+			    continue
+			}
+                        if {$::Prefs(forceElse)} {
+                            errorMsg E "Badly formed if statement" $index
+                            contMsg "Found argument '[trimStr $arg]' where\
+                                    else/elseif was expected."
+                            return 2
+                        }
+		    }
+		}
+		switch -- $state {
+		    expr {
+                        # Handle if 0 { ... } as a comment
+                        if {[string is integer $arg] && $arg == 0} {
+                            lappend ifsyntax x
+                            set state skip
+                        } else {
+                            lappend ifsyntax e
+                            set state then
+                        }
+		    }
+		    lastbody {
+			lappend ifsyntax c
+			set state illegal
+		    }
+		    body {
+			lappend ifsyntax c
+			set state else
+		    }
+		    illegal {
+			errorMsg E "Badly formed if statement" $index
+			contMsg "Found argument '[trimStr $arg]' after\
+                              supposed last body."
+			return 2
+		    }
+		}
+	    }
+            # State should be "else" if there was no else clause or
+            # "illegal" if there was one.
+	    if {$state ne "else" && $state ne "illegal"} {
+		errorMsg E "Badly formed if statement" $index
+		contMsg "Missing one body."
+		return 2
+	    } elseif {$state eq "else"} {
+                # Mark the missing else for instrumenting
+                set ::instrumenting([expr {$index + [string length $arg]}]) 2
+            }
+#            decho "if syntax \"$ifsyntax\""
+	    set ::syntax(if) $ifsyntax
+	    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+            set ::syntax(if) $old_ifsyntax
+	}
+	try { # Special check of "try" command
+            # Check that we are in at least 8.6
+            if {![info exists ::syntax(try)]} {
+                return 0
+            } else {
+                if {$argc < 1} {
+                    WA
+                    return 2
+                }
+                set old_trysyntax $::syntax(try)
+                # Build a syntax string that fits this try statement
+                set state body
+                set trysyntax {}
+                foreach arg $argv ws $wordstatus index $indices {
+                    switch -- $state {
+                        body {
+                            lappend trysyntax c
+                            set state handler
+                            continue
+                        }
+                        finally {
+                            lappend trysyntax c
+                            set state illegal
+                            continue
+                        }
+                        handler {
+                            if {$arg eq "on" || $arg eq "trap"} {
+                                set state code
+                                lappend trysyntax x
+                                continue
+                            }
+                            if {$arg eq "finally"} {
+                                lappend trysyntax x
+                                set state finally
+                                continue
+                            }
+                            errorMsg E "Bad word in try statement, should be on, trap or finally." $index
+                            return 2
+                        }
+                        code {
+                            lappend trysyntax x
+                            set state varlist
+                            continue
+                        }
+                        varlist {
+                            lappend trysyntax nl
+                            set state body
+                            continue
+                        }
+                        illegal {
+                            errorMsg E "Badly formed try statement" $index
+                            contMsg "Found argument '[trimStr $arg]' after\
+                              supposed last body."
+                            return 2
+                        }
+                    }
+                }
+                # State should be "handler" or "illegal"
+                if {$state ne "handler" && $state ne "illegal"} {
+                    errorMsg E "Badly formed try statement" $index
+                    #contMsg "Missing one body."
+                    return 2
+                }
+                #decho "$argc try syntax \"$trysyntax\""
+                set ::syntax(try) $trysyntax
+                checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+                set ::syntax(try) $old_trysyntax
+            }
+	}
+	switch { # Special check of "switch" command
+	    if {$argc < 2} {
+		WA
+		return 2
+	    }
+            # FIXA: As of 8.5.1, two args are not checked for options,
+            # does this imply anything
+            set i 0
+            if {$argc > 2} {
+                set max [expr {$argc - 2}]
+                set oSyn [checkOptions $cmd $argv $wordstatus $indices \
+                        0 $max]
+                set i [llength $oSyn]
+                if {[lsearch -not $oSyn "x"] >= 0} {
+                    # There is some special flag in there, probably a var
+                    set old_swsyntax $::syntax(switch)
+                    lappend oSyn xComm*
+                    set ::syntax(switch) $oSyn
+                    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+                    set ::syntax(switch) $old_swsyntax
+                }
+            }
+            if {[lindex $wordstatus $i] & 1 == 1} {
+                # First argument to switch is constant, suspiscious
+                errorMsg N "String argument to switch is constant" \
+                        [lindex $indices $i]
+            }
+            incr i
+	    set left [expr {$argc - $i}]
+
+	    if {$left == 1} {
+		# One block. Split it into a list.
+                # FIXA. Changing argv messes up the constant check.
+
+		set arg [lindex $argv $i]
+		set ws [lindex $wordstatus $i]
+		set ix [lindex $indices $i]
+
+                if {($ws & 1) == 1} {
+                    set swargv [splitList $arg $ix swindices swwordst]
+                    if {[llength $swargv] % 2 == 1} {
+                        errorMsg E "Odd number of elements in last argument to\
+                                switch." $ix
+                        return 2
+                    }
+                    if {[llength $swargv] == 0} {
+                        errorMsg W "Empty last argument to switch." $ix
+                        return 2
+                    }
+                } else {
+                    set swwordst {}
+                    set swargv {}
+                    set swindices {}
+                }
+	    } elseif {$left % 2 == 1} {
+		WA
+		return 2
+	    } else {
+		set swargv [lrange $argv $i end]
+		set swwordst [lrange $wordstatus $i end]
+		set swindices [lrange $indices $i end]
+	    }
+            set count [llength $swargv]
+	    foreach {pat body} $swargv {ws1 ws2} $swwordst {i1 i2} $swindices {
+                incr count -2
+                # A stand-alone hash as a pattern is suspicious
+		if {[string index $pat 0] eq "#" && $ws1 == 1} {
+                    # Skip warning if body is braced
+                    if {$ws2 != 3} {
+                        errorMsg W "Switch pattern starting with #.\
+                                This could be a bad comment." $i1
+                    }
+		}
+		if {$body eq "-"} {
+		    continue
+		}
+		if {($ws2 & 1) == 0} {
+		    errorMsg W "No braces around code in switch\
+                            statement." $i2
+		}
+                if {$pat eq "others" && $ws1 == 1 && $count == 0} {
+                    # Bareword "others" when last can be a mistake since other
+                    # languages use it as the "default" keyword.
+                    errorMsg N "Switch pattern \"others\" could be a mistaken\
+                            \"default\"" $i1
+                }
+                set ::instrumenting($i2) 1
+		parseBody $body $i2 knownVars
+	    }
+	}
+	expr { # Special check of "expr" command
+            # FIXA
+            # Take care of the standard case of a brace enclosed expr.
+            if {$argc == 1 && ([lindex $wordstatus 0] & 1)} {
+                 parseExpr [lindex $argv 0] [lindex $indices 0] knownVars
+            } else {
+                if {$::Prefs(warnBraceExpr)} {
+                    errorMsg W "Expr without braces" [lindex $indices 0]
+                }
+            }
+	}
+	eval { # Special check of "eval" command
+            # FIXA
+            set noConstantCheck 1
+	}
+	interp { # Special check of "interp" command
+            if {$argc < 1} {
+                WA
+                return 2
+            }
+            # Special handling of interp alias
+            if {([lindex $wordstatus 0] & 1) && "alias" eq [lindex $argv 0]} {
+                if {$argc < 3} {
+                    WA
+                    return 2
+                }
+                # This should define a source in the current interpreter
+                # with a known name.
+                if {$argc >= 5 && \
+                        ([lindex $wordstatus 1] & 1) && \
+                        "" eq [lindex $argv 1] && \
+                        ([lindex $wordstatus 2] & 1)} {
+                    set newAlias [lindex $argv 2]
+                    set aliasCmd {}
+                    for {set t 4} {$t < $argc} {incr t} {
+                        if {[lindex $wordstatus 1] & 1} {
+                            lappend aliasCmd [lindex $argv $t]
+                        } else {
+                            lappend aliasCmd {}
+                        }
+                    }
+                    set ::knownAliases($newAlias) $aliasCmd
+                }
+            }
+            set type [checkCommand $cmd $index $argv $wordstatus \
+                    $wordtype $indices]
+            set noConstantCheck 1
+	}
+        package { # Special check of "package" command
+            # Take care of require to autoload package definition
+            if {$argc >= 2 && [lindex $argv 0] eq "require"} {
+                set nameI 1
+                if {[string match "-*" [lindex $argv $nameI]]} {
+                    incr nameI
+                }
+                if {$nameI < $argc} {
+                    if {[lindex $wordstatus $nameI] & 1} {
+                        set pName [lindex $argv $nameI]
+                        lookForPackageDb $pName [lindex $indices $nameI]
+                    } else {
+                        errorMsg N "Non constant package require" \
+                                [lindex $indices $nameI]
+                    }
+                }
+            }
+            set type [checkCommand $cmd $index $argv $wordstatus $wordtype \
+                              $indices]
+        }
+	namespace { # Special check of "namespace" command
+            if {$argc < 1} {
+                WA
+                return 2
+            }
+            # Special handling of namespace eval
+            if {([lindex $wordstatus 0] & 1) && \
+                    [string match "ev*" [lindex $argv 0]]} {
+                if {$argc < 3} {
+                    WA
+                    return 2
+                }
+                set arg1const [expr {[lindex $wordstatus 1] & 1}]
+                set arg2const [expr {[lindex $wordstatus 2] & 1}]
+                # Look for unknown parts
+                if {[string is space [lindex $argv 2]]} {
+                    # Empty body, do nothing
+                } elseif {$arg2const && $argc == 3} {
+                    if {$arg1const} {
+                        set ns [lindex $argv 1]
+                        if {![string match "::*" $ns]} {
+                            set root [currentNamespace]
+                            if {$root ne "__unknown__"} {
+                                set ns ${root}::$ns
+                            }
+                        }
+                    } else {
+                        set ns __unknown__
+                    }
+
+                    pushNamespace $ns
+                    parseBody [lindex $argv 2] [lindex $indices 2] knownVars
+                    popNamespace
+                } else {
+                    errorMsg N "Only braced namespace evals are checked." \
+                            [lindex $indices 0] 1
+                }
+            } elseif {([lindex $wordstatus 0] & 1) && \
+                    [string match "im*" [lindex $argv 0]]} {
+                # Handle namespace import
+                if {$argc < 2} {
+                    WA
+                    return 2
+                }
+                set ns [currentNamespace]
+                if {[lindex $argv 1] eq "-force"} {
+                    set t 2
+                } else {
+                    set t 1
+                }
+                for {} {$t < [llength $argv]} {incr t} {
+                    if {([lindex $wordstatus $t] & 1) == 0} {
+                        continue
+                    }
+                    set other [lookForCommand [lindex $argv $t] $ns -1]
+                    set other [lindex $other 0]
+                    set tail [namespace tail $other]
+                    if {$ns eq ""} {
+                        set me $tail
+                    } else {
+                        set me ${ns}::$tail
+                        if {[string match "::*" $me]} {
+                            set me [string range $me 2 end]
+                        }
+                    }
+                    #puts "ME: $me : OTHER: $other"
+                    # Copy the command info
+                    if {[lsearch -exact $::knownCommands $me] < 0} {
+                        lappend ::knownCommands $me
+                    }
+                    if {![info exists ::syntax($me)] && \
+                            [info exists ::syntax($other)]} {
+                        set ::syntax($me) $::syntax($other)
+                    }
+                }
+                set type [checkCommand $cmd $index $argv $wordstatus \
+                        $wordtype $indices]
+            } else {
+                set type [checkCommand $cmd $index $argv $wordstatus \
+                                  $wordtype $indices]
+            }
+	}
+        next { # Special check of "next" command
+            # Figure out the superclass of the caller to be able to check
+            set currObj [currentObject]
+            if {[info exists ::superclass($currObj)]} {
+                foreach {superCmd superObj} $::superclass($currObj) break
+                set methodName [namespace tail [currentProc]]
+                #puts "next: super '$superObj' meth '$methodName'"
+                if {[string match "* new" $methodName]} {
+                    # This is a constructor
+                    set subCmd "$superCmd new"
+                } else {
+                    set subCmd "$superObj $methodName"
+                }
+                if {[info exists ::syntax($subCmd)]} {
+                    #puts "Syntax for '$subCmd' '$::syntax($subCmd)'"
+                    set type [checkCommand $subCmd $index $argv $wordstatus \
+                            $wordtype $indices]
+                }
+            } else {
+                errorMsg N "No superclass found for 'next'" $index
+            }
+        }
+	tailcall { # Special check of "tailcall" command
+            if {$argc < 1} {
+                WA
+                return 2
+            }
+            set newStatement [join $argv]
+            set newIndex [lindex $indices 0]
+            set type [parseStatement $newStatement $newIndex knownVars]
+            set noConstantCheck 1
+	}
+	uplevel { # Special check of "uplevel" command
+            # FIXA
+            set noConstantCheck 1
+	}
+	default {
+            return 0
+        }
+    }
+    return 1
+}
+
 # Parse one statement and check the syntax of the command
 # Returns the return type of the statement
 proc parseStatement {statement index knownVarsName} {
@@ -2147,661 +2814,11 @@ proc parseStatement {statement index knownVarsName} {
     # Any command that can be checked by checkCommand should
     # be in the syntax database.
 
-    set thisCmdHasBeenHandled 1
-
-    switch -glob -- $cmd {
-	.* { # FIXA, check code in any -command.
-             # Even widget commands should be checked.
-	     # Maybe in checkOptions ?
-	    return
-	}
-	global { # Special check of "global" command
-	    foreach var $argv ws $wordstatus {
-		if {$ws & 1} {
-		    knownVar knownVars $var
-		} else {
-		    errorMsg N "Non constant argument to $cmd: $var" $index
-		}
-	    }
-            set noConstantCheck 1
-	}
-	variable { # Special check of "variable" command
-            set currNs [currentNamespace]
-            # Special case in oo::class create
-            if {[string match "oo::class create*" $currNs]} {
-                #echo "Var: in $currNs"
-                foreach var $argv ws $wordstatus {
-                    lappend ::implicitVarNs($currNs) $var
-                }
-            } else {
-                set i 0
-                foreach {var val} $argv {ws1 ws2} $wordstatus {
-                    set ns [currentNamespace]
-                    if {[regexp {^(.*)::([^:]+)$} $var -> root var]} {
-                        set ns $root
-                        if {[string match "::*" $ns]} {
-                            set ns [string range $ns 2 end]
-                        }
-                    }
-                    if {$ns ne "__unknown__"} {
-                        if {($ws1 & 1) || [string is wordchar $var]} {
-			    knownVar knownVars $var
-                            dict set knownVars $var namespace $ns
-                            if {$i < $argc - 1} {
-                                dict set knownVars $var set 1
-                                dict set knownVars $var array 0
-                                # FIXA: What if it is an array element?
-                                # Should the array be marked?
-                            }
-                            lappend constantsDontCheck $i
-                        } else {
-                            errorMsg N "Non constant argument to $cmd: $var" \
-                                    $index
-                        }
-                    }
-                    incr i 2
-                }
-            }
-	}
-	upvar { # Special check of "upvar" command
-            if {$argc < 2} {
-                WA
-                return
-            }
-            set level [lindex $argv 0]
-            set oddA [expr {$argc % 2 == 1}]
-            set hasLevel 0
-            if {[lindex $wordstatus 0] & 1} {
-                # Is it a level ?
-                if {[regexp {^[\\\#0-9]} $level]} {
-                    if {!$oddA} {
-                        WA
-                        return
-                    }
-                    set hasLevel 1
-                } else {
-                    if {$oddA} {
-                        WA
-                        return
-                    }
-                    set level 1
-                }
-            } else {
-                # Assume it is not a level unless odd number of args.
-                if {$oddA} {
-                    # Warn here? FIXA
-                    errorMsg N "Non constant level to $cmd: \"$level\"" $index
-                    set hasLevel 1
-                    set level ""
-                } else {
-                    set level 1
-                }
-            }
-            if {$hasLevel} {
-                set tmp [lrange $argv 1 end]
-                set tmpWS [lrange $wordstatus 1 end]
-                set i 2
-            } else {
-                set tmp $argv
-                set tmpWS $wordstatus
-                set i 1
-            }
-
-	    foreach {other var} $tmp {wsO wsV} $tmpWS {
-                if {($wsV & 1) == 0} {
-                    # The variable name contains substitutions
-                    errorMsg N "Suspicious upvar variable \"$var\"" $index
-                } else {
-		    knownVar knownVars $var
-                    lappend constantsDontCheck $i
-                    if {$other eq $var} { # Allow "upvar xx xx" construct
-                        lappend constantsDontCheck [expr {$i - 1}]
-                    }
-                    if {($wsO & 1) == 0} {
-                        # Is the other name a simple var subst?
-                        if {[regexp {^\$([\w()]+)$}  $other -> other] || \
-                            [regexp {^\${([^{}]*)}$} $other -> other]} {
-                            if {[dict exists $knownVars $other]} {
-                                if {$level == 1} {
-                                    dict set knownVars $other upvar $var
-                                } elseif {$level eq "#0"} {
-                                    # FIXA: level #0 for global
-                                    dict set knownVars $other upvar $var
-                                    dict set knownVars $var set 1 ;# FIXA?
-                                }
-                            }
-                        }
-                    }
-                }
-		incr i 2
-	    }
-	}
-	set { # Special check of "set" command
-	    # Set gets a different syntax string depending on the
-	    # number of arguments.
-	    if {$argc == 1} {
-                # Check the variable
-                set var [lindex $argv 0]
-                # Allow a plugin to have a look at the variable read
-                if {$::Nagelfar(pluginVarRead)} {
-                    pluginHandleVarRead var knownVars $index
-                }
-                if {[string match ::* $var]} {
-                    # Skip qualified names until we handle
-                    # namespace better. FIXA
-                } elseif {[markVariable $var \
-                        [lindex $wordstatus 0] [lindex $wordtype 0] \
-                        2 [lindex $indices 0] known knownVars wtype]} {
-                    if {!$::Prefs(noVar)} {
-                        errorMsg E "Unknown variable \"$var\""\
-                                [lindex $indices 0] 1
-                    }
-                }
-            } elseif {$argc == 2} {
-                set wtype [lindex $wordtype 1]
-                markVariable [lindex $argv 0] \
-                        [lindex $wordstatus 0] [lindex $wordtype 0] \
-                        1 [lindex $indices 0] known \
-                        knownVars wtype
-            } else {
-		WA
-		set wtype ""
-	    }
-            lappend constantsDontCheck 0
-            set type $wtype
-	}
-	foreach - lmap { # Special check of "foreach" and "lmap" commands
-            # Check that we are in at least 8.6 for lmap
-            if {$cmd eq "lmap" && ![info exists ::syntax(lmap)]} {
-                errorMsg N "MOOO" $index
-                set thisCmdHasBeenHandled 0
-            } else {
-                if {$argc < 3 || ($argc % 2) == 0} {
-                    WA
-                    return
-                }
-                for {set i 0} {$i < $argc - 1} {incr i 2} {
-                    if {[lindex $wordstatus $i] == 0} {
-                        errorMsg W "Non constant variable list to foreach\
-                            statement." [lindex $indices $i]
-                        # FIXA, maybe abort here?
-                    }
-                    lappend constantsDontCheck $i
-                    foreach var [lindex $argv $i] {
-                        markVariable $var 1 "" 1 $index known knownVars ""
-                    }
-                }
-                # FIXA: Experimental foreach check...
-                # A special case for looping over constant lists
-                set varsAdded {}
-                foreach {varList valList} [lrange $argv 0 end-1] \
-                        {varWS valWS} [lrange $wordstatus 0 end-1] {
-                    if {($varWS & 1) && ($valWS & 1)} {
-                        set fVars {}
-                        foreach fVar $varList {
-                            set ::foreachVar($fVar) {}
-                            lappend fVars apaV($fVar)
-                            lappend varsAdded $fVar
-                        }
-                        ##nagelfar ignore Non constant variable list to foreach
-                        foreach $fVars $valList {
-                            foreach fVar $varList {
-                                ##nagelfar variable apaV
-                                lappend ::foreachVar($fVar) $apaV($fVar)
-                            }
-                        }
-                    }
-                }
-
-                if {([lindex $wordstatus end] & 1) == 0} {
-                    errorMsg W "No braces around body in foreach\
-                            statement." $index
-                }
-                set ::instrumenting([lindex $indices end]) 1
-                set type [parseBody [lindex $argv end] [lindex $indices end] \
-                                  knownVars]
-                # Clean up
-                foreach fVar $varsAdded {
-                    catch {unset ::foreachVar($fVar)}
-                }
-            }
-        }
-	if { # Special check of "if" command
-	    if {$argc < 2} {
-		WA
-		return
-	    }
-            set old_ifsyntax $::syntax(if)
-	    # Build a syntax string that fits this if statement
-	    set state expr
-	    set ifsyntax {}
-            foreach arg $argv ws $wordstatus index $indices {
-		switch -- $state {
-                    skip {
-                        # This will behave bad with "if 0 then then"...
-                        lappend ifsyntax xComm
-			if {$arg ne "then"} {
-                            set state else
-			}
-                        continue
-                    }
-		    then {
-			set state body
-			if {$arg eq "then"} {
-			    lappend ifsyntax x
-			    continue
-			}
-		    }
-		    else {
-			if {$arg eq "elseif"} {
-			    set state expr
-			    lappend ifsyntax x
-			    continue
-			}
-			set state lastbody
-			if {$arg eq "else"} {
-			    lappend ifsyntax x
-			    continue
-			}
-                        if {$::Prefs(forceElse)} {
-                            errorMsg E "Badly formed if statement" $index
-                            contMsg "Found argument '[trimStr $arg]' where\
-                                    else/elseif was expected."
-                            return
-                        }
-		    }
-		}
-		switch -- $state {
-		    expr {
-                        # Handle if 0 { ... } as a comment
-                        if {[string is integer $arg] && $arg == 0} {
-                            lappend ifsyntax x
-                            set state skip
-                        } else {
-                            lappend ifsyntax e
-                            set state then
-                        }
-		    }
-		    lastbody {
-			lappend ifsyntax c
-			set state illegal
-		    }
-		    body {
-			lappend ifsyntax c
-			set state else
-		    }
-		    illegal {
-			errorMsg E "Badly formed if statement" $index
-			contMsg "Found argument '[trimStr $arg]' after\
-                              supposed last body."
-			return
-		    }
-		}
-	    }
-            # State should be "else" if there was no else clause or
-            # "illegal" if there was one.
-	    if {$state ne "else" && $state ne "illegal"} {
-		errorMsg E "Badly formed if statement" $index
-		contMsg "Missing one body."
-		return
-	    } elseif {$state eq "else"} {
-                # Mark the missing else for instrumenting
-                set ::instrumenting([expr {$index + [string length $arg]}]) 2
-            }
-#            decho "if syntax \"$ifsyntax\""
-	    set ::syntax(if) $ifsyntax
-	    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
-            set ::syntax(if) $old_ifsyntax
-	}
-	try { # Special check of "try" command
-            # Check that we are in at least 8.6
-            if { ![info exists ::syntax(try)]} {
-                set thisCmdHasBeenHandled 0
-            } else {
-                if {$argc < 1} {
-                    WA
-                    return
-                }
-                set old_trysyntax $::syntax(try)
-                # Build a syntax string that fits this try statement
-                set state body
-                set trysyntax {}
-                foreach arg $argv ws $wordstatus index $indices {
-                    switch -- $state {
-                        body {
-                            lappend trysyntax c
-                            set state handler
-                            continue
-                        }
-                        finally {
-                            lappend trysyntax c
-                            set state illegal
-                            continue
-                        }
-                        handler {
-                            if {$arg eq "on" || $arg eq "trap"} {
-                                set state code
-                                lappend trysyntax x
-                                continue
-                            }
-                            if {$arg eq "finally"} {
-                                lappend trysyntax x
-                                set state finally
-                                continue
-                            }
-                            errorMsg E "Bad word in try statement, should be on, trap or finally." $index
-                            return
-                        }
-                        code {
-                            lappend trysyntax x
-                            set state varlist
-                            continue
-                        }
-                        varlist {
-                            lappend trysyntax nl
-                            set state body
-                            continue
-                        }
-                        illegal {
-                            errorMsg E "Badly formed try statement" $index
-                            contMsg "Found argument '[trimStr $arg]' after\
-                              supposed last body."
-                            return
-                        }
-                    }
-                }
-                # State should be "handler" or "illegal"
-                if {$state ne "handler" && $state ne "illegal"} {
-                    errorMsg E "Badly formed try statement" $index
-                    #contMsg "Missing one body."
-                    return
-                }
-                #decho "$argc try syntax \"$trysyntax\""
-                set ::syntax(try) $trysyntax
-                checkCommand $cmd $index $argv $wordstatus $wordtype $indices
-                set ::syntax(try) $old_trysyntax
-            }
-	}
-	switch { # Special check of "switch" command
-	    if {$argc < 2} {
-		WA
-		return
-	    }
-            # FIXA: As of 8.5.1, two args are not checked for options,
-            # does this imply anything
-            set i 0
-            if {$argc > 2} {
-                set max [expr {$argc - 2}]
-                set oSyn [checkOptions $cmd $argv $wordstatus $indices \
-                        0 $max]
-                set i [llength $oSyn]
-                if {[lsearch -not $oSyn "x"] >= 0} {
-                    # There is some special flag in there, probably a var
-                    set old_swsyntax $::syntax(switch)
-                    lappend oSyn xComm*
-                    set ::syntax(switch) $oSyn
-                    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
-                    set ::syntax(switch) $old_swsyntax
-                }
-            }
-            if {[lindex $wordstatus $i] & 1 == 1} {
-                # First argument to switch is constant, suspiscious
-                errorMsg N "String argument to switch is constant" \
-                        [lindex $indices $i]
-            }
-            incr i
-	    set left [expr {$argc - $i}]
-
-	    if {$left == 1} {
-		# One block. Split it into a list.
-                # FIXA. Changing argv messes up the constant check.
-
-		set arg [lindex $argv $i]
-		set ws [lindex $wordstatus $i]
-		set ix [lindex $indices $i]
-
-                if {($ws & 1) == 1} {
-                    set swargv [splitList $arg $ix swindices swwordst]
-                    if {[llength $swargv] % 2 == 1} {
-                        errorMsg E "Odd number of elements in last argument to\
-                                switch." $ix
-                        return
-                    }
-                    if {[llength $swargv] == 0} {
-                        errorMsg W "Empty last argument to switch." $ix
-                        return
-                    }
-                } else {
-                    set swwordst {}
-                    set swargv {}
-                    set swindices {}
-                }
-	    } elseif {$left % 2 == 1} {
-		WA
-		return
-	    } else {
-		set swargv [lrange $argv $i end]
-		set swwordst [lrange $wordstatus $i end]
-		set swindices [lrange $indices $i end]
-	    }
-            set count [llength $swargv]
-	    foreach {pat body} $swargv {ws1 ws2} $swwordst {i1 i2} $swindices {
-                incr count -2
-                # A stand-alone hash as a pattern is suspicious
-		if {[string index $pat 0] eq "#" && $ws1 == 1} {
-                    # Skip warning if body is braced
-                    if {$ws2 != 3} {
-                        errorMsg W "Switch pattern starting with #.\
-                                This could be a bad comment." $i1
-                    }
-		}
-		if {$body eq "-"} {
-		    continue
-		}
-		if {($ws2 & 1) == 0} {
-		    errorMsg W "No braces around code in switch\
-                            statement." $i2
-		}
-                if {$pat eq "others" && $ws1 == 1 && $count == 0} {
-                    # Bareword "others" when last can be a mistake since other
-                    # languages use it as the "default" keyword.
-                    errorMsg N "Switch pattern \"others\" could be a mistaken\
-                            \"default\"" $i1
-                }
-                set ::instrumenting($i2) 1
-		parseBody $body $i2 knownVars
-	    }
-	}
-	expr { # Special check of "expr" command
-            # FIXA
-            # Take care of the standard case of a brace enclosed expr.
-            if {$argc == 1 && ([lindex $wordstatus 0] & 1)} {
-                 parseExpr [lindex $argv 0] [lindex $indices 0] knownVars
-            } else {
-                if {$::Prefs(warnBraceExpr)} {
-                    errorMsg W "Expr without braces" [lindex $indices 0]
-                }
-            }
-	}
-	eval { # Special check of "eval" command
-            # FIXA
-            set noConstantCheck 1
-	}
-	interp { # Special check of "interp" command
-            if {$argc < 1} {
-                WA
-                return
-            }
-            # Special handling of interp alias
-            if {([lindex $wordstatus 0] & 1) && "alias" eq [lindex $argv 0]} {
-                if {$argc < 3} {
-                    WA
-                    return
-                }
-                # This should define a source in the current interpreter
-                # with a known name.
-                if {$argc >= 5 && \
-                        ([lindex $wordstatus 1] & 1) && \
-                        "" eq [lindex $argv 1] && \
-                        ([lindex $wordstatus 2] & 1)} {
-                    set newAlias [lindex $argv 2]
-                    set aliasCmd {}
-                    for {set t 4} {$t < $argc} {incr t} {
-                        if {[lindex $wordstatus 1] & 1} {
-                            lappend aliasCmd [lindex $argv $t]
-                        } else {
-                            lappend aliasCmd {}
-                        }
-                    }
-                    set ::knownAliases($newAlias) $aliasCmd
-                }
-            }
-            set type [checkCommand $cmd $index $argv $wordstatus \
-                    $wordtype $indices]
-            set noConstantCheck 1
-	}
-        package { # Special check of "package" command
-            # Take care of require to autoload package definition
-            if {$argc >= 2 && [lindex $argv 0] eq "require"} {
-                set nameI 1
-                if {[string match "-*" [lindex $argv $nameI]]} {
-                    incr nameI
-                }
-                if {$nameI < $argc} {
-                    if {[lindex $wordstatus $nameI] & 1} {
-                        set pName [lindex $argv $nameI]
-                        lookForPackageDb $pName [lindex $indices $nameI]
-                    } else {
-                        errorMsg N "Non constant package require" \
-                                [lindex $indices $nameI]
-                    }
-                }
-            }
-            set type [checkCommand $cmd $index $argv $wordstatus $wordtype \
-                              $indices]
-        }
-	namespace { # Special check of "namespace" command
-            if {$argc < 1} {
-                WA
-                return
-            }
-            # Special handling of namespace eval
-            if {([lindex $wordstatus 0] & 1) && \
-                    [string match "ev*" [lindex $argv 0]]} {
-                if {$argc < 3} {
-                    WA
-                    return
-                }
-                set arg1const [expr {[lindex $wordstatus 1] & 1}]
-                set arg2const [expr {[lindex $wordstatus 2] & 1}]
-                # Look for unknown parts
-                if {[string is space [lindex $argv 2]]} {
-                    # Empty body, do nothing
-                } elseif {$arg2const && $argc == 3} {
-                    if {$arg1const} {
-                        set ns [lindex $argv 1]
-                        if {![string match "::*" $ns]} {
-                            set root [currentNamespace]
-                            if {$root ne "__unknown__"} {
-                                set ns ${root}::$ns
-                            }
-                        }
-                    } else {
-                        set ns __unknown__
-                    }
-
-                    pushNamespace $ns
-                    parseBody [lindex $argv 2] [lindex $indices 2] knownVars
-                    popNamespace
-                } else {
-                    errorMsg N "Only braced namespace evals are checked." \
-                            [lindex $indices 0] 1
-                }
-            } elseif {([lindex $wordstatus 0] & 1) && \
-                    [string match "im*" [lindex $argv 0]]} {
-                # Handle namespace import
-                if {$argc < 2} {
-                    WA
-                    return
-                }
-                set ns [currentNamespace]
-                if {[lindex $argv 1] eq "-force"} {
-                    set t 2
-                } else {
-                    set t 1
-                }
-                for {} {$t < [llength $argv]} {incr t} {
-                    if {([lindex $wordstatus $t] & 1) == 0} {
-                        continue
-                    }
-                    set other [lookForCommand [lindex $argv $t] $ns -1]
-                    set other [lindex $other 0]
-                    set tail [namespace tail $other]
-                    if {$ns eq ""} {
-                        set me $tail
-                    } else {
-                        set me ${ns}::$tail
-                        if {[string match "::*" $me]} {
-                            set me [string range $me 2 end]
-                        }
-                    }
-                    #puts "ME: $me : OTHER: $other"
-                    # Copy the command info
-                    if {[lsearch -exact $::knownCommands $me] < 0} {
-                        lappend ::knownCommands $me
-                    }
-                    if {![info exists ::syntax($me)] && \
-                            [info exists ::syntax($other)]} {
-                        set ::syntax($me) $::syntax($other)
-                    }
-                }
-                set type [checkCommand $cmd $index $argv $wordstatus \
-                        $wordtype $indices]
-            } else {
-                set type [checkCommand $cmd $index $argv $wordstatus \
-                                  $wordtype $indices]
-            }
-	}
-        next { # Special check of "next" command
-            # Figure out the superclass of the caller to be able to check
-            set currObj [currentObject]
-            if {[info exists ::superclass($currObj)]} {
-                foreach {superCmd superObj} $::superclass($currObj) break
-                set methodName [namespace tail [currentProc]]
-                #puts "next: super '$superObj' meth '$methodName'"
-                if {[string match "* new" $methodName]} {
-                    # This is a constructor
-                    set subCmd "$superCmd new"
-                } else {
-                    set subCmd "$superObj $methodName"
-                }
-                if {[info exists ::syntax($subCmd)]} {
-                    #puts "Syntax for '$subCmd' '$::syntax($subCmd)'"
-                    set type [checkCommand $subCmd $index $argv $wordstatus \
-                            $wordtype $indices]
-                }
-            } else {
-                errorMsg N "No superclass found for 'next'" $index
-            }
-        }
-	tailcall { # Special check of "tailcall" command
-            if {$argc < 1} {
-                WA
-                return
-            }
-            set newStatement [join $argv]
-            set newIndex [lindex $indices 0]
-            set type [parseStatement $newStatement $newIndex knownVars]
-            set noConstantCheck 1
-	}
-	uplevel { # Special check of "uplevel" command
-            # FIXA
-            set noConstantCheck 1
-	}
-	default {
-            set thisCmdHasBeenHandled 0
-        }
-    }
+    # checkSpecial is coded as if inline, might affect these vars:
+    # noConstantCheck constantsDontCheck type
+    set thisCmdHasBeenHandled [checkSpecial $cmd $index $argv $wordstatus \
+                                       $wordtype $indices]
+    if {$thisCmdHasBeenHandled == 2} return
 
     # Fallthrough
     if {!$thisCmdHasBeenHandled} {
