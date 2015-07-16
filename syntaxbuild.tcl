@@ -475,8 +475,10 @@ proc buildDb {ch} {
         set special(next) 1
         set syntax(yield)        "x?"
         set syntax(yieldto)        "x x*"
+        # lmap is handled specially, like foreach, but the presence of the
+        # syntax string tells the internals that it is allowed
         set syntax(lmap) "n x c"
-        #set special(lmap) 1 FIXA
+        set special(lmap) 1
         set syntax(zlib)             "s x*"
         set syntax(zlib\ adler32)    "x x?"
         set syntax(zlib\ compress)   "x x?"

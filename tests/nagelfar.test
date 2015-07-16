@@ -1178,3 +1178,41 @@ test nagelfar-28.1 {
     }
     execTestFile -plugin _testfile_.plugin.tcl
 } -match glob -result {%%Line   4: E Bad expression: invalid bareword "my_noncool_bin_op"*}
+
+test nagelfar-29.1 {
+    Handling foreach combos
+} -body {
+    createTestFile {
+        foreach apa {a b c d} {
+            list $apa $bepa
+        }
+        foreach {apa2 bepa2} {a b c d} {
+            list $apa2 $bepa2 $cepa2
+        }
+        foreach apa3 {x y z} {bepa3 cepa3} {a b c d} {
+            list $apa3 $bepa3 $cepa3 $depa3
+        }
+    }
+    execTestFile
+} -result {%%Line   3: E Unknown variable "bepa"
+Line   6: E Unknown variable "cepa2"
+Line   9: E Unknown variable "depa3"}
+
+test nagelfar-29.2 {
+    Handling lmap combos
+} -constraints runin86 -body {
+    createTestFile {
+        lmap apa {a b c d} {
+            list $apa $bepa
+        }
+        lmap {apa2 bepa2} {a b c d} {
+            list $apa2 $bepa2 $cepa2
+        }
+        lmap apa3 {x y z} {bepa3 cepa3} {a b c d} {
+            list $apa3 $bepa3 $cepa3 $depa3
+        }
+    }
+    execTestFile -flags "-s syntaxdb86.tcl"
+} -result {%%Line   3: E Unknown variable "bepa"
+Line   6: E Unknown variable "cepa2"
+Line   9: E Unknown variable "depa3"}

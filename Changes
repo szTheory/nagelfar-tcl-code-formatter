@@ -1,3 +1,6 @@
+2015-07-16
+ Handle all lmap variants, like foreach.
+
 2015-03-08
  Made a utility to extract info to package databases.
  Added some generated package databases.

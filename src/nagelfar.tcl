@@ -2310,56 +2310,62 @@ proc parseStatement {statement index knownVarsName} {
             lappend constantsDontCheck 0
             set type $wtype
 	}
-	foreach { # Special check of "foreach" command
-	    if {$argc < 3 || ($argc % 2) == 0} {
-		WA
-		return
-	    }
-	    for {set i 0} {$i < $argc - 1} {incr i 2} {
-		if {[lindex $wordstatus $i] == 0} {
-		    errorMsg W "Non constant variable list to foreach\
+	foreach - lmap { # Special check of "foreach" and "lmap" commands
+            # Check that we are in at least 8.6 for lmap
+            if {$cmd eq "lmap" && ![info exists ::syntax(lmap)]} {
+                errorMsg N "MOOO" $index
+                set thisCmdHasBeenHandled 0
+            } else {
+                if {$argc < 3 || ($argc % 2) == 0} {
+                    WA
+                    return
+                }
+                for {set i 0} {$i < $argc - 1} {incr i 2} {
+                    if {[lindex $wordstatus $i] == 0} {
+                        errorMsg W "Non constant variable list to foreach\
                             statement." [lindex $indices $i]
-		    # FIXA, maybe abort here?
-		}
-		lappend constantsDontCheck $i
-		foreach var [lindex $argv $i] {
-		    markVariable $var 1 "" 1 $index known knownVars ""
-		}
-	    }
-            # FIXA: Experimental foreach check...
-            # A special case for looping over constant lists
-            set varsAdded {}
-            foreach {varList valList} [lrange $argv 0 end-1] \
-                    {varWS valWS} [lrange $wordstatus 0 end-1] {
-                if {($varWS & 1) && ($valWS & 1)} {
-                    set fVars {}
-                    foreach fVar $varList {
-                        set ::foreachVar($fVar) {}
-                        lappend fVars apaV($fVar)
-                        lappend varsAdded $fVar
+                        # FIXA, maybe abort here?
                     }
-                    ##nagelfar ignore Non constant variable list to foreach
-                    foreach $fVars $valList {
+                    lappend constantsDontCheck $i
+                    foreach var [lindex $argv $i] {
+                        markVariable $var 1 "" 1 $index known knownVars ""
+                    }
+                }
+                # FIXA: Experimental foreach check...
+                # A special case for looping over constant lists
+                set varsAdded {}
+                foreach {varList valList} [lrange $argv 0 end-1] \
+                        {varWS valWS} [lrange $wordstatus 0 end-1] {
+                    if {($varWS & 1) && ($valWS & 1)} {
+                        set fVars {}
                         foreach fVar $varList {
-                            ##nagelfar variable apaV
-                            lappend ::foreachVar($fVar) $apaV($fVar)
+                            set ::foreachVar($fVar) {}
+                            lappend fVars apaV($fVar)
+                            lappend varsAdded $fVar
+                        }
+                        ##nagelfar ignore Non constant variable list to foreach
+                        foreach $fVars $valList {
+                            foreach fVar $varList {
+                                ##nagelfar variable apaV
+                                lappend ::foreachVar($fVar) $apaV($fVar)
+                            }
                         }
                     }
                 }
-            }
 
-            if {([lindex $wordstatus end] & 1) == 0} {
-                errorMsg W "No braces around body in foreach\
-                        statement." $index
-	    }
-            set ::instrumenting([lindex $indices end]) 1
-	    set type [parseBody [lindex $argv end] [lindex $indices end] \
-                    knownVars]
-            # Clean up
-            foreach fVar $varsAdded {
-                catch {unset ::foreachVar($fVar)}
+                if {([lindex $wordstatus end] & 1) == 0} {
+                    errorMsg W "No braces around body in foreach\
+                            statement." $index
+                }
+                set ::instrumenting([lindex $indices end]) 1
+                set type [parseBody [lindex $argv end] [lindex $indices end] \
+                                  knownVars]
+                # Clean up
+                foreach fVar $varsAdded {
+                    catch {unset ::foreachVar($fVar)}
+                }
             }
-	}
+        }
 	if { # Special check of "if" command
 	    if {$argc < 2} {
 		WA
