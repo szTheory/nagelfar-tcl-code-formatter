@@ -61,6 +61,20 @@ proc execTestFile {args} {
     return -code $code $res
 }    
 
+proc execTestFileInstrument {args} {
+    set res [list [execTestFile {*}$args -flags -instrument]]
+
+    set ch [open _testfile__i r]
+    set data [read $ch]
+    close $ch
+    file delete _testfile__i
+    foreach {item lineNo} [regexp -inline -all {_testfile_,(\d+)} $data] {
+        lappend res $lineNo
+    }
+
+    return $res
+}    
+
 proc cleanupTestFile {} {
     file delete -force _testfile_
     file delete -force _testfile2_
