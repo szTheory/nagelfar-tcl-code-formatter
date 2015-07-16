@@ -1988,18 +1988,19 @@ proc lookForCommand {cmd ns index} {
 # This is a helper for parseStatement, it should not be called from
 # anywhere but parseStatement
 proc checkSpecial {cmd index argv wordstatus wordtype indices} {
-    #cmd index argv wordstatus wordtype indices
     upvar 1 "constantsDontCheck" constantsDontCheck "knownVars" knownVars
     upvar 1 "noConstantCheck" noConstantCheck "type" type
 
     set argc [llength $argv]
 
-    switch -glob -- $cmd {
-	.* { # FIXA, check code in any -command.
-             # Even widget commands should be checked.
-	     # Maybe in checkOptions ?
-	    return 2
-	}
+    if {[string match ".*" $cmd]} {
+        # FIXA, check code in any -command.
+        # Even widget commands should be checked.
+        # Maybe in checkOptions ?
+        return 2
+    }
+
+    switch $cmd {
 	global { # Special check of "global" command
 	    foreach var $argv ws $wordstatus {
 		if {$ws & 1} {
@@ -2018,34 +2019,34 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 foreach var $argv ws $wordstatus {
                     lappend ::implicitVarNs($currNs) $var
                 }
-            } else {
-                set i 0
-                foreach {var val} $argv {ws1 ws2} $wordstatus {
-                    set ns [currentNamespace]
-                    if {[regexp {^(.*)::([^:]+)$} $var -> root var]} {
-                        set ns $root
-                        if {[string match "::*" $ns]} {
-                            set ns [string range $ns 2 end]
-                        }
+                return 1
+            }
+            set i 0
+            foreach {var val} $argv {ws1 ws2} $wordstatus {
+                set ns [currentNamespace]
+                if {[regexp {^(.*)::([^:]+)$} $var -> root var]} {
+                    set ns $root
+                    if {[string match "::*" $ns]} {
+                        set ns [string range $ns 2 end]
                     }
-                    if {$ns ne "__unknown__"} {
-                        if {($ws1 & 1) || [string is wordchar $var]} {
-			    knownVar knownVars $var
-                            dict set knownVars $var namespace $ns
-                            if {$i < $argc - 1} {
-                                dict set knownVars $var set 1
-                                dict set knownVars $var array 0
-                                # FIXA: What if it is an array element?
-                                # Should the array be marked?
-                            }
-                            lappend constantsDontCheck $i
-                        } else {
-                            errorMsg N "Non constant argument to $cmd: $var" \
-                                    $index
-                        }
-                    }
-                    incr i 2
                 }
+                if {$ns ne "__unknown__"} {
+                    if {($ws1 & 1) || [string is wordchar $var]} {
+                        knownVar knownVars $var
+                        dict set knownVars $var namespace $ns
+                        if {$i < $argc - 1} {
+                            dict set knownVars $var set 1
+                            dict set knownVars $var array 0
+                            # FIXA: What if it is an array element?
+                            # Should the array be marked?
+                        }
+                        lappend constantsDontCheck $i
+                    } else {
+                        errorMsg N "Non constant argument to $cmd: $var" \
+                                $index
+                    }
+                }
+                incr i 2
             }
 	}
 	upvar { # Special check of "upvar" command
@@ -2158,57 +2159,55 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
 	foreach - lmap { # Special check of "foreach" and "lmap" commands
             # Check that we are in at least 8.6 for lmap
             if {$cmd eq "lmap" && ![info exists ::syntax(lmap)]} {
-                errorMsg N "MOOO" $index
-                set thisCmdHasBeenHandled 0
-            } else {
-                if {$argc < 3 || ($argc % 2) == 0} {
-                    WA
-                    return 2
-                }
-                for {set i 0} {$i < $argc - 1} {incr i 2} {
-                    if {[lindex $wordstatus $i] == 0} {
-                        errorMsg W "Non constant variable list to foreach\
+                return 0
+            }
+            if {$argc < 3 || ($argc % 2) == 0} {
+                WA
+                return 2
+            }
+            for {set i 0} {$i < $argc - 1} {incr i 2} {
+                if {[lindex $wordstatus $i] == 0} {
+                    errorMsg W "Non constant variable list to foreach\
                             statement." [lindex $indices $i]
-                        # FIXA, maybe abort here?
-                    }
-                    lappend constantsDontCheck $i
-                    foreach var [lindex $argv $i] {
-                        markVariable $var 1 "" 1 $index known knownVars ""
-                    }
+                    # FIXA, maybe abort here?
                 }
-                # FIXA: Experimental foreach check...
-                # A special case for looping over constant lists
-                set varsAdded {}
-                foreach {varList valList} [lrange $argv 0 end-1] \
-                        {varWS valWS} [lrange $wordstatus 0 end-1] {
-                    if {($varWS & 1) && ($valWS & 1)} {
-                        set fVars {}
+                lappend constantsDontCheck $i
+                foreach var [lindex $argv $i] {
+                    markVariable $var 1 "" 1 $index known knownVars ""
+                }
+            }
+            # FIXA: Experimental foreach check...
+            # A special case for looping over constant lists
+            set varsAdded {}
+            foreach {varList valList} [lrange $argv 0 end-1] \
+                    {varWS valWS} [lrange $wordstatus 0 end-1] {
+                if {($varWS & 1) && ($valWS & 1)} {
+                    set fVars {}
+                    foreach fVar $varList {
+                        set ::foreachVar($fVar) {}
+                        lappend fVars apaV($fVar)
+                        lappend varsAdded $fVar
+                    }
+                    ##nagelfar ignore Non constant variable list to foreach
+                    foreach $fVars $valList {
                         foreach fVar $varList {
-                            set ::foreachVar($fVar) {}
-                            lappend fVars apaV($fVar)
-                            lappend varsAdded $fVar
-                        }
-                        ##nagelfar ignore Non constant variable list to foreach
-                        foreach $fVars $valList {
-                            foreach fVar $varList {
-                                ##nagelfar variable apaV
-                                lappend ::foreachVar($fVar) $apaV($fVar)
-                            }
+                            ##nagelfar variable apaV
+                            lappend ::foreachVar($fVar) $apaV($fVar)
                         }
                     }
                 }
+            }
 
-                if {([lindex $wordstatus end] & 1) == 0} {
-                    errorMsg W "No braces around body in foreach\
-                            statement." $index
-                }
-                set ::instrumenting([lindex $indices end]) 1
-                set type [parseBody [lindex $argv end] [lindex $indices end] \
-                                  knownVars]
-                # Clean up
-                foreach fVar $varsAdded {
-                    catch {unset ::foreachVar($fVar)}
-                }
+            if {([lindex $wordstatus end] & 1) == 0} {
+                errorMsg W "No braces around body in foreach\
+                        statement." $index
+            }
+            set ::instrumenting([lindex $indices end]) 1
+            set type [parseBody [lindex $argv end] [lindex $indices end] \
+                              knownVars]
+            # Clean up
+            foreach fVar $varsAdded {
+                catch {unset ::foreachVar($fVar)}
             }
         }
 	if { # Special check of "if" command
@@ -2302,71 +2301,70 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             # Check that we are in at least 8.6
             if {![info exists ::syntax(try)]} {
                 return 0
-            } else {
-                if {$argc < 1} {
-                    WA
-                    return 2
-                }
-                set old_trysyntax $::syntax(try)
-                # Build a syntax string that fits this try statement
-                set state body
-                set trysyntax {}
-                foreach arg $argv ws $wordstatus index $indices {
-                    switch -- $state {
-                        body {
-                            lappend trysyntax c
-                            set state handler
-                            continue
-                        }
-                        finally {
-                            lappend trysyntax c
-                            set state illegal
-                            continue
-                        }
-                        handler {
-                            if {$arg eq "on" || $arg eq "trap"} {
-                                set state code
-                                lappend trysyntax x
-                                continue
-                            }
-                            if {$arg eq "finally"} {
-                                lappend trysyntax x
-                                set state finally
-                                continue
-                            }
-                            errorMsg E "Bad word in try statement, should be on, trap or finally." $index
-                            return 2
-                        }
-                        code {
+            }
+            if {$argc < 1} {
+                WA
+                return 2
+            }
+            set old_trysyntax $::syntax(try)
+            # Build a syntax string that fits this try statement
+            set state body
+            set trysyntax {}
+            foreach arg $argv ws $wordstatus index $indices {
+                switch -- $state {
+                    body {
+                        lappend trysyntax c
+                        set state handler
+                        continue
+                    }
+                    finally {
+                        lappend trysyntax c
+                        set state illegal
+                        continue
+                    }
+                    handler {
+                        if {$arg eq "on" || $arg eq "trap"} {
+                            set state code
                             lappend trysyntax x
-                            set state varlist
                             continue
                         }
-                        varlist {
-                            lappend trysyntax nl
-                            set state body
+                        if {$arg eq "finally"} {
+                            lappend trysyntax x
+                            set state finally
                             continue
                         }
-                        illegal {
-                            errorMsg E "Badly formed try statement" $index
-                            contMsg "Found argument '[trimStr $arg]' after\
+                        errorMsg E "Bad word in try statement, should be on, trap or finally." $index
+                        return 2
+                    }
+                    code {
+                        lappend trysyntax x
+                        set state varlist
+                        continue
+                    }
+                    varlist {
+                        lappend trysyntax nl
+                        set state body
+                        continue
+                    }
+                    illegal {
+                        errorMsg E "Badly formed try statement" $index
+                        contMsg "Found argument '[trimStr $arg]' after\
                               supposed last body."
-                            return 2
-                        }
+                        return 2
                     }
                 }
-                # State should be "handler" or "illegal"
-                if {$state ne "handler" && $state ne "illegal"} {
-                    errorMsg E "Badly formed try statement" $index
-                    #contMsg "Missing one body."
-                    return 2
-                }
-                #decho "$argc try syntax \"$trysyntax\""
-                set ::syntax(try) $trysyntax
-                checkCommand $cmd $index $argv $wordstatus $wordtype $indices
-                set ::syntax(try) $old_trysyntax
             }
-	}
+            # State should be "handler" or "illegal"
+            if {$state ne "handler" && $state ne "illegal"} {
+                errorMsg E "Badly formed try statement" $index
+                #contMsg "Missing one body."
+                return 2
+            }
+            #decho "$argc try syntax \"$trysyntax\""
+            set ::syntax(try) $trysyntax
+            checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+            set ::syntax(try) $old_trysyntax
+        }
 	switch { # Special check of "switch" command
 	    if {$argc < 2} {
 		WA
