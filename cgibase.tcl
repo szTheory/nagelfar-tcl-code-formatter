@@ -1,6 +1,6 @@
 #!/bin/env tclsh
 
-# map specail chars for HTML
+# map special chars for HTML
 proc m {str} {
     set map {< &lt; > &gt; & &amp;}
     return [string map $map $str]

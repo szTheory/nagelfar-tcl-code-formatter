@@ -1,6 +1,15 @@
 Changes
 ========
 
+Changes in v?.?.? (not yet released):
+
+* Handle all lmap variants, like foreach.
+* Handle namespace import with glob pattern. (exports are not tracked so it just assumes existing procs are exported) [Bug #7]
+* Do not introduce side effect when instrumenting implicit else. [Bug #5]
+* Line number reporting could be wrong with {*} operator. [Bug #6]
+* Made a utility for package database creation.
+* More package databases (fileutil, textutil, profiler, ftp)
+
 Changes in v1.2.2 (2015-03-08):
 
 * Various bug fixes:
