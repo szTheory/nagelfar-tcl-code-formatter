@@ -1969,11 +1969,11 @@ proc lookForCommand {cmd ns index} {
         if {[info exists ::syntax($cmdCandidate)]} {
             return [list $cmdCandidate]
         }
-        if {[lsearch $::knownCommands $cmdCandidate] >= 0} {
+        if {[lsearch -exact $::knownCommands $cmdCandidate] >= 0} {
             return [list $cmdCandidate]
         }
     }
-    if {[lsearch $::knownCommands $cmd] >= 0} {
+    if {[lsearch -exact $::knownCommands $cmd] >= 0} {
         return [list $cmd]
     }
 
@@ -2575,27 +2575,45 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 }
                 for {} {$t < [llength $argv]} {incr t} {
                     if {([lindex $wordstatus $t] & 1) == 0} {
+                        # Non constant cannot be checked
                         continue
                     }
-                    set other [lookForCommand [lindex $argv $t] $ns -1]
-                    set other [lindex $other 0]
-                    set tail [namespace tail $other]
-                    if {$ns eq ""} {
-                        set me $tail
-                    } else {
-                        set me ${ns}::$tail
-                        if {[string match "::*" $me]} {
-                            set me [string range $me 2 end]
+                    set candidate [lindex $argv $t]
+                    set others [lookForCommand $candidate $ns -1]
+                    set others [lrange $others 0 0]
+                    if {[llength $others] == 0} {
+                        # Fall back on trying glob matching
+                        if {[string match "::*" $candidate]} {
+                            set candidate [string range $candidate 2 end]
                         }
+                        # If it is an import of * we make the assumption
+                        # that only lower-case procs are imported, since we
+                        # do not know the export list
+                        if {[string match "*::\\*" $candidate]} {
+                            set candidate [string range $candidate 0 end-1]
+                            append candidate {[a-z]*}
+                        }
+                        set others [lsearch -all -inline -glob $::knownCommands $candidate]
                     }
-                    #puts "ME: $me : OTHER: $other"
-                    # Copy the command info
-                    if {[lsearch -exact $::knownCommands $me] < 0} {
-                        lappend ::knownCommands $me
-                    }
-                    if {![info exists ::syntax($me)] && \
-                            [info exists ::syntax($other)]} {
-                        set ::syntax($me) $::syntax($other)
+                    foreach other $others {
+                        set tail [namespace tail $other]
+                        if {$ns eq ""} {
+                            set me $tail
+                        } else {
+                            set me ${ns}::$tail
+                            if {[string match "::*" $me]} {
+                                set me [string range $me 2 end]
+                            }
+                        }
+                        #puts "ME: $me : OTHER: $other"
+                        # Copy the command info
+                        if {[lsearch -exact $::knownCommands $me] < 0} {
+                            lappend ::knownCommands $me
+                        }
+                        if {![info exists ::syntax($me)] && \
+                                [info exists ::syntax($other)]} {
+                            set ::syntax($me) $::syntax($other)
+                        }
                     }
                 }
                 set type [checkCommand $cmd $index $argv $wordstatus \

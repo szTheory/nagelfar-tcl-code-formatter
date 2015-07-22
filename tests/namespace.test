@@ -97,6 +97,45 @@ test namespace-2.2 {
     execTestFile
 } -result {%%}
 
+test namespace-2.3 {
+    Namespaces, imported procs
+} -body {
+    createTestFile {
+        namespace eval x {
+            namespace export f F
+            proc f {} {}
+            proc gugg {} {}
+            proc F {} {}
+        }
+        # Nagelfar does not trace namespace export and makes the assumption
+        # that an import of * gets all lower-case commands
+        namespace import x::*
+        f
+        F
+        gugg
+    }
+    execTestFile
+} -result {%%Line  12: W Unknown command "F"}
+
+test namespace-2.4 {
+    Namespaces, imported procs
+} -body {
+    createTestFile {
+        namespace eval x {
+            namespace export f Gugg
+            proc f {} {}
+            proc GAgg {} {}
+            proc Gugg {} {}
+        }
+        # Nagelfar does not trace namespace export and just follows the glob
+        namespace import x::G*
+        GAgg
+        Gugg
+        f
+    }
+    execTestFile
+} -result {%%Line  12: W Unknown command "f"}
+
 test namespace-3.1 {
     Namespaces, eval
 } -body {
