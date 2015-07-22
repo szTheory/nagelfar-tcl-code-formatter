@@ -1,3 +1,6 @@
+2015-07-22
+ Line number reporting could be wrong with {*} operator. [Bug #6]
+
 2015-07-16
  Handle all lmap variants, like foreach.
 

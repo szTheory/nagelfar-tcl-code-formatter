@@ -54,6 +54,16 @@ test expand-2.3 {
     execTestFile
 } -result {%%Line   3: E Wrong number of arguments (3) to "set"}
 
+test expand-2.4 {
+    Simple errors, this was a bug with line numbers
+} -constraints {runin85}  -body {
+    createTestFile "
+        {*}\[list \\
+                    \$bepa\]
+    "
+    execTestFile
+} -result {%%Line   3: E Unknown variable "bepa"}
+
 test expand-3.1 {
     New syntax warning
 } -constraints {runin85} -body {

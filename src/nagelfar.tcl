@@ -2717,6 +2717,7 @@ proc parseStatement {statement index knownVarsName} {
         if {[string length $word] > 3 && [string match "{\\*}*" $word]} {
             set ws 8
             set word [string range $word 3 end]
+            incr index 3
         }
         set char [string index $word 0]
         if {$char eq "\{"} {
