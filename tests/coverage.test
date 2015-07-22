@@ -162,3 +162,27 @@ test coverage-5.1 {
     }
     execTestFileInstrument
 } -result [list {%%Writing file _testfile__i} 11 8 7 7 8 11]
+
+test coverage-6.1 {
+    Side effects
+} -body {
+    createTestFile {
+        proc Xx {a} {
+            if {$a} {
+                return y
+            }
+            # Implicit return of empty string here
+        }
+    }
+    set res [list [execTestFile -flags -instrument]]
+
+    interp create apa
+    apa eval source _testfile__i
+    lappend res [apa eval Xx 0] [apa eval Xx 1]
+    apa eval ::_instrument_::cleanup
+    interp delete apa
+
+    file delete _testfile__i
+    file delete _testfile__log
+    set res
+} -result [list {%%Writing file _testfile__i} "" y]

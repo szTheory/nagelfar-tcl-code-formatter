@@ -3834,7 +3834,9 @@ proc dumpInstrumenting {filename} {
             if {[string index $iscript $ix] eq "\}"} {
                 incr ix
             }
-            set insert [list incr ::_instrument_::log($item)]
+            # To make the instrumentation side effect free the else clause
+            # returns an empty string by adding the "list" command at the end.
+            set insert [list incr ::_instrument_::log($item)]\;list
             set insert " [list else $insert]"
             set pre [string range $iscript 0 [expr {$ix - 1}]]
             set post [string range $iscript $ix end]

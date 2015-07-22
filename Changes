@@ -1,4 +1,7 @@
 2015-07-22
+ Do not introduce side effect when instrumenting implicit else. [Bug #5]
+
+2015-07-22
  Line number reporting could be wrong with {*} operator. [Bug #6]
 
 2015-07-16
