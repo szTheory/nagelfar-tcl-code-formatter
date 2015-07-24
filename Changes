@@ -1,3 +1,7 @@
+2015-07-24
+ Allow code coverage to run in parallell. [FR #8]
+ Idea and patch from Sven Beyer.
+
 2015-07-22
  Handle namespace import xx::* [Bug #7]
 

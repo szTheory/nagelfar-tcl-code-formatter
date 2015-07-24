@@ -3920,18 +3920,45 @@ proc dumpInstrumenting {filename} {
                 ::_instrument_::cleanup
                 uplevel 1 [linsert $args 0 ::_instrument_::exit]
             }
+            proc ::_instrument_::flock {filename cmds} {
+                set lck ${filename}.lck
+                set i 0
+                while { [catch {open $lck {WRONLY CREAT EXCL}} lock] } {
+                    incr i
+                    after 250
+                    if { $i>9 } {
+                        # Could use throw in 8.6
+                        return -code error -errorcode LOCK \
+                                "Could not acquire lock '$lck' in $i tries!"
+                    }
+                }
+                # Could use try in 8.6
+                catch { uplevel 1 $cmds }
+                # finally
+                close $lock
+                file delete $lck
+            }
             proc ::_instrument_::cleanup {} {
                 variable log
                 variable all
                 variable dumpList
                 foreach {src logFile} $dumpList {
-                    set ch [open $logFile w]
-                    puts $ch [list array unset ::_instrument_::log $src,*]
-                    foreach item [lsort -dictionary [array names log $src,*]] {
-                        puts $ch [list set ::_instrument_::log($item) \
-                                $::_instrument_::log($item)]
+                    flock $logFile {
+                        if {[file exists $logFile]} {
+                            # Avoid source
+                            set ch [open $logFile r]
+                            set logdata [read $ch]
+                            close $ch
+                            eval $logdata
+                        }
+                        set ch [open $logFile w]
+                        foreach item [lsort -dictionary [array names log $src,*]] {
+                            puts $ch [list incr ::_instrument_::log($item) \
+                                              $::_instrument_::log($item)]
+                            set ::_instrument_::log($item) 0
+                        }
+                        close $ch
                     }
-                    close $ch
                 }
             }
         }
@@ -3950,11 +3977,7 @@ proc dumpInstrumenting {filename} {
             if {[string match "*_i" $thisScript]} {
                 set thisScript [string range $thisScript 0 end-2]
             }
-            set logFile    ${thisScript}_log
-            if {[file exists $logFile]} {
-                ::_instrument_::source $logFile
-            }
-
+            set logFile ${thisScript}_log
             lappend dumpList $current $logFile
         }
 
@@ -3992,6 +4015,11 @@ proc instrumentMarkup {filename} {
         }
         if {$::_instrument_::log($item) != 0} {
             incr covered
+            if {[regexp {,(\d+),\d+$} $item -> line]} {
+                set lines($line) " ;# Reached $::_instrument_::log($item) times"
+            } elseif {[regexp {,(\d+)$} $item -> line]} {
+                set lines($line) " ;# Reached $::_instrument_::log($item) times"
+            }
             continue
         }
         incr noncovered

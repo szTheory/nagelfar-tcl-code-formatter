@@ -100,6 +100,69 @@ test coverage-2.1 {
     file delete _testfile_1_log _testfile_2_log
 }
 
+test coverage-2.2 {
+    Multiple files, multiple runs
+} -body {
+    createTestFile {
+        proc x1 {y z} {
+            if {$y} {# Should be able to handle a comment here
+                set hej 1
+            };# Should be able to handle a comment here
+            if {$z} {
+                set hej 1
+            }
+        }
+    }
+    file rename _testfile_ _testfile_1
+    createTestFile {
+        proc x2 {y z} {
+            if {$y} {# Should be able to handle a comment here
+                set hej 1
+            };# Should be able to handle a comment here 
+            if {$z} {
+                set hej 1
+            }
+       }
+    }
+    file rename _testfile_ _testfile_2
+    execTestFile -flags -instrument -fn _testfile_1
+    execTestFile -flags -instrument -fn _testfile_2
+
+    interp create apa
+    apa eval source _testfile_1_i
+    apa eval source _testfile_2_i
+    apa eval x1 1 0
+    apa eval x2 0 1
+    apa eval ::_instrument_::cleanup
+    interp delete apa
+
+    interp create apa
+    apa eval source _testfile_1_i
+    apa eval source _testfile_2_i
+    apa eval x1 1 0
+    apa eval x1 0 1
+    apa eval x2 0 1
+    apa eval ::_instrument_::cleanup
+    interp delete apa
+
+    interp create apa
+    apa eval [list namespace eval ::_instrument_ {}]
+    apa eval source _testfile_1_log
+    apa eval source _testfile_2_log
+    set items [apa eval array get ::_instrument_::log]
+    interp delete apa
+    
+    set res {}
+    foreach {item val} $items {
+        lappend res [list $item $val]
+    }
+    lsort -dictionary -index 0 $res
+} -result {{_testfile_1,2 3} {_testfile_1,3 2} {_testfile_1,5 1} {_testfile_1,6 1} {_testfile_1,8 2} {_testfile_2,2 2} {_testfile_2,3 0} {_testfile_2,5 2} {_testfile_2,6 2} {_testfile_2,8 0}} -cleanup {
+    file delete _testfile_1_i _testfile_1
+    file delete _testfile_2_i _testfile_2
+    file delete _testfile_1_log _testfile_2_log
+}
+
 test coverage-3.1 {
     Repeated instrumenting
 } -body {
@@ -120,11 +183,13 @@ test coverage-3.1 {
     file delete _testfile__i
     file delete _testfile__log
     set res
+    # Note: the coverage statistics in the result depends in the contents
+    # of instrumentation prolog code, any change there can affect the numbers.
 } -result [list \
         {%%Writing file _testfile__i} \
         {%%Warning: Instrumenting already instrumented file _testfile_
 Writing file _testfile__i} \
-        {Writing file _testfile__m (3/13 23.1%)
+        {Writing file _testfile__m (2/16 12.5%)
 File _testfile_ is instrumented, aborting markup}]
 
 test coverage-4.1 {
