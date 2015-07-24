@@ -3899,97 +3899,112 @@ proc dumpInstrumenting {filename} {
         set iscript [string range $iscript $headerIndex end]
     }
     # Create a prolog equal in all instrumented files
-    puts $ch {\
-        namespace eval ::_instrument_ {}
-        if {[info commands ::_instrument_::source] == ""} {
-            rename ::source ::_instrument_::source
-            proc ::source {args} {
-                set fileName [lindex $args end]
-                set args [lrange $args 0 end-1]
-                set newFileName $fileName
-                set altFileName ${fileName}_i
-                if {[file exists $altFileName]} {
-                    set newFileName $altFileName
-                }
-                set args [linsert $args 0 ::_instrument_::source]
-                lappend args $newFileName
-                uplevel 1 $args
-            }
-            rename ::exit ::_instrument_::exit
-            proc ::exit {args} {
-                ::_instrument_::cleanup
-                uplevel 1 [linsert $args 0 ::_instrument_::exit]
-            }
-            proc ::_instrument_::flock {filename cmds} {
-                set lck ${filename}.lck
-                set i 0
-                while { [catch {open $lck {WRONLY CREAT EXCL}} lock] } {
-                    incr i
-                    after 250
-                    if { $i>9 } {
-                        # Could use throw in 8.6
-                        return -code error -errorcode LOCK \
-                                "Could not acquire lock '$lck' in $i tries!"
-                    }
-                }
-                # Could use try in 8.6
-                catch { uplevel 1 $cmds }
-                # finally
-                close $lock
-                file delete $lck
-            }
-            proc ::_instrument_::cleanup {} {
-                variable log
-                variable all
-                variable dumpList
-                foreach {src logFile} $dumpList {
-                    flock $logFile {
-                        if {[file exists $logFile]} {
-                            # Avoid source
-                            set ch [open $logFile r]
-                            set logdata [read $ch]
-                            close $ch
-                            eval $logdata
-                        }
-                        set ch [open $logFile w]
-                        foreach item [lsort -dictionary [array names log $src,*]] {
-                            puts $ch [list incr ::_instrument_::log($item) \
-                                              $::_instrument_::log($item)]
-                            set ::_instrument_::log($item) 0
-                        }
-                        close $ch
-                    }
-                }
-            }
-        }
-    }
+    puts $ch [info body _instrumentProlog1]
     # Insert file specific info
     puts $ch "# Initialise list of lines"
     puts $ch "namespace eval ::_instrument_ \{"
     puts $ch [join $init \n]
     puts $ch "\}"
-    # More common prolog
-    ##nagelfar ignore +2 Suspicious # char
-    puts $ch {
-        # Check if there is a stored log
-        namespace eval ::_instrument_ {
-            set thisScript [file normalize [file join [pwd] [info script]]]
-            if {[string match "*_i" $thisScript]} {
-                set thisScript [string range $thisScript 0 end-2]
-            }
-            set logFile ${thisScript}_log
-            lappend dumpList $current $logFile
-        }
+    # More common prolog for file specific stuff
+    puts $ch [info body _instrumentProlog2]
 
-        #instrumented source goes here
-    }
-
+    puts $ch "\#instrumented source goes here"
     puts $ch $iscript
     close $ch
 
     # Copy permissions to instrumented file.
     catch {file attributes $ifile -permissions \
             [file attributes $filename -permissions]}
+}
+
+# The body of this procedure is used as common code in instrumented files
+# It is stored in a proc to be able to treat it as code in indentation and
+# syntax checking.
+proc _instrumentProlog1 {} {
+    namespace eval ::_instrument_ {}
+    # Defining help procedures should be done once even if multiple
+    # instrumented files are loaded, so check if it has been done.
+    if {[info commands ::_instrument_::source] == ""} {
+        rename ::source ::_instrument_::source
+        ##nagelfar ignore does not match previous
+        proc ::source {args} {
+            set fileName [lindex $args end]
+            set args [lrange $args 0 end-1]
+            set newFileName $fileName
+            set altFileName ${fileName}_i
+            if {[file exists $altFileName]} {
+                set newFileName $altFileName
+            }
+            set args [linsert $args 0 ::_instrument_::source]
+            lappend args $newFileName
+            uplevel 1 $args
+        }
+        rename ::exit ::_instrument_::exit
+        ##nagelfar ignore does not match previous
+        proc ::exit {args} {
+            ::_instrument_::cleanup
+            uplevel 1 [linsert $args 0 ::_instrument_::exit]
+        }
+        ##nagelfar syntax _instrument_::flock x c
+        proc ::_instrument_::flock {filename cmds} {
+            set lck ${filename}.lck
+            set i 0
+            while { [catch {open $lck {WRONLY CREAT EXCL}} lock] } {
+                incr i
+                after 250
+                if { $i>9 } {
+                    # Could use throw in 8.6
+                    return -code error -errorcode LOCK \
+                            "Could not acquire lock '$lck' in $i tries!"
+                }
+            }
+            # Should use try in 8.6
+            catch { uplevel 1 $cmds }
+            # finally
+            close $lock
+            file delete $lck
+        }
+        proc ::_instrument_::cleanup {} {
+            variable log
+            variable all
+            variable dumpList
+            foreach {src logFile} $dumpList {
+                flock $logFile {
+                    if {[file exists $logFile]} {
+                        # Avoid source
+                        set ch [open $logFile r]
+                        set logdata [read $ch]
+                        close $ch
+                        eval $logdata
+                    }
+                    set ch [open $logFile w]
+                    foreach item [lsort -dictionary [array names log $src,*]] {
+                        puts $ch [list incr ::_instrument_::log($item) \
+                                          $::_instrument_::log($item)]
+                        set ::_instrument_::log($item) 0
+                    }
+                    close $ch
+                }
+            }
+        }
+    }
+}
+
+# The body of this procedure is used as common code in instrumented files
+# It is stored in a proc to be able to treat it as code in indentation and
+# syntax checking.
+# Variables dumpList and current are known where this code is run, this is
+# emulated by making them arguments.
+proc _instrumentProlog2 {dumpList current} {
+    # Store information about this particular file for later use in cleanup
+    namespace eval ::_instrument_ {
+        set thisScript [file normalize [file join [pwd] [info script]]]
+        if {[string match "*_i" $thisScript]} {
+            set thisScript [string range $thisScript 0 end-2]
+        }
+        set logFile ${thisScript}_log
+        lappend dumpList $current $logFile
+    }
 }
 
 # Add Code Coverage markup to a file according to measured coverage
@@ -4053,7 +4068,7 @@ proc instrumentMarkup {filename} {
     }
     set lineNo 1
     while {[gets $chi line] >= 0} {
-        if {$line eq " namespace eval ::_instrument_ {}"} {
+        if {$line eq "    namespace eval ::_instrument_ {}"} {
             echo "File $filename is instrumented, aborting markup"
             close $chi
             close $cho
