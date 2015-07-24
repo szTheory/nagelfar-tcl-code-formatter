@@ -3899,6 +3899,9 @@ proc dumpInstrumenting {filename} {
         set iscript [string range $iscript $headerIndex end]
     }
     # Create a prolog equal in all instrumented files
+    # The first line is indented with one space to make it detectable when
+    # looking for an instrumented file
+    puts $ch { namespace eval ::_instrument_ {}}
     puts $ch [info body _instrumentProlog1]
     # Insert file specific info
     puts $ch "# Initialise list of lines"
@@ -3921,7 +3924,6 @@ proc dumpInstrumenting {filename} {
 # It is stored in a proc to be able to treat it as code in indentation and
 # syntax checking.
 proc _instrumentProlog1 {} {
-    namespace eval ::_instrument_ {}
     # Defining help procedures should be done once even if multiple
     # instrumented files are loaded, so check if it has been done.
     if {[info commands ::_instrument_::source] == ""} {
@@ -4074,7 +4076,7 @@ proc instrumentMarkup {filename} {
     }
     set lineNo 1
     while {[gets $chi line] >= 0} {
-        if {$line eq "    namespace eval ::_instrument_ {}"} {
+        if {$line eq " namespace eval ::_instrument_ {}"} {
             echo "File $filename is instrumented, aborting markup"
             close $chi
             close $cho

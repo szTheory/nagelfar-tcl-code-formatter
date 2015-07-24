@@ -122,7 +122,7 @@ instrument: base $(IFILES) nagelfar.tcl_i
 nagelfar_dummy.tcl: $(IFILES)
 	@rm -f nagelfar_dummy.tcl
 	@touch nagelfar_dummy.tcl
-	@echo "#!/usr/bin/env tclsh" >> nagelfar_dummy.tcl
+	@cat src/prologue.tcl >> nagelfar_dummy.tcl
 	@for i in $(SRCFILES) ; do echo "source $$i" >> nagelfar_dummy.tcl ; done
 
 # Top file for coverage run

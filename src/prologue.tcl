@@ -31,9 +31,12 @@ set debug 0
 package require Tcl 8.4
 
 package provide app-nagelfar 1.0
-set version "Version 1.2.2 2015-03-08"
+set version "Version 1.2.2+ 2015-07-25"
 
-set thisScript [file normalize [file join [pwd] [info script]]]
+# Allow thisScript to be predefined (used for test)
+if {![info exists thisScript]} {
+    set thisScript [file normalize [file join [pwd] [info script]]]
+}
 set thisDir    [file dirname $thisScript]
 
 # Follow any link
