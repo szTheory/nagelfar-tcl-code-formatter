@@ -46,6 +46,7 @@ proc usage {} {
  -header <file>    : Create a "header" file with syntax info for scriptfiles.
  -instrument       : Instrument source file for code coverage.
  -markup           : Markup source file with code coverage result.
+ -markupfull       : Like -markup, but includes stats for covered blocks.
  -quiet            : Suppress non-syntax output.
  -glob <pattern>   : Add matching files to scriptfiles to check.
  -plugin <plugin>  : Run with this plugin.
@@ -294,12 +295,13 @@ if {![info exists gurka]} {
                     severity E
                 }
             }
-            -markup {
+            -markup* {
                 incr i
                 if {$i < $argc} {
                     lappend ::Nagelfar(files) [lindex $argv $i]
                 }
-                instrumentMarkup [lindex $::Nagelfar(files) 0]
+                instrumentMarkup [lindex $::Nagelfar(files) 0] \
+                        [string equal $arg "-markupfull"]
                 exit
             }
  	    -plugin {

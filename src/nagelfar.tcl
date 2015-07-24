@@ -4016,7 +4016,7 @@ proc _instrumentProlog2 {dumpList current} {
 }
 
 # Add Code Coverage markup to a file according to measured coverage
-proc instrumentMarkup {filename} {
+proc instrumentMarkup {filename full} {
     set tail [file tail $filename]
     set logfile ${filename}_log
     set mfile ${filename}_m
@@ -4038,10 +4038,15 @@ proc instrumentMarkup {filename} {
         }
         if {$::_instrument_::log($item) != 0} {
             incr covered
-            if {[regexp {,(\d+),\d+$} $item -> line]} {
-                set lines($line) " ;# Reached $::_instrument_::log($item) times"
-            } elseif {[regexp {,(\d+)$} $item -> line]} {
-                set lines($line) " ;# Reached $::_instrument_::log($item) times"
+            # Markup covered only if full is requested
+            if {$full} {
+                if {[regexp {,(\d+),\d+$} $item -> line]} {
+                    set lines($line) \
+                            " ;# Reached $::_instrument_::log($item) times"
+                } elseif {[regexp {,(\d+)$} $item -> line]} {
+                    set lines($line) \
+                            " ;# Reached $::_instrument_::log($item) times"
+                }
             }
             continue
         }
