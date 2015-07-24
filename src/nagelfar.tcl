@@ -3979,8 +3979,14 @@ proc _instrumentProlog1 {} {
                     }
                     set ch [open $logFile w]
                     foreach item [lsort -dictionary [array names log $src,*]] {
-                        puts $ch [list incr ::_instrument_::log($item) \
-                                          $::_instrument_::log($item)]
+                        if {[string match *,var $item]} {
+                            # Variable coverage is a list, not a number
+                            puts $ch [linsert $::_instrument_::log($item) 0 \
+                                    lappend ::_instrument_::log($item)]
+                        } else {
+                            puts $ch [list incr ::_instrument_::log($item) \
+                                              $::_instrument_::log($item)]
+                        }
                         set ::_instrument_::log($item) 0
                     }
                     close $ch
