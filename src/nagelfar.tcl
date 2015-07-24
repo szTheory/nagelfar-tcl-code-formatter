@@ -3635,6 +3635,13 @@ proc buildLineDb {str} {
         # Check for comments.
 	if {[string index $line 0] eq "#"} {
 	    checkPossibleComment $line $lineNo
+        }
+        # Keep track of the leading comment lines (header) to preserve them
+        # when instrumenting for coverage.
+	if {[string index $line 0] eq "#" && \
+                    ![string match "##nagelfar *" $line]} {
+            # Do nothing, this can be a header line
+            # Inline comment pragmas are not considered part of a header
 	} elseif {$headerLines && $line ne "" && !$previousWasEscaped} {
             set headerLines 0
             set ::instrumenting(header) [string length $result]
@@ -3828,6 +3835,7 @@ proc dumpInstrumenting {filename} {
     set init [list [list set current $tail]]
     set headerIndex $::instrumenting(header)
     foreach ix $indices {
+        # Indices goes backwards here, so when reaching headerIndex we are done
         if {$ix <= $headerIndex} break
         set line [calcLineNo $ix]
         set item "$tail,$line"
