@@ -870,7 +870,7 @@ proc checkEditWin {} {
     set script [$w get 1.0 end]
     set ::Nagelfar(scriptContents) $script
     doCheck
-    unset ::Nagelfar(scriptsContents)
+    unset ::Nagelfar(scriptContents)
 }
 
 ######
