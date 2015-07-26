@@ -3,6 +3,9 @@ Changes
 
 Changes in v?.?.? (not yet released):
 
+* Added -idir option to redirect temporary files created during code coverage.
+* Added -markupfull option to include stats of covered lines in markup.
+* Allow code coverage to run in parallell. [FR #8] Thanks to Sven Beyer.
 * Handle all lmap variants, like foreach.
 * Handle namespace import with glob pattern. (exports are not tracked so it just assumes existing procs are exported) [Bug #7]
 * Do not introduce side effect when instrumenting implicit else. [Bug #5]

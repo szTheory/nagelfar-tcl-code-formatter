@@ -47,6 +47,7 @@ proc usage {} {
  -instrument       : Instrument source file for code coverage.
  -markup           : Markup source file with code coverage result.
  -markupfull       : Like -markup, but includes stats for covered blocks.
+ -idir <dir>       : Store code coverage files in this dir.
  -quiet            : Suppress non-syntax output.
  -glob <pattern>   : Add matching files to scriptfiles to check.
  -plugin <plugin>  : Run with this plugin.
@@ -70,6 +71,8 @@ proc StartUp {} {
     set ::Nagelfar(pkgpicky) 0
     set ::Nagelfar(withCtext) 0
     set ::Nagelfar(instrument) 0
+    set ::Nagelfar(markup) 0
+    set ::Nagelfar(idir) ""
     set ::Nagelfar(header) ""
     set ::Nagelfar(tabReg) { {0,7}\t| {8,8}}
     set ::Nagelfar(tabSub) [string repeat " " 8]
@@ -296,13 +299,12 @@ if {![info exists gurka]} {
                 }
             }
             -markup* {
+                set ::Nagelfar(markup) [expr {1 + ($arg eq "-markupfull")}]
+            }
+            -idir {
                 incr i
-                if {$i < $argc} {
-                    lappend ::Nagelfar(files) [lindex $argv $i]
-                }
-                instrumentMarkup [lindex $::Nagelfar(files) 0] \
-                        [string equal $arg "-markupfull"]
-                exit
+                set arg [lindex $argv $i]
+                set ::Nagelfar(idir) $arg
             }
  	    -plugin {
                 incr i
@@ -390,6 +392,17 @@ if {![info exists gurka]} {
                 lappend ::Nagelfar(files) $arg
             }
         }
+    }
+
+    if {$::Nagelfar(markup)} {
+        instrumentMarkup [lindex $::Nagelfar(files) 0] \
+                [expr {$::Nagelfar(markup) == 2}]
+        exit
+    }
+    # Sanity check
+    if {$::Nagelfar(idir) ne "" && !$::Nagelfar(instrument)} {
+        puts "Option -idir can only be used with -instrument or -markup*"
+        exit
     }
 
     # Initialise plugin system

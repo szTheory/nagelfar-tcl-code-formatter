@@ -3815,6 +3815,10 @@ proc dumpInstrumenting {filename} {
         echo "Warning: Instrumenting already instrumented file $tail"
     }
     set ifile ${filename}_i
+    if {$::Nagelfar(idir) ne ""} {
+        file mkdir $::Nagelfar(idir)
+        set ifile [file join $::Nagelfar(idir) ${tail}_i]
+    }
     echo "Writing file $ifile" 1
     set iscript $::instrumenting(script)
     set indices {}
@@ -3832,7 +3836,9 @@ proc dumpInstrumenting {filename} {
             set indices [lreplace $indices $i $i]
         }
     }
-    set init [list [list set current $tail]]
+    set init {}
+    lappend init [list set current $tail]
+    lappend init [list set idir $::Nagelfar(idir)]
     set headerIndex $::instrumenting(header)
     foreach ix $indices {
         # Indices goes backwards here, so when reaching headerIndex we are done
@@ -3933,9 +3939,15 @@ proc _instrumentProlog1 {} {
             set fileName [lindex $args end]
             set args [lrange $args 0 end-1]
             set newFileName $fileName
-            set altFileName ${fileName}_i
-            if {[file exists $altFileName]} {
-                set newFileName $altFileName
+            set altFileNames [list ${fileName}_i]
+            if {$::_instrument_::idir ne ""} {
+                lappend altFileNames [file join $::_instrument_::idir \
+                                              [file tail $fileName]_i]
+            }
+            foreach altFileName $altFileNames {
+                if {[file exists $altFileName]} {
+                    set newFileName $altFileName
+                }
             }
             set args [linsert $args 0 ::_instrument_::source]
             lappend args $newFileName
@@ -3954,17 +3966,20 @@ proc _instrumentProlog1 {} {
             while { [catch {open $lck {WRONLY CREAT EXCL}} lock] } {
                 incr i
                 after 250
-                if { $i>9 } {
+                if {$i > 9} {
                     # Could use throw in 8.6
                     return -code error -errorcode LOCK \
                             "Could not acquire lock '$lck' in $i tries!"
                 }
             }
             # Should use try in 8.6
-            catch { uplevel 1 $cmds }
+            set errCode [catch { uplevel 1 $cmds } errMsg]
             # finally
             close $lock
             file delete $lck
+            if {$errCode} {
+                return -code $errCode $errMsg
+            }
         }
         proc ::_instrument_::cleanup {} {
             variable log
@@ -3973,7 +3988,7 @@ proc _instrumentProlog1 {} {
             foreach {src logFile} $dumpList {
                 flock $logFile {
                     if {[file exists $logFile]} {
-                        # Avoid source
+                        # Avoid source command
                         set ch [open $logFile r]
                         set logdata [read $ch]
                         close $ch
@@ -4018,8 +4033,12 @@ proc _instrumentProlog2 {dumpList current} {
 # Add Code Coverage markup to a file according to measured coverage
 proc instrumentMarkup {filename full} {
     set tail [file tail $filename]
-    set logfile ${filename}_log
-    set mfile ${filename}_m
+    set base $filename
+    if {$::Nagelfar(idir) ne ""} {
+        set base [file join $::Nagelfar(idir) $tail]
+    }
+    set logfile ${base}_log
+    set mfile ${base}_m
 
     namespace eval ::_instrument_ {}
     source $logfile

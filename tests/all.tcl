@@ -62,12 +62,23 @@ proc execTestFile {args} {
 }    
 
 proc execTestFileInstrument {args} {
-    set res [list [execTestFile {*}$args -flags -instrument]]
+    set xx(-flags) {}
+    array set xx $args
+    lappend xx(-flags) -instrument
 
-    set ch [open _testfile__i r]
+    set res [list [execTestFile {*}[array get xx]]]
+
+    set i [lsearch $xx(-flags) -idir]
+    if {$i >= 0} {
+        incr i
+        set ifile [lindex $xx(-flags) $i]/_testfile__i
+    } else {
+        set ifile _testfile__i
+    }
+    set ch [open $ifile r]
     set data [read $ch]
     close $ch
-    file delete _testfile__i
+    file delete $ifile
     foreach {item lineNo} [regexp -inline -all {_testfile_,(\d+)} $data] {
         lappend res $lineNo
     }
@@ -86,3 +97,4 @@ tcltest::testsDirectory $thisDir
 tcltest::runAllTests
 
 cleanupTestFile
+tcltest::cleanupTests

@@ -186,11 +186,11 @@ test coverage-3.1 {
     set res
     # Note: the coverage statistics in the result depends in the contents
     # of instrumentation prolog code, any change there can affect the numbers.
-} -result [list \
+} -match glob -result [list \
         {%%Writing file _testfile__i} \
         {%%Warning: Instrumenting already instrumented file _testfile_
 Writing file _testfile__i} \
-        {Writing file _testfile__m (2/22  9.1%)
+        {Writing file _testfile__m (*/* *%)
 File _testfile_ is instrumented, aborting markup}]
 
 test coverage-4.1 {
@@ -252,3 +252,48 @@ test coverage-6.1 {
     file delete _testfile__log
     set res
 } -result [list {%%Writing file _testfile__i} "" y]
+
+test coverage-7.1 {
+    idir option, error
+} -body {
+    createTestFile {
+        set apa [list hej hopp]
+    }
+    execTestFile -flags "-idir x"
+} -match glob -result {*Option -idir can only be used*}
+
+test coverage-7.2 {
+    idir option
+} -body {
+    createTestFile {
+        set apa [list hej hopp]
+        proc x {y z} {
+            set apa [list hej hopp]
+            if {$y} {
+                puts $z
+                set apa [list hej hopp]
+            }
+            if {$z} break
+        }
+    }
+    set idir [tcltest::makeDirectory _tdir_]
+    set res {}
+    lappend res [execTestFile -flags "-idir $idir -instrument"]
+    lappend res [lsort [glob -dir $idir -tails *]]
+
+    interp create apa
+    apa eval source $idir/_testfile__i
+    apa eval ::_instrument_::cleanup
+    interp delete apa
+    lappend res [lsort [glob -dir $idir -tails *]]
+
+    lappend res [execTestFile -flags "-markup -idir $idir"]
+    lappend res [lsort [glob -dir $idir -tails *]]
+
+    tcltest::removeDirectory _tdir_
+    set res
+} -match glob -result [list {%%Writing file */_tdir_/_testfile__i} \
+                               {_testfile__i} \
+                               {_testfile__i _testfile__log} \
+                               {Writing file */_tdir_/_testfile__m (*)} \
+                               {_testfile__i _testfile__log _testfile__m}]

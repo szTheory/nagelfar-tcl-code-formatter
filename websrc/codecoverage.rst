@@ -35,12 +35,16 @@ Create a markup file for displaying result:
 ``nagelfar.tcl -markup apa.tcl``
 
 This reads coverage data from ``apa.tcl_log`` and creates ``apa.tcl_m``. The
-markup file contains markers in blocks that were not run.
+markup file contains markers in blocks that were not run. If ``-markupfull``
+is used instead, covered code also gets markers but with counts.
 
 See uncovered parts by comparing original with markup in a graphical
 diff tool, like `eskil <http://eskil.tcl.tk>`_:
 
 ``eskil -noparse apa.tcl apa.tcl_m``
+
+The directory where _i, _log and _m files are stored can be redirected with
+``-idir <dir>``.
 
 Example
 ^^^^^^^

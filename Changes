@@ -1,3 +1,6 @@
+2015-07-26
+ Added -idir option to redirect temporary files created during code coverage.
+
 2015-07-24
  Added -markupfull option to include stats of covered lines in markup.
  Allow code coverage to run in parallell. [FR #8]
