@@ -747,6 +747,19 @@ test nagelfar-12.4 {
     execTestFile
 } -result "%%"
 
+test nagelfar-12.5 {
+    Comments, handle hash without being comment
+} -body {
+    createTestFile {
+        proc lvar {name} {
+            # This line caused an older version to fail
+            list #[expr {[info level]-1}] $name
+            list \#[expr {[info level]-1}] $name
+        }
+    }
+    execTestFile
+} -result {%%}
+
 test nagelfar-13.1 {
     Syntax database, multiple ?
 } -body {

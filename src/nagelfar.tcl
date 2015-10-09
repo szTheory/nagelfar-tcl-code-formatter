@@ -503,7 +503,9 @@ proc scanWord {str len index i} {
         } else {
             set i $len
         }
-        if {[info complete [string range $str $si2 $i]]} {
+        # any word starting with # will not work correctly in info
+        # complete, but by prepending the string with "x " it works
+        if {[info complete "x [string range $str $si2 $i]"]} {
             return [expr {$i - 1}]
         }
     }

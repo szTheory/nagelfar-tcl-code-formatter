@@ -1,3 +1,6 @@
+2015-10-09
+ Handle if a word starts with #. [Bug #9]
+
 2015-07-26
  Added -idir option to redirect temporary files created during code coverage.
 
