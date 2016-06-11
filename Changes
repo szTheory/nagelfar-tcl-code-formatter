@@ -1,3 +1,6 @@
+2016-06-11
+ Avoid warning with code that comes from a variable. [Bug #10]
+ 
 2015-10-09
  Handle if a word starts with #. [Bug #9]
 

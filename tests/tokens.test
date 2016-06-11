@@ -328,6 +328,23 @@ test tokens-7.10 {
     execTestFile
 } -result {%%}
 
+test tokens-7.11 {
+    Code token, warnings
+} -body {
+    createTestFile {
+        set apa 1
+        ##nagelfar syntax hopp x c? c
+        hopp hej "$apa x" {list $apa}
+        trace add variable apa write "$apa $apa"
+        # These should be silent
+        trace add variable apa write $apa
+        trace add variable apa write $::apa::bepa
+        trace add variable apa write [list $apa 1]
+    }
+    execTestFile
+} -result {%%Line   4: W No braces around code in hopp statement.
+Line   5: W No braces around code in trace add variable statement.}
+
 
 test tokens-8.1 {
     Subcommand token

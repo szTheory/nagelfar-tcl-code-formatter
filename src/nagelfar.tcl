@@ -1198,6 +1198,24 @@ proc SplitToken {token tokName tokCountName typeName modName lenName} {
     }
 }
 
+# Some heuristics when non-braced non constant code is found
+proc checkNonConstantCode {cmd arg tok index} {
+    # Special case: [list ...]
+    if {[string match {\[list*} $arg]} {
+        # FIXA: Check the code
+        #echo "(List code)"
+        return
+    }
+    # Special case: single variable
+    if {[regexp {^\$[\w:]+$} $arg]} {
+        return
+    }
+     
+    if {$tok eq "c" || $tok eq "cv"} {
+        errorMsg W "No braces around code in $cmd statement." $index
+    }
+}
+
 # Check a command that have a syntax defined in the database
 # 'firsti' says at which index in argv et.al. the arguments begin.
 # Returns the return type of the command
@@ -1511,17 +1529,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		}
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     # No braces around non constant code.
-                    # Special case: [list ...]
-                    set arg [lindex $argv $i]
-                    if {[string match {\[list*} $arg]} {
-                        # FIXA: Check the code
-                        #echo "(List code)"
-                    } else {
-                        if {$tok eq "c"} {
-                            errorMsg W "No braces around code in $cmd\
-                                    statement." [lindex $indices $i]
-                        }
-                    }
+                    checkNonConstantCode $cmd [lindex $argv $i] $tok \
+                            [lindex $indices $i]
 		} else {
                     set body [lindex $argv $i]
                     if {$tokCount ne ""} {
@@ -1592,15 +1601,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 incr i
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     # No braces around non constant code.
-                    # Special case: [list ...]
-                    set arg [lindex $argv $i]
-                    if {[string match {\[list*} $arg]} {
-                        # FIXA: Check the code
-                        #echo "(List code)"
-                    } else {
-                        errorMsg W "No braces around code in $cmd\
-                                statement." [lindex $indices $i]
-                    }
+                    checkNonConstantCode $cmd [lindex $argv $i] $tok \
+                            [lindex $indices $i]
 		} else {
                     set body [lindex $argv $i]
                     if {$tokCount ne ""} {
