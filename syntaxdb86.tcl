@@ -107,12 +107,17 @@ menu
 menubutton
 message
 msgcat::mc
+msgcat::mcexists
 msgcat::mcflmset
 msgcat::mcflset
+msgcat::mcforgetpackage
 msgcat::mcload
+msgcat::mcloadedlocales
 msgcat::mclocale
 msgcat::mcmax
 msgcat::mcmset
+msgcat::mcpackageconfig
+msgcat::mcpackagelocale
 msgcat::mcpreferences
 msgcat::mcset
 msgcat::mcunknown
@@ -825,7 +830,7 @@ set ::syntax(console) {r 1}
 set ::syntax(continue) 0
 set ::syntax(coroutine) {x x x*}
 set ::syntax(destroy) x*
-set ::syntax(dict) {s x*}
+set ::syntax(dict) {s x x*}
 set {::syntax(dict append)} {n x x*}
 set {::syntax(dict filter)} {x x x*}
 set {::syntax(dict for)} {nl x c}
@@ -933,15 +938,20 @@ set ::syntax(menu) {x p*}
 set ::syntax(menubutton) {x p*}
 set ::syntax(message) {x p*}
 set ::syntax(msgcat::mc) {r 1}
+set ::syntax(msgcat::mcexists) {r 0}
 set ::syntax(msgcat::mcflmset) 1
 set ::syntax(msgcat::mcflset) {r 1 2}
+set ::syntax(msgcat::mcforgetpackage) 0
 set ::syntax(msgcat::mcload) 1
+set ::syntax(msgcat::mcloadedlocales) 1
 set ::syntax(msgcat::mclocale) {r 0}
 set ::syntax(msgcat::mcmax) {r 0}
 set ::syntax(msgcat::mcmset) 2
+set ::syntax(msgcat::mcpackageconfig) {r 2 3}
+set ::syntax(msgcat::mcpackagelocale) {r 1 2}
 set ::syntax(msgcat::mcpreferences) 0
 set ::syntax(msgcat::mcset) {r 2 3}
-set ::syntax(msgcat::mcunknown) {r 2}
+set ::syntax(msgcat::mcunknown) {r 0}
 set ::syntax(my) {s x*}
 set {::syntax(my variable)} n*
 set ::syntax(namespace) {s x*}
@@ -1447,8 +1457,8 @@ set {::option(_obj,menubutton configure -textvariable)} n
 set {::option(_obj,message cget)} {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
 set {::option(_obj,message configure)} {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
 set {::option(_obj,message configure -textvariable)} n
-set {::option(_obj,panedwindow cget)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
-set {::option(_obj,panedwindow configure)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set {::option(_obj,panedwindow cget)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set {::option(_obj,panedwindow configure)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set {::option(_obj,radiobutton cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(_obj,radiobutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(_obj,radiobutton configure -textvariable)} n
@@ -1491,8 +1501,8 @@ set {::option(_obj,tk::menubutton configure -textvariable)} n
 set {::option(_obj,tk::message cget)} {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
 set {::option(_obj,tk::message configure)} {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
 set {::option(_obj,tk::message configure -textvariable)} n
-set {::option(_obj,tk::panedwindow cget)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
-set {::option(_obj,tk::panedwindow configure)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set {::option(_obj,tk::panedwindow cget)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set {::option(_obj,tk::panedwindow configure)} {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set {::option(_obj,tk::radiobutton cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(_obj,tk::radiobutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(_obj,tk::radiobutton configure -textvariable)} n
@@ -1613,7 +1623,7 @@ set {::option(namespace which -variable)} v
 set {::option(oo::class create::filter)} {create destroy}
 set {::option(oo::class create::mixin)} {create destroy}
 set {::option(package require)} -exact
-set ::option(panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set ::option(panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set ::option(puts) -nonewline
 set ::option(radiobutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(radiobutton -textvariable)} n
@@ -1664,7 +1674,7 @@ set ::option(tk::menubutton) {-activebackground -activeforeground -anchor -backg
 set {::option(tk::menubutton -textvariable)} n
 set ::option(tk::message) {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
 set {::option(tk::message -textvariable)} n
-set ::option(tk::panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
+set ::option(tk::panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set ::option(tk::radiobutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -value -variable -width -wraplength}
 set {::option(tk::radiobutton -textvariable)} n
 set {::option(tk::radiobutton -variable)} n

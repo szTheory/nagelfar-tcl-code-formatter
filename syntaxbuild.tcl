@@ -387,7 +387,7 @@ proc buildDb {ch} {
 
     # Things added in 8.5
     if {[info commands dict] ne ""} {
-        set syntax(dict)          "s x*"
+        set syntax(dict)          "s x x*"
         set syntax(dict\ append)  "n x x*"
         set syntax(dict\ incr)    "n x x*"
         set syntax(dict\ filter)  "x x x"
