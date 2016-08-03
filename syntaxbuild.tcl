@@ -387,6 +387,7 @@ proc buildDb {ch} {
 
     # Things added in 8.5
     if {[info commands dict] ne ""} {
+        set syntax(catch)        "c n? n?" ;# FIXA make a test for this
         set syntax(dict)          "s x x*"
         set syntax(dict\ append)  "n x x*"
         set syntax(dict\ incr)    "n x x*"
@@ -434,7 +435,6 @@ proc buildDb {ch} {
     # Things added in 8.6
     if {[info commands try] ne ""} {
         # Changed commands
-        set syntax(catch)        "c n? n?" ;# FIXA make a test for this
         set syntax(close)           "x x?"
         set syntax(chan\ close)     "x x?"
         set syntax(dict\ filter)    "x x x*"

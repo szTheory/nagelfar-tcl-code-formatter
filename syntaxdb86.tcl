@@ -1,6 +1,6 @@
 # Automatically generated syntax database.
 
-lappend ::dbInfo {Tcl 8.6.4 unix, Tk 8.6.4 x11}
+lappend ::dbInfo {Tcl 8.6.6 unix, Tk 8.6.6 x11}
 set ::dbTclVersion 8.6
 set ::knownGlobals {argc argv argv0 auto_index auto_path env errorCode errorInfo tcl_interactive tcl_library tcl_nonwordchars tcl_patchLevel tcl_pkgPath tcl_platform tcl_rcFileName tcl_version tcl_wordchars tk_library tk_patchLevel tk_strictMotif tk_version}
 set ::knownCommands {
@@ -1343,7 +1343,7 @@ set ::subCmd(_obj,radiobutton) {cget configure deselect flash invoke select}
 set ::subCmd(_obj,scale) {cget configure coords get identify set}
 set ::subCmd(_obj,scrollbar) {activate cget configure delta fraction get identify set}
 set ::subCmd(_obj,spinbox) {bbox cget configure delete get icursor identify index insert invoke scan selection set validate xview}
-set ::subCmd(_obj,text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer replace scan search see tag window xview yview}
+set ::subCmd(_obj,text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer pendingsync replace scan search see sync tag window xview yview}
 set ::subCmd(_obj,tk::button) {cget configure flash invoke}
 set ::subCmd(_obj,tk::canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
 set ::subCmd(_obj,tk::checkbutton) {cget configure deselect flash invoke select toggle}
@@ -1359,7 +1359,7 @@ set ::subCmd(_obj,tk::radiobutton) {cget configure deselect flash invoke select}
 set ::subCmd(_obj,tk::scale) {cget configure coords get identify set}
 set ::subCmd(_obj,tk::scrollbar) {activate cget configure delta fraction get identify set}
 set ::subCmd(_obj,tk::spinbox) {bbox cget configure delete get icursor identify index insert invoke scan selection set validate xview}
-set ::subCmd(_obj,tk::text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer replace scan search see tag window xview yview}
+set ::subCmd(_obj,tk::text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer pendingsync replace scan search see sync tag window xview yview}
 set ::subCmd(_obj,tk::toplevel) {cget configure}
 set ::subCmd(_obj,toplevel) {cget configure}
 set ::subCmd(_obj,ttk::button) {cget configure identify instate invoke state}
@@ -1446,8 +1446,8 @@ set {::option(_obj,label configure)} {-activebackground -activeforeground -ancho
 set {::option(_obj,label configure -textvariable)} n
 set {::option(_obj,labelframe cget)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,labelframe configure)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set {::option(_obj,listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
-set {::option(_obj,listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,listbox configure -listvariable)} n
 set {::option(_obj,menu cget)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
 set {::option(_obj,menu configure)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
@@ -1492,8 +1492,8 @@ set {::option(_obj,tk::label configure)} {-activebackground -activeforeground -a
 set {::option(_obj,tk::label configure -textvariable)} n
 set {::option(_obj,tk::labelframe cget)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,tk::labelframe configure)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set {::option(_obj,tk::listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
-set {::option(_obj,tk::listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,tk::listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,tk::listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,tk::listbox configure -listvariable)} n
 set {::option(_obj,tk::menubutton cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,tk::menubutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
@@ -1604,7 +1604,7 @@ set {::option(interp invokehidden -namespace)} 1
 set ::option(label) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -padx -pady -relief -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(label -textvariable)} n
 set ::option(labelframe) {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set ::option(listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set ::option(listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(listbox -listvariable)} n
 set ::option(lsearch) {-all -ascii -bisect -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -subindices}
 set {::option(lsearch -index)} 1
@@ -1668,7 +1668,7 @@ set ::option(tk::frame) {-bd -borderwidth -class -relief -background -bg -colorm
 set ::option(tk::label) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -padx -pady -relief -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::label -textvariable)} n
 set ::option(tk::labelframe) {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set ::option(tk::listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set ::option(tk::listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(tk::listbox -listvariable)} n
 set ::option(tk::menubutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::menubutton -textvariable)} n
