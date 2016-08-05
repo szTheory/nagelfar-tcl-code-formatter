@@ -7,7 +7,6 @@ VERSION = 123
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/peter/tclkit
 TCLKIT_LINUX   = $(TCLKIT)/v84/tclkit-linux-x86
-TCLKIT_SOLARIS = $(TCLKIT)/v84/tclkit-solaris-sparc
 TCLKIT_WIN     = $(TCLKIT)/v84/tclkit-win32.upx.exe
 TCLKITSH_WIN   = $(TCLKIT)/v84/tclkitsh-win32.upx.exe
 TCLKIT85_LINUX = $(TCLKIT)/v85/tclkit-linux-x86
@@ -224,9 +223,8 @@ wrap: base
 	sdx wrap nagelfar.kit
 
 wrapexe: base
-	@\rm -f nagelfar nagelfar.exe nagelfar.solaris nagelfar_sh.exe
+	@\rm -f nagelfar nagelfar.exe nagelfar_sh.exe
 	sdx wrap nagelfar.linux   -runtime $(TCLKIT85_LINUX)
-	sdx wrap nagelfar.solaris -runtime $(TCLKIT_SOLARIS)
 	sdx wrap nagelfar.exe     -runtime $(TCLKIT85_WIN)
 	sdx wrap nagelfar.shexe   -runtime $(TCLKITSH85_WIN)
 	mv nagelfar.shexe nagelfar_sh.exe
@@ -256,10 +254,8 @@ release: force distrib wrap wrapexe
 	@mv nagelfar.linux.gz nagelfar$(VERSION).linux.gz
 	@zip nagelfar$(VERSION).win.zip nagelfar.exe
 	@zip nagelfar_sh$(VERSION).win.zip nagelfar_sh.exe
-	@gzip nagelfar.solaris
-	@mv nagelfar.solaris.gz nagelfar$(VERSION).solaris.gz
 	@cp nagelfar.kit nagelfar`date +%Y%m%d`.kit
 	@cp nagelfar.kit nagelfar$(VERSION).kit
 
 upload:
-	rsync -e ssh README nagelfar$(VERSION).tar.gz nagelfar$(VERSION).kit nagelfar$(VERSION).linux.gz nagelfar$(VERSION).win.zip nagelfar_sh$(VERSION).win.zip nagelfar$(VERSION).solaris.gz pspjuth@frs.sourceforge.net:/home/frs/project/nagelfar/Rel_$(VERSION)/
+	rsync -e ssh README nagelfar$(VERSION).tar.gz nagelfar$(VERSION).kit nagelfar$(VERSION).linux.gz nagelfar$(VERSION).win.zip nagelfar_sh$(VERSION).win.zip pspjuth@frs.sourceforge.net:/home/frs/project/nagelfar/Rel_$(VERSION)/
