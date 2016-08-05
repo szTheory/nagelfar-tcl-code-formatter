@@ -1,6 +1,10 @@
 Changes
 ========
 
+Changes in v1.x.x (not released):
+
+* Support oo::define.
+
 Changes in v1.2.3 (2016-08-05):
 
 * Support namespace path. Added inline directive "nspath".

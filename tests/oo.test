@@ -4,6 +4,41 @@
 # $Revision: 384 $
 #----------------------------------------------------------------------
 
+# Helper to test tcloo creation using different ways
+proc testTclOOCreate {style args} {
+    set lines {}
+    # Assume indent 8
+    set i "        "
+    foreach {obj body} $args {
+        switch $style {
+            1 { # Class create
+                lappend lines ""
+                lappend lines "$i[list oo::class create $obj $body]"
+            }
+            2 { # Define, one block
+                lappend lines "$i[list oo::class create $obj]"
+                lappend lines "$i[list oo::define $obj $body]"
+            }
+            default { # Define multiple
+                lappend lines "$i[list oo::class create $obj]"
+                set buildLine ""
+                foreach line [split $body \n] {
+                    if {$buildLine eq ""} {
+                        set buildLine $line
+                    } else {
+                        append buildLine \n $line
+                    }
+                    if {[info complete $buildLine]} {
+                        lappend lines "$i    [list oo::define $obj $buildLine]"
+                        set buildLine ""
+                    }
+                }
+            }
+        }
+    }
+    createTestFile [join $lines \n]
+}
+
 test oo-1.1 {
     Object definition experiment
 } -body {
@@ -33,11 +68,11 @@ test oo-1.1 {
     execTestFile
 } -result {%%} -match glob
 
-test oo-2.1 {
-    tcloo inheritance, checking "next"
-} -constraints runin86 -body {
-    createTestFile {
-        oo::class create Base {
+foreach style {1 2 3} {
+    test oo-2.1.$style {
+        tcloo inheritance, checking "next"
+    } -constraints runin86 -body {
+        testTclOOCreate $style Base {
             variable id
             constructor {n} {
                 set id $n
@@ -45,8 +80,7 @@ test oo-2.1 {
             method id {} {
                 return $id
             }
-        }
-        oo::class create Package {
+        } Package {
             superclass Base
             variable records
             constructor {n {r {}}} {
@@ -55,19 +89,20 @@ test oo-2.1 {
             }
             method id {} {
                 next x
+                list $records
             }
         }
-    }
-    execTestFile -s syntaxdb86.tcl
-} -result {%%Line  15: E Wrong number of arguments (2) to "Base new"
-Line  19: E Wrong number of arguments (1) to "_obj,Base id"}
+        execTestFile -s syntaxdb86.tcl
+    } -result {%%Line  16: E Wrong number of arguments (2) to "Base new"
+Line  20: E Wrong number of arguments (1) to "_obj,Base id"}
+}
 
-test oo-3.1 {
-    tcloo, my
-} -constraints runin86 -body {
-    createTestFile {
+foreach style {1 2 3} {
+    test oo-3.1.$style {
+        tcloo, my
+    } -constraints runin86 -body {
         # A fully qualified name
-        oo::class create ::Base::Bas {
+        testTclOOCreate $style ::Base::Bas {
             variable apa
             constructor {n} {
                 my variable id
@@ -90,16 +125,16 @@ test oo-3.1 {
                 my Hej $apa $bepa apa bepa
             }
         }
-    }
-    execTestFile -s syntaxdb86.tcl
-} -result {%%Line  15: E Wrong number of arguments (2) to "_obj,Bas id"}
+        execTestFile -s syntaxdb86.tcl
+    } -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
+}
 
-test oo-3.2 {
-    tcloo, my
-} -constraints runin86 -body {
-    createTestFile {
+foreach style {1 2 3} {
+    test oo-3.2.$style {
+        tcloo, my
+    } -constraints runin86 -body {
         # A not fully qualified name
-        oo::class create Base::Bas {
+        testTclOOCreate $style Base::Bas {
             variable apa
             constructor {n} {
                 my variable id
@@ -122,15 +157,15 @@ test oo-3.2 {
                 my Hej $apa $bepa apa bepa
             }
         }
-    }
-    execTestFile -s syntaxdb86.tcl
-} -result {%%Line  15: E Wrong number of arguments (2) to "_obj,Bas id"}
+        execTestFile -s syntaxdb86.tcl
+    } -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
+}
 
-test oo-4.1 {
-    tcloo, variable
-} -constraints runin86 -body {
-    createTestFile {
-        oo::class create Base {
+foreach style {1 2 3} {
+    test oo-4.1.$style {
+        tcloo, variable
+    } -constraints runin86 -body {
+        testTclOOCreate $style Base {
             variable apa bepa cepa
             constructor {n} {
                 set apa $n
@@ -145,15 +180,15 @@ test oo-4.1 {
                 list $cepa $depa $y
             }
         }
-    }
-    execTestFile -s syntaxdb86.tcl
-} -result {%%Line  14: E Unknown variable "depa"}
+        execTestFile -s syntaxdb86.tcl
+    } -result {%%Line  14: E Unknown variable "depa"}
+}
 
-test oo-5.1 {
-    tcloo, misc
-} -constraints runin86 -body {
-    createTestFile {
-        oo::class create Base {
+foreach style {1 2 3} {
+    test oo-5.1.$style {
+        tcloo, misc
+    } -constraints runin86 -body {
+        testTclOOCreate $style Base {
             variable apa bepa cepa
             constructor {n} {
                 set apa $n
@@ -177,14 +212,12 @@ test oo-5.1 {
             destructor { 
                 list $apa $bepa $cepa
             }
-
             method Upper {} {
-
             }
         }
-    }
-    execTestFile -s syntaxdb86.tcl
-} -result {%%Line  12: W Unknown command "expurt"}
+        execTestFile -s syntaxdb86.tcl
+    } -result {%%Line  12: W Unknown command "expurt"}
+}
 
 test oo-6.1 {
     Test with included snit package definition

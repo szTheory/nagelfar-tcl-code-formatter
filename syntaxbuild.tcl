@@ -170,6 +170,7 @@ proc buildDb {ch} {
     # dp Define procedure (name+args+body)
     # dm Define method (name+args+body)
     # dmp Define metod/procedure (name+args+body)
+    # div Define implicit variable
     # e  Expression
     # E  Expression that should be in braces
     # c  Code, checked in surrounding context
@@ -503,12 +504,14 @@ proc buildDb {ch} {
         set syntax(tcl::prefix\ match)  "o* x x"
         set option(tcl::prefix\ match\ -message) x
         set option(tcl::prefix\ match\ -error) x
+
         set syntax(oo::class)    "s x*"
         set syntax(oo::class\ create) "do=_stdclass_oo cn?"
         set syntax(oo::class\ create::constructor) dk ;# Define constructor
         set syntax(oo::class\ create::superclass)  di ;# Define inheritance
         set syntax(oo::class\ create::method) "dm"    ;# Define method 
         set syntax(oo::class\ create::destructor) dd  ;# Define destructor
+        set syntax(oo::class\ create::variable) div*
         set syntax(oo::class\ create::export) x
         set syntax(oo::class\ create::class) x
         set syntax(oo::class\ create::deletemethod) "x x*"
@@ -535,25 +538,19 @@ proc buildDb {ch} {
         set syntax(oo::copy)     "x x?"
         lappend ::kP TclOO
 
-        # FIXA: all oo::define
-        set syntax(oo::define)   "2: x cn : x s x x*"
-        set syntax(oo::objdefine)   "2: x cn : x s x x*"
-        set syntax(oo::define::method) "x cv"
-        set syntax(oo::objdefine::method) "x cv"
-        set syntax(oo::define\ method) "x cv"
-        set syntax(oo::objdefine\ method) "x cv"
-        set syntax(oo::define::constructor) "cv"
-        set syntax(oo::objdefine::constructor) "cv"
-        set syntax(oo::define\ constructor) "cv"
-        set syntax(oo::objdefine\ constructor) "cv"
-        set syntax(oo::define::denstructor) "cl"
-        set syntax(oo::objdefine::destructor) "cl"
-        set syntax(oo::define\ destructor) "cl"
-        set syntax(oo::objdefine\ destructor) "cl"
-        set syntax(oo::define::forward) "x x x*"
-        set syntax(oo::objdefine::forward) "x x x*"
-        set syntax(oo::define::unexport) "x x*"
-        set syntax(oo::objdefine::unexport) "x x*"
+        # oo::define has two formats, one for a "configure script" and one
+        # for single subcommands. Thus each command needs to be defined
+        # both as a command in the namespace, and as a subcommand.
+        set syntax(oo::define)      "2: do cn : do s x x*"
+        set syntax(oo::objdefine)   "2: do cn : do s x x*"
+        # Copy from class create
+        foreach item [array names syntax oo::class\ create::*] {
+            set tail [namespace tail $item]
+            set syntax(oo::define::$tail) $syntax($item)
+            set syntax(oo::define\ $tail) $syntax($item)
+            set syntax(oo::objdefine::$tail) $syntax($item)
+            set syntax(oo::objdefine\ $tail) $syntax($item)
+        }
 
         set syntax(oo::object)   "s x*" ;# FIXA?
         # Set up basic checking of self/my

@@ -972,25 +972,66 @@ set {::syntax(oo::class create::renamemethod)} {x x}
 set {::syntax(oo::class create::self)} x*
 set {::syntax(oo::class create::superclass)} di
 set {::syntax(oo::class create::unexport)} {x x*}
+set {::syntax(oo::class create::variable)} div*
 set ::syntax(oo::copy) {x x?}
-set ::syntax(oo::define) {2: x cn : x s x x*}
-set {::syntax(oo::define constructor)} cv
-set {::syntax(oo::define destructor)} cl
-set {::syntax(oo::define method)} {x cv}
-set ::syntax(oo::define::constructor) cv
-set ::syntax(oo::define::denstructor) cl
+set ::syntax(oo::define) {2: do cn : do s x x*}
+set {::syntax(oo::define class)} x
+set {::syntax(oo::define constructor)} dk
+set {::syntax(oo::define deletemethod)} {x x*}
+set {::syntax(oo::define destructor)} dd
+set {::syntax(oo::define export)} {x x*}
+set {::syntax(oo::define filter)} {o? x*}
+set {::syntax(oo::define forward)} {x x x*}
+set {::syntax(oo::define method)} dm
+set {::syntax(oo::define mixin)} {o? x*}
+set {::syntax(oo::define renamemethod)} {x x}
+set {::syntax(oo::define self)} x*
+set {::syntax(oo::define superclass)} di
+set {::syntax(oo::define unexport)} {x x*}
+set {::syntax(oo::define variable)} div*
+set ::syntax(oo::define::class) x
+set ::syntax(oo::define::constructor) dk
+set ::syntax(oo::define::deletemethod) {x x*}
+set ::syntax(oo::define::destructor) dd
+set ::syntax(oo::define::export) {x x*}
+set ::syntax(oo::define::filter) {o? x*}
 set ::syntax(oo::define::forward) {x x x*}
-set ::syntax(oo::define::method) {x cv}
+set ::syntax(oo::define::method) dm
+set ::syntax(oo::define::mixin) {o? x*}
+set ::syntax(oo::define::renamemethod) {x x}
+set ::syntax(oo::define::self) x*
+set ::syntax(oo::define::superclass) di
 set ::syntax(oo::define::unexport) {x x*}
-set ::syntax(oo::objdefine) {2: x cn : x s x x*}
-set {::syntax(oo::objdefine constructor)} cv
-set {::syntax(oo::objdefine destructor)} cl
-set {::syntax(oo::objdefine method)} {x cv}
-set ::syntax(oo::objdefine::constructor) cv
-set ::syntax(oo::objdefine::destructor) cl
+set ::syntax(oo::define::variable) div*
+set ::syntax(oo::objdefine) {2: do cn : do s x x*}
+set {::syntax(oo::objdefine class)} x
+set {::syntax(oo::objdefine constructor)} dk
+set {::syntax(oo::objdefine deletemethod)} {x x*}
+set {::syntax(oo::objdefine destructor)} dd
+set {::syntax(oo::objdefine export)} {x x*}
+set {::syntax(oo::objdefine filter)} {o? x*}
+set {::syntax(oo::objdefine forward)} {x x x*}
+set {::syntax(oo::objdefine method)} dm
+set {::syntax(oo::objdefine mixin)} {o? x*}
+set {::syntax(oo::objdefine renamemethod)} {x x}
+set {::syntax(oo::objdefine self)} x*
+set {::syntax(oo::objdefine superclass)} di
+set {::syntax(oo::objdefine unexport)} {x x*}
+set {::syntax(oo::objdefine variable)} div*
+set ::syntax(oo::objdefine::class) x
+set ::syntax(oo::objdefine::constructor) dk
+set ::syntax(oo::objdefine::deletemethod) {x x*}
+set ::syntax(oo::objdefine::destructor) dd
+set ::syntax(oo::objdefine::export) {x x*}
+set ::syntax(oo::objdefine::filter) {o? x*}
 set ::syntax(oo::objdefine::forward) {x x x*}
-set ::syntax(oo::objdefine::method) {x cv}
+set ::syntax(oo::objdefine::method) dm
+set ::syntax(oo::objdefine::mixin) {o? x*}
+set ::syntax(oo::objdefine::renamemethod) {x x}
+set ::syntax(oo::objdefine::self) x*
+set ::syntax(oo::objdefine::superclass) di
 set ::syntax(oo::objdefine::unexport) {x x*}
+set ::syntax(oo::objdefine::variable) div*
 set ::syntax(oo::object) {s x*}
 set ::syntax(open) {r 1 3}
 set ::syntax(option) {s x*}
@@ -1622,6 +1663,10 @@ set {::option(namespace which)} {-variable -command}
 set {::option(namespace which -variable)} v
 set {::option(oo::class create::filter)} {create destroy}
 set {::option(oo::class create::mixin)} {create destroy}
+set ::option(oo::define::filter) {-append -clear -set}
+set ::option(oo::define::mixin) {-append -clear -set}
+set ::option(oo::objdefine::filter) {-append -clear -set}
+set ::option(oo::objdefine::mixin) {-append -clear -set}
 set {::option(package require)} -exact
 set ::option(panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set ::option(puts) -nonewline

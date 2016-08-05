@@ -1371,6 +1371,24 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		    incr i
 		}
 	    }
+            div { # Define implicit variable for this namespace
+		if {$mod ne "" && $mod ne "*"} {
+		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
+                            syntax for $cmd."
+		}
+		set ei [expr {$i + 1}]
+                if {$mod eq "*"} {
+		    set ei $lastOptional
+                    set mod [string range $mod 0 end-1]
+		}
+                set currNs [currentNamespace]
+                while {$i < $ei} {
+                    set var [lindex $argv $i]
+                    lappend ::implicitVarNs($currNs) $var
+		    lappend constantsDontCheck $i
+                    incr i
+                }
+            }
             di { # Define inheritance
 		if {$mod ne ""} {
 		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
@@ -2046,15 +2064,17 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             set noConstantCheck 1
 	}
 	variable { # Special check of "variable" command
+            # Look for a defined syntax in this namespace
             set currNs [currentNamespace]
-            # Special case in oo::class create when outside a method
-            if {[string match "oo::class create*" $currNs] && \
-                        [currentProc] eq ""} {
-                #echo "Var: in $currNs"
-                foreach var $argv ws $wordstatus {
-                    lappend ::implicitVarNs($currNs) $var
+            set rescmd [lookForCommand $cmd $currNs $index]
+            if {[llength $rescmd] > 0 && \
+                        [info exists ::syntax([lindex $rescmd 0])]} {
+                # If it resides outside a procedure, it most likely
+                # defines implicit variables. Fall back to syntax def.
+                # This might not cover all cases, but is good enough for now.
+                if {[currentProc] eq ""} {
+                    return 0
                 }
-                return 1
             }
             set i 0
             foreach {var val} $argv {ws1 ws2} $wordstatus {
