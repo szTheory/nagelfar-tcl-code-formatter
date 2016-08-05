@@ -140,7 +140,9 @@ test oo-4.1 {
                 return $apa
             }
             method xx {} {
-                list $cepa $depa
+                # A normal variable command should work here
+                variable y
+                list $cepa $depa $y
             }
         }
     }

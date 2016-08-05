@@ -2035,8 +2035,9 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
 	}
 	variable { # Special check of "variable" command
             set currNs [currentNamespace]
-            # Special case in oo::class create
-            if {[string match "oo::class create*" $currNs]} {
+            # Special case in oo::class create when outside a method
+            if {[string match "oo::class create*" $currNs] && \
+                        [currentProc] eq ""} {
                 #echo "Var: in $currNs"
                 foreach var $argv ws $wordstatus {
                     lappend ::implicitVarNs($currNs) $var
