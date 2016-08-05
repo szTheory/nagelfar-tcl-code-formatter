@@ -1,8 +1,11 @@
 Changes
 ========
 
-Changes in v?.?.? (not yet released):
+Changes in v1.2.3 (2016-08-05):
 
+* Support namespace path. Added inline directive "nspath".
+* Avoid warning with code that comes from a variable. [Bug #10]
+* Handle if a word starts with #. [Bug #9]
 * Added -idir option to redirect temporary files created during code coverage.
 * Added -markupfull option to include stats of covered lines in markup.
 * Allow code coverage to run in parallell. [FR #8] Thanks to Sven Beyer.
