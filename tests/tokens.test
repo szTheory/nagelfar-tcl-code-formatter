@@ -179,7 +179,7 @@ test tokens-7.1 {
         ##nagelfar syntax gurka x c* c
         gurka hej {list $apa} [list hej hopp]
         ##nagelfar syntax hopp x c? c
-        hopp hej $apa {list $apa}
+        hopp hej ${apa}x {list $apa}
     }
     execTestFile
 } -result {%%Modifier "*" is not supported for "c" in syntax for gurka.
