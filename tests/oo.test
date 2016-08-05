@@ -66,7 +66,8 @@ test oo-3.1 {
     tcloo, my
 } -constraints runin86 -body {
     createTestFile {
-        oo::class create Base {
+        # A fully qualified name
+        oo::class create ::Base::Bas {
             variable apa
             constructor {n} {
                 my variable id
@@ -80,10 +81,50 @@ test oo-3.1 {
                 set [my varname apa] x
                 return [my id x]
             }
+            method Hej {a b xName yName} {
+                upvar 1 $xName x $yName y
+                set x 1
+                set y 1
+            }
+            method hopp {apa bepa} {
+                my Hej $apa $bepa apa bepa
+            }
         }
     }
     execTestFile -s syntaxdb86.tcl
-} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Base id"}
+} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
+
+test oo-3.2 {
+    tcloo, my
+} -constraints runin86 -body {
+    createTestFile {
+        # A not fully qualified name
+        oo::class create Base::Bas {
+            variable apa
+            constructor {n} {
+                my variable id
+                set id $n
+            }
+            method id {} {
+                my variable id
+                return $id
+            }
+            method xx {} {
+                set [my varname apa] x
+                return [my id x]
+            }
+            method Hej {a b xName yName} {
+                upvar 1 $xName x $yName y
+                set x 1
+                set y 1
+            }
+            method hopp {apa bepa} {
+                my Hej $apa $bepa apa bepa
+            }
+        }
+    }
+    execTestFile -s syntaxdb86.tcl
+} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
 
 test oo-4.1 {
     tcloo, variable

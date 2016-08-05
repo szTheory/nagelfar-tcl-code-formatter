@@ -1401,6 +1401,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                             # Special case when defining an object in tcloo
                             # Add an alias to make "my" an object
                             if {[string match oo::* $cmd]} {
+                                # The construct of this should match how a
+                                # virtual namespace context is named.
                                 set ::knownAliases(${cmd}::${name}::my) $objname
                             }
 
@@ -1560,6 +1562,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     } elseif {$tok eq "cn"} {
                         # Check in virtual namespace context
                         set vNs ${cmd}::[join [lrange $argv $firsti [expr {$i-1}]] ::]
+                        # Avoid :::: if a full qualified name is used
+                        set vNs [string map {:::: ::} $vNs]
                         #puts "cmd '$cmd' vNs '$vNs'"
                         pushNamespace $vNs
                         set dummyVars {}
