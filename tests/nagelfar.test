@@ -310,11 +310,8 @@ test nagelfar-4.3 {
     execTestFile
 } -result {%%Line   2: E Wrong number of arguments (3) to "lsort"}
 
-# This error gives a different message which I hope I can correct.
 test nagelfar-4.4 {
     Options checking
-} -constraints {
-    knownbug
 } -body {
     createTestFile {
         fconfigure xx -blocking 1 -encoding 0 -mode

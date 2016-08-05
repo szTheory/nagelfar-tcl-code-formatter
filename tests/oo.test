@@ -92,7 +92,7 @@ test oo-3.1 {
         }
     }
     execTestFile -s syntaxdb86.tcl
-} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
+} -result {%%Line  15: E Wrong number of arguments (2) to "_obj,Bas id"}
 
 test oo-3.2 {
     tcloo, my
@@ -124,7 +124,7 @@ test oo-3.2 {
         }
     }
     execTestFile -s syntaxdb86.tcl
-} -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
+} -result {%%Line  15: E Wrong number of arguments (2) to "_obj,Bas id"}
 
 test oo-4.1 {
     tcloo, variable
@@ -147,7 +147,7 @@ test oo-4.1 {
         }
     }
     execTestFile -s syntaxdb86.tcl
-} -result {%%Line  12: E Unknown variable "depa"}
+} -result {%%Line  14: E Unknown variable "depa"}
 
 test oo-5.1 {
     tcloo, misc

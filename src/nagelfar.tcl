@@ -587,12 +587,14 @@ proc checkOptions {cmd argv wordstatus indices {startI 0} {max 0} {pair 0}} {
     set maxa [expr {[llength $argv] - $startI}]
 
     # Pairs swallow an even number of args.
+    set extraAfterPair 0
     if {$pair && ($maxa % 2) == 1} {
         # If the odd one is "--", it may continue
         if {[lindex $argv [expr {$startI + $maxa - 1}]] == "--" && \
                 [lsearch -exact $option($cmd) --] >= 0} {
             # Nothing
         } else {
+            set extraAfterPair 1
             incr maxa -1
         }
     }
@@ -626,6 +628,16 @@ proc checkOptions {cmd argv wordstatus indices {startI 0} {max 0} {pair 0}} {
 	    continue
 	}
 	if {$max != 0 && $used >= $max} {
+            # A special check to give a nicer message when there is
+            # a missing value among pairs.
+            if {$extraAfterPair} {
+                if {($ws & 1) && $check} {
+                    set ix [lsearch -exact $option($cmd) $arg]
+                    if {$ix >= 0} {
+                        set skip 1
+                    }
+                }
+            }
 	    break
 	}
 	if {[string match "-*" $arg]} {
