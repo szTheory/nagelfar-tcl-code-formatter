@@ -1,0 +1,13 @@
+The steps needed for releasing a new version:
+Update revision according to bumprev.txt. Commit.
+
+Create release files:
+make release
+
+Transfer web and files:
+make webt
+make upload
+
+After a short while the files show up in the sourcefourge file listings.
+Edit file properties as needed.
+
