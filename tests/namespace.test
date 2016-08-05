@@ -294,3 +294,37 @@ test namespace-6.2 {
     execTestFile
 } -result {%%Line   6: E Unknown variable "2"
 Line  11: E Unknown variable "2"}
+
+test namespace-7.1 {
+    Namespace search path
+} -body {
+    createTestFile {
+        namespace eval xx {}
+        proc xx::apa {a} {
+            return "apa $a"
+        }
+
+        namespace eval yy {
+            ##nagelfar nspath current xx
+            # Make it so the detection mechanism cannot see it, thus
+            # testing that the inline notation above works.
+            namespace path [list {*}[namespace path] \:\:xx]
+        }
+        proc yy::bepa {a} {
+            set b [apa $a]
+            return "bepa $b"
+        }
+
+        namespace eval zz {
+            # This should be picked up by the 
+            namespace path [list {*}[namespace path] ::yy]
+        }
+        proc zz::cepa {a} {
+            set b [bepa $a]
+            return "cepa $b"
+        }
+        zz::cepa 1
+    }
+    # Include eval to make sure the example runs ok
+    concat [evalTestFile] [execTestFile]
+} -result {cepa bepa apa 1 %%}

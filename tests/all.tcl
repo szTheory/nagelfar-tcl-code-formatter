@@ -61,6 +61,17 @@ proc execTestFile {args} {
     return -code $code $res
 }    
 
+# Helper while designing tests, to see runtime errors
+proc evalTestFile {} {
+    set xx(-fn) _testfile_
+    set fn $xx(-fn)
+    interp create -safe _apa
+    interp expose _apa source
+    catch {_apa eval source $fn} r
+    interp delete _apa
+    return $r
+}
+
 proc execTestFileInstrument {args} {
     set xx(-flags) {}
     array set xx $args

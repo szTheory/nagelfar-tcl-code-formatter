@@ -142,3 +142,18 @@ is equivalent to encountering the same package require in the code.
 .. code:: tcl
 
  ##nagelfar package require snit
+
+Other handling
+^^^^^^^^^^^^^^
+Nagelfar tries to pick up namespace path commands to track command
+resolution. It is possible to manually provide namespace path information,
+as shown below. If the namespace is given as "current", the surrounding
+namespace where the inline comment resides is used.
+
+.. code:: tcl
+
+ ##nagelfar nspath ns paths
+ # A line like this is recognised:
+ namespace path [list {*}[namespace path] ::apa]
+ # The corresponing inline directive would be:
+ ##nagelfar nspath current ::apa

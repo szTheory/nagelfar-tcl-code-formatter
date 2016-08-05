@@ -337,6 +337,12 @@ proc checkComment {str index knownVarsName} {
             alias {
                 set ::knownAliases($first) $rest
             }
+            nspath {
+                if {$first eq "current"} {
+                    set first [currentNamespace]
+                }
+                eval [list lappend "::namespacePath($first)"] $rest
+            }
             copy {
                 #echo "Copy in $::Nagelfar(firstpass) $first [lindex $rest 0]"
                 CopyCmdInDatabase $first [lindex $rest 0] [lrange $rest 1 end]
@@ -1941,24 +1947,32 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
 }
 
 # This is called when an unknown command is encountered.
-# If not encountered it is stored to be checked last.
+# If not found it is stored to be checked last.
 # Returns a list with a partial command where the first element
 # is the resolved name with qualifier.
 proc lookForCommand {cmd ns index} {
     # Get both the namespace and global possibility
     set cmds {}
     if {[string match "::*" $cmd]} {
+        # Fully qualified, so only one possible
         set cmds [list [string range $cmd 2 end]]
     } elseif {$ns ne "__unknown__" } {
         # Look through all levels of namespaces
+        set nsSearchPath {}
         set nsPrefix $ns
         while {$nsPrefix ne ""} {
+            lappend nsSearchPath $nsPrefix
+            if {[info exists ::namespacePath($nsPrefix)]} {
+                lappend nsSearchPath {*}$::namespacePath($nsPrefix)
+            }
+            set nsPrefix [namespace qualifiers $nsPrefix]
+        }
+        foreach nsPrefix $nsSearchPath {
             set cmd1 "${nsPrefix}::$cmd"
             if {[string match "::*" $cmd1]} {
                 set cmd1 [string range $cmd1 2 end]
             }
             lappend cmds $cmd1
-            set nsPrefix [namespace qualifiers $nsPrefix]
         }
         lappend cmds $cmd
     } else {
@@ -2622,6 +2636,21 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 }
                 set type [checkCommand $cmd $index $argv $wordstatus \
                         $wordtype $indices]
+            } elseif {([lindex $wordstatus 0] & 1) && \
+                    [string match "pa*" [lindex $argv 0]]} {
+                # Handle namespace path
+                if {$argc > 2} {
+                    WA
+                    return 2
+                }
+                # Stupid simple search for obvious names
+                set targets [regexp -all -inline {[\w:]+} $argv]
+                set ns [currentNamespace]
+                foreach target $targets {
+                    if {![string match "*::*" $target]} continue
+                    #puts "Added '$target' to '$ns'"
+                    lappend ::namespacePath($ns) $target
+                }
             } else {
                 set type [checkCommand $cmd $index $argv $wordstatus \
                                   $wordtype $indices]
@@ -3690,6 +3719,7 @@ proc parseScript {script} {
     set unknownCommands {}
     set knownVars {}
     array set ::knownAliases {}
+    array set ::namespacePaths {}
     foreach g $knownGlobals {
 	knownVar knownVars $g
 	dict set knownVars $g set 1
@@ -4267,6 +4297,9 @@ proc loadDatabases {{addDb {}}} {
                 alias {
                     _ipset ::knownAliases($first) $rest
                 }
+                nspath {
+                    eval [list _iplappend "::namespacePath($first)"] $rest
+                }
                 default {
                     echo "Bad type in ##nagelfar comment in db $f line $commentline"
                     continue
@@ -4322,6 +4355,7 @@ proc loadDatabases {{addDb {}}} {
         catch {unset ::subCmd}
         catch {unset ::option}
         catch {unset ::knownAliases}
+        catch {unset ::namespacePath}
     }
     if {[_iparray exists ::syntax]} {
         array set ::syntax [_iparray get ::syntax]
@@ -4343,6 +4377,9 @@ proc loadDatabases {{addDb {}}} {
     }
     if {[_iparray exists ::knownAliases]} {
         array set ::knownAliases [_iparray get ::knownAliases]
+    }
+    if {[_iparray exists ::namespacePath]} {
+        array set ::knownAliases [_iparray get ::namespacePath]
     }
 
     interp delete loadinterp
@@ -4433,6 +4470,7 @@ proc doCheck {} {
         array set h_oldimplicitvarns [array get ::implicitVarNs]
         array set h_oldimplicitvarcmd [array get ::implicitVarCmd]
         array set h_oldaliases [array get ::knownAliases]
+        array set h_oldnspath [array get ::namespacePath]
         set h_oldknownpackages $::knownPackages
     }
 
@@ -4512,6 +4550,11 @@ proc doCheck {} {
                 unset ::knownAliases($item)
             }
         }
+        foreach item [array names h_oldnspath] {
+            if {$h_oldnspath($item) eq $::namespacePath($item)} {
+                unset ::namespacePath($item)
+            }
+        }
 
         if {[catch {set ch [open $::Nagelfar(header) w]}]} {
             puts stderr "Could not create file \"$::Nagelfar(header)\""
@@ -4544,6 +4587,9 @@ proc doCheck {} {
             }
             foreach item [lsort -dictionary [array names ::knownAliases]] {
                 puts $ch "\#\#nagelfar [list alias $item] $::knownAliases($item)"
+            }
+            foreach item [lsort -dictionary [array names ::namespacePath]] {
+                puts $ch "\#\#nagelfar [list nspath $item] $::namespacePath($item)"
             }
             close $ch
         }
