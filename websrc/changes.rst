@@ -1,7 +1,7 @@
 Changes
 ========
 
-Changes in v1.x.x (not released):
+Changes in v1.2.4 (2016-08-06):
 
 * Support oo::define.
 

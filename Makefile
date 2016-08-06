@@ -2,7 +2,7 @@
 # Make file for Nagelfar
 #----------------------------------------------------------------------
 
-VERSION = 123
+VERSION = 124
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/peter/tclkit
