@@ -93,6 +93,7 @@ Syntax database
  ##nagelfar subcmd cmd subcmds
  ##nagelfar subcmd+ cmd subcmds
  ##nagelfar option cmd options
+ ##nagelfar option+ cmd options
  ##nagelfar return cmd type
  ##nagelfar copy from to
 
@@ -117,11 +118,12 @@ Add to subcmd list, e.g. when using namespace ensemble:
  ##nagelfar subcmd+ string mysubcmd
  ##nagelfar syntax string\ mysubcmd x x
 
-Copy syntax from command
+Copy syntax from command, with added option.
 
 .. code:: tcl
 
  ##nagelfar copy binary mybinary
+ ##nagelfar option+ mybinary -mysuperflag
 
 For more examples, use the database browser to see how the comments
 would look like for the commands known in the database.

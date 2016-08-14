@@ -5,6 +5,9 @@ Syntaxflagga för "globalt variabelnamn" (-variable).
 Skippa "Suspiscious variable name" för dessa.
 
 Alt. hantera typen "variable". (fixat, "varName")
+**Det borde vara möjligt att bara sätta typen, inte görat den synlig.
+**Annars kan man maska buggar där variabeln saknas.
+**Och "set var" som passeras ska inte överrida typen.
 
 Borde inte 2pass se upvar i procedurerna?
 

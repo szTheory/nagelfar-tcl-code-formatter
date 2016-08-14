@@ -21,7 +21,7 @@ A plugin can be used for things like:
 
 * Collect statistics, e.g. a call graph
 
-See further *Examples* below.
+See further Examples below.
 
 
 Generic rules

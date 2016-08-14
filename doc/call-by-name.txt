@@ -33,7 +33,7 @@ earlier in the file than it is used, or you have to provide the syntax
 description yourself.  The latter is also necessary when Nagelfar's
 automatic detection doesn't do the right thing.
 
-You provide a syntax description using *Inline Comments*. For the
+You provide a syntax description using Inline Comments. For the
 example above it would be:
 
    ##nagelfar syntax Incr v x

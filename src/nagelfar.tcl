@@ -330,6 +330,9 @@ proc checkComment {str index knownVarsName} {
             option {
                 set ::option($first) $rest
             }
+            option+ {
+                eval [list lappend "::option($first)"] $rest
+            }
             variable {
                 set type [join $rest]
                 markVariable $first 1 "" 1n $index unknown knownVars type
@@ -4330,6 +4333,9 @@ proc loadDatabases {{addDb {}}} {
                 }
                 option {
                     _ipset ::option($first) $rest
+                }
+                option+ {
+                    eval [list _iplappend "::option($first)"] $rest
                 }
                 alias {
                     _ipset ::knownAliases($first) $rest

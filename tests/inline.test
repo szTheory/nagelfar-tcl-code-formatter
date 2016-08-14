@@ -289,6 +289,18 @@ test inline-9.2 {
     execTestFile
 } -result {%%}
 
+test inline-9.3 {
+    Copy with option
+} -body {
+    createTestFile {
+        ##nagelfar copy lsort mysort
+        ##nagelfar option+ mysort -onemore
+        mysort -unique -onemore apa
+        mysort -badone apa
+    }
+    execTestFile
+} -result {%%Line   5: E Bad option -badone to "mysort"}
+
 test inline-10.1 {
     implicitvarns
 } -body {
