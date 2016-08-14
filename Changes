@@ -1,4 +1,5 @@
-2016-08-04
+2016-08-14
+ Added inline syntax of "vartype", to annotate variables.
  Added inline syntax of "option+", to handle adding options.
 
 Version 1.2.4

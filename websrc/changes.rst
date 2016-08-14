@@ -3,6 +3,7 @@ Changes
 
 Changes in v1.x (not released yet):
 
+* New inline command "vartype" to just annotate a variable with a type. Using "variable" for that purpose could mask bugs.
 * New inline command "option+" to handle manually added options. Useful together with "copy" when you extend e.g. a widget.
 
 Changes in v1.2.4 (2016-08-06):

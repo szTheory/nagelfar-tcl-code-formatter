@@ -337,6 +337,15 @@ proc checkComment {str index knownVarsName} {
                 set type [join $rest]
                 markVariable $first 1 "" 1n $index unknown knownVars type
             }
+            vartype {
+                # Just mark the type on an existing variable
+                # This cannot be done during the first pass when variables
+                # are not fully handled
+                if {!$::Nagelfar(firstpass)} {
+                    set type [join $rest]
+                    setVariableType $first $type $index knownVars
+                }
+            }
             alias {
                 set ::knownAliases($first) $rest
             }
@@ -1921,6 +1930,8 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
     }
 
     if {$check == 2} {
+        # This is a check, so type in an out, not an inout.
+        # Ignore any incoming value.
         set type ""
 	if {![dict exists $knownVars $varBase]} {
 	    return 1
@@ -1959,7 +1970,8 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
                 dict set knownVars $varBase array 1
             }
         }
-        if {1 || $type ne ""} {
+        # A non-type cannot override a known type
+        if {$type ne ""} {
             # Warn if changed?? FIXA
             dict set knownVars $varBase "type" $type
         }
@@ -1981,6 +1993,18 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
             }
 	}
     }
+}
+
+# Just for setting a known variable's type
+proc setVariableType {var type index knownVarsName} {
+    upvar $knownVarsName knownVars
+    # TODO parse variable for array etc?
+    set varBase $var
+    if {![dict exists $knownVars $varBase]} {
+        errorMsg E "Unknown variable \"$varBase\"" $index 1
+        return
+    }
+    dict set knownVars $varBase "type" $type
 }
 
 # This is called when an unknown command is encountered.

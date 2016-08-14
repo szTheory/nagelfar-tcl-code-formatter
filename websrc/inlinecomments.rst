@@ -63,6 +63,22 @@ Example:
  ##nagelfar variable apaName varName
  set hejsan [set $apaName]
 
+ .. code:: tcl
+
+ ##nagelfar vartype name type
+
+This will set the type of the variable "name".
+The variable must already be known. Using "variable" for just annotating
+the type could mask bugs since you will not notice if the variable is missing.
+
+Example:
+
+.. code:: tcl
+
+ set apaName [somethingThatReturnsAVarName]
+ ##nagelfar vartype apaName varName
+ set hejsan [set $apaName]
+
 Specifying implicit variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

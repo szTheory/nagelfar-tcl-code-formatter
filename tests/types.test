@@ -20,14 +20,17 @@ test types-2.1 {
     createTestFile {
         set apa [frame .f -padx 3 -pady 3]
         $apa configure -gurkmeja 2
+        # A non-type does not overwrite
         set apa "Hej"
         $apa gurkmeja
+        # A type might overwrite
         set apa [button .b]
         $apa configure -gurkmeja 2
     }
     execTestFile
 } -result {%%Line   3: E Bad option -gurkmeja to "_obj,frame configure"
-Line   7: E Bad option -gurkmeja to "_obj,button configure"}
+Line   6: E Unknown subcommand "gurkmeja" to "_obj,frame"
+Line   9: E Bad option -gurkmeja to "_obj,button configure"}
 
 test types-3.1 {
     Types in arrays
@@ -53,3 +56,27 @@ test types-4.1 {
     }
     execTestFile
 } -result {%%Line   3: E Bad option -gurkmeja to "_obj,frame configure"}
+
+test types-4.2 {
+    Types in inline comments
+} -body {
+    createTestFile {
+        set apa [frame .f -padx 3 -pady 3]
+        $apa configure -gurkmeja 2
+        ##nagelfar vartype apa varName
+        set $apa
+    }
+    execTestFile
+} -result {%%Line   3: E Bad option -gurkmeja to "_obj,frame configure"}
+
+test types-4.3 {
+    Types in inline comments
+} -body {
+    createTestFile {
+        # vartype cannot create the varaible
+        ##nagelfar vartype apa varName
+        list $apa
+    }
+    execTestFile
+} -result {%%Line   3: E Unknown variable "apa"
+Line   4: E Unknown variable "apa"}
