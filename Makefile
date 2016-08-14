@@ -2,7 +2,10 @@
 # Make file for Nagelfar
 #----------------------------------------------------------------------
 
+# This string is used to generate release file names
 VERSION = 124
+# This string is used to show the version number in the source
+DOTVERSION = 1.2.4+
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/peter/tclkit
@@ -61,13 +64,17 @@ setup: links
 # Concatening source
 #----------------------------------------------------------------
 
-CATFILES = src/prologue.tcl src/nagelfar.tcl src/gui.tcl src/dbbrowser.tcl \
+FILES1 = src/prologue.tcl
+FILES2 = src/nagelfar.tcl src/gui.tcl src/dbbrowser.tcl \
 	src/registry.tcl src/preferences.tcl src/plugin.tcl src/startup.tcl
+SRCFILES = $(FILES1) $(FILES2)
+CATFILES = $(FILES1) catversion.txt $(FILES2)
 
-
-nagelfar.tcl: $(CATFILES)
+nagelfar.tcl: $(SRCFILES)
+	echo "set version \"Version $(DOTVERSION) `date --iso-8601`\"" > catversion.txt
 	cat $(CATFILES) | sed "s/\\\$$Revision\\\$$/`git show-ref --hash --heads master`/" > nagelfar.tcl
 	@chmod 775 nagelfar.tcl
+	@rm catversion.txt
 
 #----------------------------------------------------------------
 # Testing
@@ -77,12 +84,12 @@ spell:
 	@cat doc/*.txt | ispell -d british -l | sort -u
 
 # Create a common "header" file for all source files.
-nagelfar_h.syntax: nagelfar.tcl nagelfar.syntax $(CATFILES)
+nagelfar_h.syntax: nagelfar.tcl nagelfar.syntax $(SRCFILES)
 	@echo Creating syntax header file...
-	@./nagelfar.tcl -header nagelfar_h.syntax nagelfar.syntax $(CATFILES)
+	@./nagelfar.tcl -header nagelfar_h.syntax nagelfar.syntax $(SRCFILES)
 
 check: nagelfar.tcl nagelfar_h.syntax
-	@./nagelfar.tcl -strictappend -plugin nfplugin.tcl nagelfar_h.syntax $(CATFILES)
+	@./nagelfar.tcl -strictappend -plugin nfplugin.tcl nagelfar_h.syntax $(SRCFILES)
 
 test: clean base
 	@$(TCLSH85) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
@@ -104,7 +111,6 @@ testoo: base
 #----------------------------------------------------------------
 
 # Source files for code coverage
-SRCFILES = $(CATFILES)
 IFILES   = $(SRCFILES:.tcl=.tcl_i)
 LOGFILES = $(SRCFILES:.tcl=.tcl_log)
 MFILES   = $(SRCFILES:.tcl=.tcl_m)

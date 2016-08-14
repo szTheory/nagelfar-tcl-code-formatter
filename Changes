@@ -1,4 +1,5 @@
 2016-08-14
+ Made build process fill in version and date in source.
  Added inline syntax of "vartype", to annotate variables.
  Added inline syntax of "option+", to handle adding options.
 

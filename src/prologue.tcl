@@ -31,7 +31,8 @@ set debug 0
 package require Tcl 8.4
 
 package provide app-nagelfar 1.0
-set version "Version 1.2.4 2016-08-06"
+# This variable should be overwritten by the build process
+set version "Version ??? ???"
 
 # Allow thisScript to be predefined (used for test)
 if {![info exists thisScript]} {
