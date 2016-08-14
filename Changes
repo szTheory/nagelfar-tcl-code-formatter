@@ -1,4 +1,5 @@
 2016-08-14
+ A combination of trace execution and variable x was bad.       
  Made build process fill in version and date in source.
  Added inline syntax of "vartype", to annotate variables.
  Added inline syntax of "option+", to handle adding options.

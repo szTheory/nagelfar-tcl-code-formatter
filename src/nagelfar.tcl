@@ -1584,7 +1584,9 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		} else {
                     set body [lindex $argv $i]
                     if {$tokCount ne ""} {
-                        append body [string repeat " x" $tokCount]
+                        # The appended value couldn't be e.g. 'x' in case
+                        # the surrounding code has a variable named x.
+                        append body [string repeat " ___" $tokCount]
                     }
                     # Special fix to support bind's "+".
                     if {$tok eq "cg" && [string match "+*" $body] && \

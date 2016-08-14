@@ -204,7 +204,7 @@ test tokens-7.2 {
     execTestFile
     # Known bug: Prefix errors give bad extra info
 } -result {%%Line  12: E Wrong number of arguments (2) to "llength"
-            Argument 2 at line 14}
+            Argument 2 at line 13}
 
 test tokens-7.3 {
     Code token, partial commands
@@ -233,7 +233,7 @@ Line  10: E Wrong number of arguments (4) to "string index"
             Argument 3 at line 11
             Argument 4 at line 11
 Line  11: E Wrong number of arguments (4) to "string index"
-            Argument 3 at line 13
+            Argument 3 at line 12
             Argument 4 at line 12}
 
 test tokens-7.4 {
