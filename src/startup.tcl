@@ -43,6 +43,7 @@ proc usage {} {
  -WelseN           : Enforce else keyword. Default 1.
  -strictappend     : Enforce having an initialised variable in (l)append.
  -tab <size>       : Tab size, default is 8.
+ -len <len>        : Enforce max line length.
  -header <file>    : Create a "header" file with syntax info for scriptfiles.
  -instrument       : Instrument source file for code coverage.
  -markup           : Markup source file with code coverage result.
@@ -77,6 +78,7 @@ proc StartUp {} {
     set ::Nagelfar(tabReg) { {0,7}\t| {8,8}}
     set ::Nagelfar(tabSub) [string repeat " " 8]
     set ::Nagelfar(tabMap) [list \t $::Nagelfar(tabSub)]
+    set ::Nagelfar(lineLen) 0
     set ::Nagelfar(procs) {}
     set ::Nagelfar(stop) 0
     set ::Nagelfar(trace) ""
@@ -361,6 +363,15 @@ if {![info exists gurka]} {
             -prefix {
                 incr i
                 set ::Prefs(htmlprefix) [lindex $argv $i]
+            }
+            -len {
+                incr i
+                set arg [lindex $argv $i]
+                if {![string is integer -strict $arg] || $arg < 1} {
+                    puts "Bad len value '$arg'"
+                    exit
+                }
+                set ::Nagelfar(lineLen) $arg
             }
  	    -tab {
                 incr i

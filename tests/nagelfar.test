@@ -1226,3 +1226,42 @@ test nagelfar-29.2 {
 } -result {%%Line   3: E Unknown variable "bepa"
 Line   6: E Unknown variable "cepa2"
 Line   9: E Unknown variable "depa3"}
+
+test preferences-30.1 {
+    Max line length check
+} -body {
+    createTestFile {
+        if {1} {
+            set bepa apa
+        }
+    }
+    execTestFile -len 20
+} -result {%%Line   3: W Too long line}
+
+test preferences-30.2 {
+    Max line length check
+} -body {
+    createTestFile {list 678901234567890
+        if {1} {
+            list b
+        }
+    }
+    set res [list [execTestFile -len 19]]
+    lappend res [execTestFile -len 20]
+} -result {{%%Line   1: W Too long line} %%}
+
+test preferences-30.3 {
+    Max line length check
+} -body {
+    createTestFile "\t\tlist 678901234567890"
+    set res [list [execTestFile -len 35]]
+    lappend res [execTestFile -len 36]
+} -result {{%%Line   1: W Too long line} %%}
+
+test preferences-30.4 {
+    Max line length check
+} -body {
+    createTestFile "\t\tlist 678901234567890"
+    set res [list [execTestFile -tab 5 -len 29]]
+    lappend res [execTestFile -tab 5 -len 30]
+} -result {{%%Line   1: W Too long line} %%}

@@ -3652,6 +3652,7 @@ proc calcLineNo {ix} {
     if {$ix < [lindex $newlineIx 0]} {return 1}
     set first 0
     set last [expr {[llength $newlineIx] - 1}]
+    if {$last < 0} {set last 0}
 
     while {$first < ($last - 1)} {
         set n [expr {($first + $last) / 2}]
@@ -3731,6 +3732,11 @@ proc buildLineDb {str} {
         # Count indent spaces and remove them
         set indent [countIndent $line]
 	set line [string trimleft $line]
+        if {$::Nagelfar(lineLen) > 0} {
+            if {$indent + [string length $line] > $::Nagelfar(lineLen)} {
+                errorMsg W "Too long line" [string length $result]
+            }
+        }
         # Check for comments.
 	if {[string index $line 0] eq "#"} {
 	    checkPossibleComment $line $lineNo
@@ -3790,11 +3796,11 @@ proc parseScript {script} {
 	knownVar knownVars $g
 	dict set knownVars $g set 1
     }
+    set ::Nagelfar(firstpass) 0
     set script [buildLineDb $script]
     set ::instrumenting(script) $script
 
     pushNamespace {}
-    set ::Nagelfar(firstpass) 0
     if {$::Nagelfar(2pass)} {
         # First do one round with proc checking
         set ::Nagelfar(firstpass) 1

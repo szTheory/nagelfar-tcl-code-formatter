@@ -1,3 +1,6 @@
+2016-08-25
+ Added -len command line option, to make Nagelfar check max line length.
+
 2016-08-14
  A combination of trace execution and variable x was bad.       
  Made build process fill in version and date in source.
