@@ -5,7 +5,7 @@
 ##nagelfar subcmd _stdclass_sqlite3 authorizer backup busy cache changes close collate collation_needed commit_hook complete copy enable_load_extension errorcode eval exists function incrblob interrupt last_insert_rowid nullvalue onecolumn profile progress rekey restore rollback_hook status timeout total_changes trace transaction unlock_notify update_hook version wal_hook
 
 ##nagelfar syntax _stdclass_sqlite3\ transaction x? c
-##nagelfar syntax _stdclass_sqlite3\ eval 1: x : x n c
+##nagelfar syntax _stdclass_sqlite3\ eval 1: x 2: x c : x n c
 ##nagelfar syntax _stdclass_sqlite3\ onecolumn x
 ##nagelfar syntax _stdclass_sqlite3\ exists x
 ##nagelfar syntax _stdclass_sqlite3\ close
@@ -26,7 +26,7 @@
 ##nagelfar syntax _stdclass_sqlite3\ copy              x x x x? x?
 ##nagelfar syntax _stdclass_sqlite3\ enable_load_extension x
 ##nagelfar syntax _stdclass_sqlite3\ errorcode         x*
-##nagelfar syntax _stdclass_sqlite3\ eval              1: x : x n c
+##nagelfar syntax _stdclass_sqlite3\ eval              1: x 2: x c : x n c
 ##nagelfar syntax _stdclass_sqlite3\ exists            x
 ##nagelfar syntax _stdclass_sqlite3\ function          x p? x
 ##nagelfar syntax _stdclass_sqlite3\ incrblob          o? x? x x x

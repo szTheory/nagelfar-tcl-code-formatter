@@ -1,3 +1,6 @@
+2016-09-24
+ Corrected syntax of sqlite3 eval
+
 2016-08-25
  Added -len command line option, to make Nagelfar check max line length.
 
