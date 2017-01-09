@@ -2,5 +2,6 @@ The following places needs changes when bumping revision number.
 
 Makefile : VERSION DOTVERSION
 websrc/changes.rst : Changes
+websrc/conf.py : version release
 Changes : Note new release
 README : Version in release notes

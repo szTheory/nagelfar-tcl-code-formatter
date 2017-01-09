@@ -173,7 +173,7 @@ misctest: misctests/test.result misctests/test.html
 # Documentation
 #----------------------------------------------------------------
 
-RSTFILES = $(wildcard websrc/*.rst)
+RSTFILES = $(wildcard websrc/*.rst) websrc/conf.py
 
 doc/plugins.txt : $(RSTFILES)
 	make -C websrc text
