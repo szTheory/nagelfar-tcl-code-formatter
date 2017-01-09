@@ -24,6 +24,9 @@
 ##nagelfar syntax snit::widgetadaptor::delegate x*
 ##nagelfar syntax snit::widgetadaptor::installhull x*
 ##nagelfar syntax snit::widgetadaptor::from l x*
+##nagelfar syntax snit::widgetadaptor::myvar l
+##nagelfar syntax snit::widgetadaptor::mymethod x x*
+##nagelfar return snit::widgetadaptor::myvar varName
 ##nagelfar syntax snit::widgetadaptor::component x
 ##nagelfar syntax snit::widgetadaptor::install s x*
 ##nagelfar syntax snit::widgetadaptor::option x p*
