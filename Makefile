@@ -36,6 +36,9 @@ all: base
 
 base: nagelfar.tcl setup misctest web doc db
 
+# Target to update minimum stuff, that needs less environment
+min: nagelfar.tcl misctest
+
 #----------------------------------------------------------------
 # Setup symbolic links from the VFS to the real files
 #----------------------------------------------------------------
