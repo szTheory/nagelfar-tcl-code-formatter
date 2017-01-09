@@ -1229,7 +1229,7 @@ proc SplitToken {token tokName tokCountName typeName modName lenName} {
 }
 
 # Some heuristics when non-braced non constant code is found
-proc checkNonConstantCode {cmd arg tok index} {
+proc checkNonConstantCode {cmd arg tok type index} {
     # Special case: [list ...]
     if {[string match {\[list*} $arg]} {
         # FIXA: Check the code
@@ -1240,9 +1240,15 @@ proc checkNonConstantCode {cmd arg tok index} {
     if {[regexp {^\$[\w:]+$} $arg]} {
         return
     }
-     
+
+    # FIXA: Handle other common methods to construct code. E.g. "mymethod".
+    # Specific return type?
+
     if {$tok eq "c" || $tok eq "cv"} {
-        errorMsg W "No braces around code in $cmd statement." $index
+        if {$type eq "script"} {
+            return
+        }
+        errorMsg N "No braces around code in $cmd statement." $index
     }
 }
 
@@ -1580,7 +1586,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     # No braces around non constant code.
                     checkNonConstantCode $cmd [lindex $argv $i] $tok \
-                            [lindex $indices $i]
+                            [lindex $wordtype $i] [lindex $indices $i]
 		} else {
                     set body [lindex $argv $i]
                     if {$tokCount ne ""} {
@@ -1656,7 +1662,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     # No braces around non constant code.
                     checkNonConstantCode $cmd [lindex $argv $i] $tok \
-                            [lindex $indices $i]
+                            [lindex $wordtype $i] [lindex $indices $i]
 		} else {
                     set body [lindex $argv $i]
                     if {$tokCount ne ""} {
