@@ -1,8 +1,8 @@
-Files in 1.2.4 release:
+Files in 1.2.5 release:
 
-nagelfar124.tar.gz is the complete distribution.
+nagelfar125.tar.gz is the complete distribution.
 
-nagelfar124.kit is a platform independent starkit, executable
+nagelfar125.kit is a platform independent starkit, executable
 by tclkit or by tclsh in many Tcl installations.
 
 Standalone executables for a few platforms are available

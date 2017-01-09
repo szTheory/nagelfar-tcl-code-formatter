@@ -1,3 +1,5 @@
+Version 1.2.5
+
 2017-01-09
  New variable type "script" used to annotate things that build e.g. call-backs.
  This is used to clean up "No braces around code" notifications.
