@@ -6,6 +6,9 @@ Changes in v1.x (not released yet):
 * New inline command "vartype" to just annotate a variable with a type. Using "variable" for that purpose could mask bugs.
 * New inline command "option+" to handle manually added options. Useful together with "copy" when you extend e.g. a widget.
 * New -len option to make Nagelfar check max line length.
+* Corrected a bug where trace execution and variable x combination failed.
+* Corrected syntax of eval command in sqlite3 database.
+* New variable type "script" used to annotate things that build e.g. call-backs. This is used to clean up "No braces around code" notifications.
 
 Changes in v1.2.4 (2016-08-06):
 

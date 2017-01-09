@@ -16,6 +16,10 @@
 ##nagelfar syntax snit::type::component x
 ##nagelfar syntax snit::type::delegate x*
 ##nagelfar syntax snit::type::install s x*
+##nagelfar syntax snit::type::mymethod x x*
+##nagelfar return snit::type::mymethod script
+##nagelfar syntax snit::type::myvar l
+##nagelfar return snit::type::myvar varName
 
 ##nagelfar syntax snit::widgetadaptor do=_stdclass_snit cn
 ##nagelfar syntax snit::widgetadaptor::method dm
@@ -24,8 +28,9 @@
 ##nagelfar syntax snit::widgetadaptor::delegate x*
 ##nagelfar syntax snit::widgetadaptor::installhull x*
 ##nagelfar syntax snit::widgetadaptor::from l x*
-##nagelfar syntax snit::widgetadaptor::myvar l
 ##nagelfar syntax snit::widgetadaptor::mymethod x x*
+##nagelfar return snit::widgetadaptor::mymethod script
+##nagelfar syntax snit::widgetadaptor::myvar l
 ##nagelfar return snit::widgetadaptor::myvar varName
 ##nagelfar syntax snit::widgetadaptor::component x
 ##nagelfar syntax snit::widgetadaptor::install s x*
@@ -40,8 +45,9 @@
 ##nagelfar syntax snit::widget::from l x*
 ##nagelfar syntax snit::widget::hulltype x
 ##nagelfar syntax snit::widget::widgetclass x
-##nagelfar syntax snit::widget::myvar l
 ##nagelfar syntax snit::widget::mymethod x x*
+##nagelfar return snit::widget::mymethod script
+##nagelfar syntax snit::widget::myvar l
 ##nagelfar return snit::widget::myvar varName
 ##nagelfar syntax snit::widget::component x
 ##nagelfar syntax snit::widget::install s x*

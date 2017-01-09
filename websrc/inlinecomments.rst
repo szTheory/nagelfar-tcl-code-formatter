@@ -54,7 +54,8 @@ Specifying variables
 This will make "name" a known variable and optionally set its type.
 Types are still experimental in Nagelfar. The type "varName" can
 be used to tell Nagelfar that a variable contains a variable name,
-which suppresses some warnings.
+which suppresses some warnings. Another type is "script" which also
+suppresses some warnings.
 
 Example:
 
@@ -78,6 +79,13 @@ Example:
  set apaName [somethingThatReturnsAVarName]
  ##nagelfar vartype apaName varName
  set hejsan [set $apaName]
+
+The latter can also be achieved by specifying the return type for
+the called command:
+
+.. code:: tcl
+
+ ##nagelfar return somethingThatReturnsAVarName varName
 
 Specifying implicit variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

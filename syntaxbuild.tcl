@@ -305,6 +305,8 @@ proc buildDb {ch} {
     set syntax(lsort)           "o* x"
     # "namespace" is handled specially
     set syntax(namespace)       "s x*" ;# FIXA: All subcommands
+    set syntax(namespace\ code) "c"
+    set return(namespace\ code) "script"
     set syntax(namespace\ import) "o* x*"
     set syntax(namespace\ which) "o* x?"
     set option(namespace\ which) "-variable -command"

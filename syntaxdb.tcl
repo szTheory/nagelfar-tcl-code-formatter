@@ -101,12 +101,17 @@ menu
 menubutton
 message
 msgcat::mc
+msgcat::mcexists
 msgcat::mcflmset
 msgcat::mcflset
+msgcat::mcforgetpackage
 msgcat::mcload
+msgcat::mcloadedlocales
 msgcat::mclocale
 msgcat::mcmax
 msgcat::mcmset
+msgcat::mcpackageconfig
+msgcat::mcpackagelocale
 msgcat::mcpreferences
 msgcat::mcset
 msgcat::mcunknown
@@ -778,16 +783,22 @@ set ::syntax(menu) {x p*}
 set ::syntax(menubutton) {x p*}
 set ::syntax(message) {x p*}
 set ::syntax(msgcat::mc) {r 1}
+set ::syntax(msgcat::mcexists) {r 0}
 set ::syntax(msgcat::mcflmset) 1
 set ::syntax(msgcat::mcflset) {r 1 2}
+set ::syntax(msgcat::mcforgetpackage) 0
 set ::syntax(msgcat::mcload) 1
+set ::syntax(msgcat::mcloadedlocales) 1
 set ::syntax(msgcat::mclocale) {r 0}
 set ::syntax(msgcat::mcmax) {r 0}
 set ::syntax(msgcat::mcmset) 2
+set ::syntax(msgcat::mcpackageconfig) {r 2 3}
+set ::syntax(msgcat::mcpackagelocale) {r 1 2}
 set ::syntax(msgcat::mcpreferences) 0
 set ::syntax(msgcat::mcset) {r 2 3}
-set ::syntax(msgcat::mcunknown) {r 2}
+set ::syntax(msgcat::mcunknown) {r 0}
 set ::syntax(namespace) {s x*}
+set {::syntax(namespace code)} c
 set {::syntax(namespace import)} {o* x*}
 set {::syntax(namespace which)} {o* x?}
 set ::syntax(open) {r 1 3}
@@ -1048,6 +1059,7 @@ set ::return(lsort) list
 set ::return(menu) _obj,menu
 set ::return(menubutton) _obj,menubutton
 set ::return(message) _obj,message
+set {::return(namespace code)} script
 set ::return(panedwindow) _obj,panedwindow
 set ::return(radiobutton) _obj,radiobutton
 set ::return(scale) _obj,scale

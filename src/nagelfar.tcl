@@ -1241,13 +1241,15 @@ proc checkNonConstantCode {cmd arg tok type index} {
         return
     }
 
-    # FIXA: Handle other common methods to construct code. E.g. "mymethod".
-    # Specific return type?
+    # A specific type called "script" annotates a command that is known
+    # to build valid code. E.g. mymethod in Snit.
+    if {$type eq "script"} {
+        return
+    }
 
     if {$tok eq "c" || $tok eq "cv"} {
-        if {$type eq "script"} {
-            return
-        }
+        # FIXA: Handle other common methods to construct code?
+
         errorMsg N "No braces around code in $cmd statement." $index
     }
 }

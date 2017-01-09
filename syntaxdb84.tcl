@@ -435,6 +435,7 @@ set ::syntax(msgcat::mcpreferences) 0
 set ::syntax(msgcat::mcset) {r 2 3}
 set ::syntax(msgcat::mcunknown) {r 2}
 set ::syntax(namespace) {s x*}
+set {::syntax(namespace code)} c
 set {::syntax(namespace import)} {o* x*}
 set {::syntax(namespace which)} {o* x?}
 set ::syntax(open) {r 1 3}
@@ -612,6 +613,7 @@ set ::return(lsort) list
 set ::return(menu) _obj,menu
 set ::return(menubutton) _obj,menubutton
 set ::return(message) _obj,message
+set {::return(namespace code)} script
 set ::return(panedwindow) _obj,panedwindow
 set ::return(radiobutton) _obj,radiobutton
 set ::return(scale) _obj,scale

@@ -1,3 +1,7 @@
+2017-01-09
+ New variable type "script" used to annotate things that build e.g. call-backs.
+ This is used to clean up "No braces around code" notifications.
+
 2016-09-24
  Corrected syntax of sqlite3 eval
 

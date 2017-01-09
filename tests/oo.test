@@ -241,6 +241,7 @@ test oo-6.1 {
             }
             method gugg {a b} {
                 puts $a
+                trace add variable pdf write [mymethod nisse]
             }
         }
         set x [apa %AUTO% -x 5]

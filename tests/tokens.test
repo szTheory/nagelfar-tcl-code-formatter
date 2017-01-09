@@ -183,7 +183,7 @@ test tokens-7.1 {
     }
     execTestFile
 } -result {%%Modifier "*" is not supported for "c" in syntax for gurka.
-Line   6: W No braces around code in hopp statement.}
+Line   6: N No braces around code in hopp statement.}
 
 test tokens-7.2 {
     Code token, partial commands
@@ -340,10 +340,14 @@ test tokens-7.11 {
         trace add variable apa write $apa
         trace add variable apa write $::apa::bepa
         trace add variable apa write [list $apa 1]
+        trace add variable apa write [namespace code $apa]
+        ##nagelfar syntax miffo 2
+        ##nagelfar return miffo script
+        trace add variable apa write [miffo x y]
     }
     execTestFile
-} -result {%%Line   4: W No braces around code in hopp statement.
-Line   5: W No braces around code in trace add variable statement.}
+} -result {%%Line   4: N No braces around code in hopp statement.
+Line   5: N No braces around code in trace add variable statement.}
 
 
 test tokens-8.1 {
