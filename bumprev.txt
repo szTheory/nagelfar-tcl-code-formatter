@@ -1,6 +1,5 @@
 The following places needs changes when bumping revision number.
 
-src/prologue.tcl : version
 Makefile : VERSION DOTVERSION
 websrc/changes.rst : Changes
 Changes : Note new release
