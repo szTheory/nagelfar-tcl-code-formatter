@@ -94,10 +94,10 @@ proc addFile {} {
     
     set filetypes [list {{Tcl Files} {.tcl}} \
             [list {All Tcl Files} $::Prefs(extensions)] \
-            {{All Files} {.*}}]
+            {{All Files} {*}}]
     set apa [tk_getOpenFile -title "Select file(s) to check" \
             -initialdir $initdir \
-            -defaultextension .tcl -multiple 1 \
+            -multiple 1 \
             -filetypes $filetypes]
     if {[llength $apa] == 0} return
 
