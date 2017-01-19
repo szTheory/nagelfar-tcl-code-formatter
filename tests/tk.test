@@ -48,7 +48,7 @@ test tk-4.1 {
 } -result {%%Line   3: E Unknown variable "y"}
 
 test tk-5.1 {
-    Tk, text widget
+    Tk, text widget, search command
 } -body {
     createTestFile {
         set apa [text .t -width 20]
@@ -59,3 +59,17 @@ test tk-5.1 {
     }
     execTestFile
 } -result {%%}
+
+test tk-5.2 {
+    Tk, text widget, xview command
+} -body {
+    createTestFile {
+        # Check that the databse entry for xview works
+        set apa [text .t -width 20]
+        $apa xview
+        $apa xview moveto x
+        $apa xview scroll x x
+        $apa xview hugge
+    }
+    execTestFile
+} -result {%%Line   7: E Unknown subcommand "hugge" to "_obj,text xview"}

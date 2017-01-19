@@ -693,10 +693,70 @@ proc buildDb {ch} {
                             [getSubCmds .w selection gurkmeja 0]
                 }
                 text {
+                    set syntax(_obj,$class\ bbox) "1"
+                    set syntax(_obj,$class\ compare) "3"
+                    set syntax(_obj,$class\ debug) "x?"
+                    set syntax(_obj,$class\ delete) "r 1"
+                    set syntax(_obj,$class\ dlineinfo) "1"
+                    set syntax(_obj,$class\ index) "1"
+                    set syntax(_obj,$class\ insert) "r 2"
+                    set syntax(_obj,$class\ pendingsync) "0"
+                    set syntax(_obj,$class\ replace) "r 3"
+                    set syntax(_obj,$class\ see) "1"
+                    set syntax(_obj,$class\ sync) "r 1 3"
+
+                    set syntax(_obj,$class\ edit) "s x*"
+                    set subCmd(_obj,$class\ edit) \
+                            [getSubCmds .w edit gurkmeja]
+
+                    set syntax(_obj,$class\ image) "s x*"
+                    set subCmd(_obj,$class\ image) \
+                            [getSubCmds .w image gurkmeja]
+
+                    set syntax(_obj,$class\ mark) "s x*"
+                    set subCmd(_obj,$class\ mark) \
+                            [getSubCmds .w mark gurkmeja]
+
+                    set syntax(_obj,$class\ peer) "s x*"
+                    set subCmd(_obj,$class\ peer) \
+                            [getSubCmds .w peer gurkmeja]
+
+                    set syntax(_obj,$class\ scan) "s x x"
+                    set subCmd(_obj,$class\ scan) \
+                            [getSubCmds .w scan gurkmeja x x]
+
+                    set syntax(_obj,$class\ tag) "s x*"
+                    set subCmd(_obj,$class\ tag) \
+                            [getSubCmds .w tag gurkmeja]
+
+                    set syntax(_obj,$class\ window) "s x*"
+                    set subCmd(_obj,$class\ window) \
+                            [getSubCmds .w window gurkmeja]
+
+                    set syntax(_obj,$class\ xview) "0: 0 : s x*"
+                    set subCmd(_obj,$class\ xview) \
+                            [getSubCmds .w xview gurkmeja]
+
+                    # yview is a bit weird
+                    set syntax(_obj,$class\ yview) "x*"
+
+                    set syntax(_obj,$class\ count) "o* x x"
+                    set option(_obj,$class\ count) \
+                            [getSubCmds .w count -gurkmeja x x]
+
+                    set syntax(_obj,$class\ dump) "o* x x?"
+                    set option(_obj,$class\ dump) \
+                            [getSubCmds .w dump -gurkmeja x]
+                    set option(_obj,$class\ dump\ -command) x
+
+                    set syntax(_obj,$class\ get) "o* x x*"
+                    set option(_obj,$class\ get) \
+                            [getSubCmds .w get -gurkmeja x x]
+
                     set syntax(_obj,$class\ search) "o* x x x?"
-                    set option(_obj,text\ search) \
+                    set option(_obj,$class\ search) \
                             [getSubCmds .w search -gurkmeja x x]
-                    set option(_obj,text\ search\ -count) n
+                    set option(_obj,$class\ search\ -count) n
                 }
             }
         }

@@ -285,9 +285,32 @@ set ::syntax(_obj,spinbox) {s x*}
 set {::syntax(_obj,spinbox cget)} o
 set {::syntax(_obj,spinbox configure)} {o. x. p*}
 set ::syntax(_obj,text) {s x*}
+set {::syntax(_obj,text bbox)} 1
 set {::syntax(_obj,text cget)} o
+set {::syntax(_obj,text compare)} 3
 set {::syntax(_obj,text configure)} {o. x. p*}
+set {::syntax(_obj,text count)} {o* x x}
+set {::syntax(_obj,text debug)} x?
+set {::syntax(_obj,text delete)} {r 1}
+set {::syntax(_obj,text dlineinfo)} 1
+set {::syntax(_obj,text dump)} {o* x x?}
+set {::syntax(_obj,text edit)} {s x*}
+set {::syntax(_obj,text get)} {o* x x*}
+set {::syntax(_obj,text image)} {s x*}
+set {::syntax(_obj,text index)} 1
+set {::syntax(_obj,text insert)} {r 2}
+set {::syntax(_obj,text mark)} {s x*}
+set {::syntax(_obj,text peer)} {s x*}
+set {::syntax(_obj,text pendingsync)} 0
+set {::syntax(_obj,text replace)} {r 3}
+set {::syntax(_obj,text scan)} {s x x}
 set {::syntax(_obj,text search)} {o* x x x?}
+set {::syntax(_obj,text see)} 1
+set {::syntax(_obj,text sync)} {r 1 3}
+set {::syntax(_obj,text tag)} {s x*}
+set {::syntax(_obj,text window)} {s x*}
+set {::syntax(_obj,text xview)} {0: 0 : s x*}
+set {::syntax(_obj,text yview)} x*
 set ::syntax(_obj,toplevel) {s x*}
 set {::syntax(_obj,toplevel cget)} o
 set {::syntax(_obj,toplevel configure)} {o. x. p*}
@@ -642,6 +665,13 @@ set ::subCmd(_obj,scale) {cget configure coords get identify set}
 set ::subCmd(_obj,scrollbar) {activate cget configure delta fraction get identify set}
 set ::subCmd(_obj,spinbox) {bbox cget configure delete get icursor identify index insert invoke scan selection set validate xview}
 set ::subCmd(_obj,text) {bbox cget compare configure debug delete dlineinfo dump edit get image index insert mark scan search see tag window xview yview}
+set {::subCmd(_obj,text edit)} {modified redo reset separator undo}
+set {::subCmd(_obj,text image)} {cget configure create names}
+set {::subCmd(_obj,text mark)} {gravity names next previous set unset}
+set {::subCmd(_obj,text peer)} {bbox cget compare configure debug delete dlineinfo dump edit get image index insert mark scan search see tag window xview yview}
+set {::subCmd(_obj,text tag)} {add bind cget configure delete lower names nextrange raise ranges remove}
+set {::subCmd(_obj,text window)} {cget configure create names}
+set {::subCmd(_obj,text xview)} {moveto scroll}
 set ::subCmd(_obj,toplevel) {cget configure}
 set ::subCmd(array) {anymore donesearch exists get names nextelement set size startsearch statistics unset}
 set ::subCmd(binary) {format scan}
@@ -720,6 +750,7 @@ set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -b
 set {::option(_obj,spinbox configure -textvariable)} n
 set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -borderwidth -cursor -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -state -tabs -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -borderwidth -cursor -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -state -tabs -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,text count)} {bbox cget compare configure debug delete dlineinfo dump edit get image index insert mark scan search see tag window xview yview}
 set {::option(_obj,text search)} {-- -backward -count -elide -exact -forward -nocase -regexp}
 set {::option(_obj,text search -count)} n
 set {::option(_obj,toplevel cget)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
