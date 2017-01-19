@@ -1,4 +1,5 @@
 2017-01-19
+ Fixed a bad check on constant array index. [Bug #1]
  Allow GUI to add files without extension.
  Added syntaxdb that "$text search -count var" creates a variable.
 

@@ -948,7 +948,7 @@ proc parseVar {str len index iName knownVarsName} {
                 if {[currentProc] eq ""} {
                     # We cannot check namespace variables in a proc.
                     # TBD: Can we ever?
-                    errorMsg E "Unknown variable1 \"$var\"" $index 1
+                    errorMsg E "Unknown variable \"$var\"" $index 1
                 }
             }
         } else {
@@ -1940,18 +1940,11 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
     }
 
     if {$check == 2} {
-        # This is a check, so type in an out, not an inout.
+        # This is a check, so "type" is an out, not an inout.
         # Ignore any incoming value.
         set type ""
 	if {![dict exists $knownVars $varBase]} {
 	    return 1
-	}
-        # A local array with a constant index?
-	if {$varArray && ($varIndexWs & 1) && \
-                [dict get $knownVars $varBase local]} {
-	    if {![dict exists $knownVars $var]} {
-		return 1
-	    }
 	}
 	if {[dict exists $knownVars $var] &&
             [dict get $knownVars $var "type"] ne ""} {

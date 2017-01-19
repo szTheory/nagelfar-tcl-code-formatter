@@ -560,6 +560,29 @@ test nagelfar-8.2 {
     execTestFile -flags -novar
 } -result {%%}
 
+test nagelfar-8.3 {
+    Variable handling
+} -body {
+    createTestFile {
+        proc apa {} {
+            array set xx {}
+            # All ways to read a variable should behave the same.
+            # Currently these should be silent since it is not possible to
+            # know what array members are present in the general case.
+            list $xx()
+            list $xx(y)
+            list $xx(z)
+            set xx()
+            set xx(y)
+            set xx(z)
+            lappend xx() x
+            lappend xx(y) x
+            lappend xx(z) x
+        }
+    }
+    execTestFile -flags -strictappend
+} -result {%%}
+
 test nagelfar-9.1 {
     if statement, as comment
 } -body {
