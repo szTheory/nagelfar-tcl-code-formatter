@@ -287,6 +287,7 @@ set {::syntax(_obj,spinbox configure)} {o. x. p*}
 set ::syntax(_obj,text) {s x*}
 set {::syntax(_obj,text cget)} o
 set {::syntax(_obj,text configure)} {o. x. p*}
+set {::syntax(_obj,text search)} {o* x x x?}
 set ::syntax(_obj,toplevel) {s x*}
 set {::syntax(_obj,toplevel cget)} o
 set {::syntax(_obj,toplevel configure)} {o. x. p*}
@@ -719,6 +720,8 @@ set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -b
 set {::option(_obj,spinbox configure -textvariable)} n
 set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -borderwidth -cursor -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -state -tabs -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -borderwidth -cursor -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -state -tabs -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,text search)} {-- -backward -count -elide -exact -forward -nocase -regexp}
+set {::option(_obj,text search -count)} n
 set {::option(_obj,toplevel cget)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,toplevel configure)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set ::option(bell) {-displayof -nice}

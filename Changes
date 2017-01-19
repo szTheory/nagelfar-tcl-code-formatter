@@ -1,3 +1,7 @@
+2017-01-19
+ Allow GUI to add files without extension.
+ Added syntaxdb that "$text search -count var" creates a variable.
+
 Version 1.2.5
 
 2017-01-09

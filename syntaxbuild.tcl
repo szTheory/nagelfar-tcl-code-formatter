@@ -685,11 +685,18 @@ proc buildDb {ch} {
             set option(_obj,$class\ configure) $option($class)
             set syntax(_obj,$class\ cget) "o"
             set option(_obj,$class\ cget) $option($class)
+            # Widget details
             switch $class {
                 listbox {
                     set syntax(_obj,$class\ selection) "s x x?"
                     set subCmd(_obj,$class\ selection) \
                             [getSubCmds .w selection gurkmeja 0]
+                }
+                text {
+                    set syntax(_obj,$class\ search) "o* x x x?"
+                    set option(_obj,text\ search) \
+                            [getSubCmds .w search -gurkmeja x x]
+                    set option(_obj,text\ search\ -count) n
                 }
             }
         }

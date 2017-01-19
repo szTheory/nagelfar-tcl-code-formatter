@@ -46,3 +46,16 @@ test tk-4.1 {
     }
     execTestFile
 } -result {%%Line   3: E Unknown variable "y"}
+
+test tk-5.1 {
+    Tk, text widget
+} -body {
+    createTestFile {
+        set apa [text .t -width 20]
+        $apa search -count bepa Hej 1.0
+        list $bepa
+        $apa search -all -count cepa -elide Hej 1.0 2.0
+        list $cepa
+    }
+    execTestFile
+} -result {%%}

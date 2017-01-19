@@ -509,6 +509,7 @@ set {::syntax(_obj,spinbox configure)} {o. x. p*}
 set ::syntax(_obj,text) {s x*}
 set {::syntax(_obj,text cget)} o
 set {::syntax(_obj,text configure)} {o. x. p*}
+set {::syntax(_obj,text search)} {o* x x x?}
 set ::syntax(_obj,tk::button) {s x*}
 set {::syntax(_obj,tk::button cget)} o
 set {::syntax(_obj,tk::button configure)} {o. x. p*}
@@ -1238,6 +1239,8 @@ set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -b
 set {::option(_obj,spinbox configure -textvariable)} n
 set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,text search)} {-- -all -backward -count -elide -exact -forward -nocase -nolinestop -overlap -regexp -strictlimits}
+set {::option(_obj,text search -count)} n
 set {::option(_obj,tk::button cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,tk::button configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,tk::button configure -textvariable)} n
