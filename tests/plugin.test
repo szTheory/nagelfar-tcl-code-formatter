@@ -163,6 +163,30 @@ test plugin-2.5 {
     execTestFile -plugin _testfile_.plugin.tcl
 } -result {%%Line   2: E Plugin _testfile_.plugin.tcl returned malformed replacement from lateExpr}
 
+test plugin-2.6 {
+    Plugin for late expr check
+} -body {
+    createTestFile {##Nagelfar Plugin : Some info
+        proc lateExpr {exp info} {
+            # Any comparison operator vs literal string give a note
+            if {[regexp {(!=|==|<|<=|>|>=)\s*\"} $exp -> op]} {
+                return [list note "Operator \"$op\" used with string literal"]
+            }
+            if {[regexp {\"\s*(!=|==|<|<=|>|>=)} $exp -> op]} {
+                return [list note "Operator \"$op\" used with string literal"]
+            }
+            return ""
+        }
+    } 2
+    createTestFile {
+        set apa [expr {1 < "apa"}]
+        set apa [expr {"bepa" >= 1}]
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   2: N Operator "<" used with string literal
+Line   3: N Operator ">=" used with string literal}
+
 test plugin-3.1 {
     Plugin for early expr check
 } -body {
