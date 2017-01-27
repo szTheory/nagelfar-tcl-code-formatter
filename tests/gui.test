@@ -436,25 +436,9 @@ test gui-7.1 {Stop Button} -body {
         lappend body {set bepa 1}
     }
     createTestFile [join $body \n]
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
-    AddFileToTest _testfile_
+    for {set t 0} {$t < 50} {incr t} {
+        AddFileToTest _testfile_
+    }
 
     tktest::press -async Check
     after 1000 "set xyz 1"
@@ -463,7 +447,7 @@ test gui-7.1 {Stop Button} -body {
     after 100
 
     set lines [GetTextLines]
-    set succ [expr {[llength $lines] < 20 && [string match *Done* $lines]}]
+    set succ [expr {[llength $lines] < 40 && [string match *Done* $lines]}]
     if {!$succ} {
         set succ '[join $lines \n]'
     }
