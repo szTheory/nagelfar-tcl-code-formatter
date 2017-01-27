@@ -1376,15 +1376,16 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 # xComm is a special token used internally to handle if 0 as
                 # a comment. xComm will not be investigated for inline comments
 
-		# x* matches anything up to the end.
+		# x* matches anything
 		if {$mod eq "*"} {
+                    set ei $lastOptional
                     if {$tok != "xComm"} {
-                        checkForCommentL [lrange $argv $i end] \
-                                [lrange $wordstatus $i end] \
-                                [lrange $indices $i end]
+                        checkForCommentL [lrange $argv $i $ei] \
+                                [lrange $wordstatus $i $ei] \
+                                [lrange $indices $i $ei]
                     }
-		    set i $argc
-		    break
+		    set i $ei
+		    continue
 		}
 		if {$mod ne "?" || $i < $argc} {
                     # Check braced for comments

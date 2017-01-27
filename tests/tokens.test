@@ -400,6 +400,19 @@ test tokens-9.1 {
     execTestFile
 } -result {%%}
 
+test tokens-9.2 {
+    Optional tokens
+} -body {
+    createTestFile {
+        # The * should not eat the last arg
+        ##nagelfar syntax xxx x* c
+        xxx a b {
+            set hej a b
+        }
+    }
+    execTestFile
+} -result {%%Line   5: E Wrong number of arguments (3) to "set"}
+
 test tokens-10.1 {
     Definition of command token
 } -body {
