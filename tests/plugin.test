@@ -166,7 +166,7 @@ test plugin-2.5 {
 test plugin-2.6 {
     Plugin for late expr check
 } -body {
-    createTestFile {##Nagelfar Plugin : Some info
+    createTestFile {##Nagelfar Plugin : Operator with string literal
         proc lateExpr {exp info} {
             # Any comparison operator vs literal string give a note
             if {[regexp {(!=|==|<|<=|>|>=)\s*\"} $exp -> op]} {

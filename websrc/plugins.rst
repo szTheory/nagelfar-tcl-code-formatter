@@ -224,6 +224,25 @@ Allow custom operator
      return [list replace $exp]
  }
 
+Look for operator usage
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: tcl
+
+ ##Nagelfar Plugin : Operator with string literal
+ # In the wake of TIP#461, help looking for things that can become a problem.
+ proc lateExpr {exp info} {
+     # Any comparison operator vs literal string give a note
+     # The regexp could be more precise of course.
+     if {[regexp {(!=|==|<|<=|>|>=)\s*\"} $exp -> op]} {
+         return [list note "Operator \"$op\" used with string literal"]
+     }
+     if {[regexp {\"\s*(!=|==|<|<=|>|>=)} $exp -> op]} {
+         return [list note "Operator \"$op\" used with string literal"]
+     }
+     return ""
+ }
+
 Handle special syntax
 ^^^^^^^^^^^^^^^^^^^^^
 
