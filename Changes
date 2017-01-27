@@ -1,3 +1,7 @@
+2017-01-27
+ Corrected syntax db for dict create. [Bug #13]
+ Added moe dict subcommand details to db.
+
 2017-01-19
  Fixed a bad check on constant array index. [Bug #1]
  Allow GUI to add files without extension.

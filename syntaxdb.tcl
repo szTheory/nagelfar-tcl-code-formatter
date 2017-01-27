@@ -708,13 +708,25 @@ set ::syntax(continue) 0
 set ::syntax(destroy) x*
 set ::syntax(dict) {s x x*}
 set {::syntax(dict append)} {n x x*}
-set {::syntax(dict filter)} {x x x}
+set {::syntax(dict create)} x*
+set {::syntax(dict exists)} {x x x*}
+set {::syntax(dict filter)} {x s x*}
+set {::syntax(dict filter key)} x*
+set {::syntax(dict filter script)} {nl c}
+set {::syntax(dict filter value)} x*
 set {::syntax(dict for)} {nl x c}
 set {::syntax(dict incr)} {n x x*}
+set {::syntax(dict info)} x
+set {::syntax(dict keys)} {x x?}
 set {::syntax(dict lappend)} {n x x*}
-set {::syntax(dict set)} {n x x*}
+set {::syntax(dict map)} {nl x c}
+set {::syntax(dict remove)} {x x*}
+set {::syntax(dict replace)} {x x*}
+set {::syntax(dict set)} {n x x x*}
+set {::syntax(dict size)} x
 set {::syntax(dict unset)} {n x x*}
 set {::syntax(dict update)} {l x x x* c}
+set {::syntax(dict values)} {x x?}
 set {::syntax(dict with)} {l x* c}
 set ::syntax(encoding) {s x*}
 set {::syntax(encoding convertfrom)} {r 1 2}
@@ -1193,6 +1205,7 @@ set ::subCmd(chan) {blocked close configure copy create eof event flush gets nam
 set ::subCmd(clipboard) {append clear get}
 set ::subCmd(clock) {add clicks format microseconds milliseconds scan seconds}
 set ::subCmd(dict) {append create exists filter for get incr info keys lappend merge remove replace set size unset update values with}
+set {::subCmd(dict filter)} {key script value}
 set ::subCmd(encoding) {convertfrom convertto dirs names system}
 set ::subCmd(event) {add delete generate info}
 set ::subCmd(file) {atime attributes channels copy delete dirname executable exists extension isdirectory isfile join link lstat mkdir mtime nativename normalize owned pathtype readable readlink rename rootname separator size split stat system tail type volumes writable}

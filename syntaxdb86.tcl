@@ -856,14 +856,25 @@ set ::syntax(coroutine) {x x x*}
 set ::syntax(destroy) x*
 set ::syntax(dict) {s x x*}
 set {::syntax(dict append)} {n x x*}
+set {::syntax(dict create)} x*
+set {::syntax(dict exists)} {x x x*}
 set {::syntax(dict filter)} {x x x*}
+set {::syntax(dict filter key)} x*
+set {::syntax(dict filter script)} {nl c}
+set {::syntax(dict filter value)} x*
 set {::syntax(dict for)} {nl x c}
 set {::syntax(dict incr)} {n x x*}
+set {::syntax(dict info)} x
+set {::syntax(dict keys)} {x x?}
 set {::syntax(dict lappend)} {n x x*}
 set {::syntax(dict map)} {nl x c}
-set {::syntax(dict set)} {n x x*}
+set {::syntax(dict remove)} {x x*}
+set {::syntax(dict replace)} {x x*}
+set {::syntax(dict set)} {n x x x*}
+set {::syntax(dict size)} x
 set {::syntax(dict unset)} {n x x*}
 set {::syntax(dict update)} {l x x x* c}
+set {::syntax(dict values)} {x x?}
 set {::syntax(dict with)} {l x* c}
 set ::syntax(encoding) {s x*}
 set {::syntax(encoding convertfrom)} {r 1 2}
