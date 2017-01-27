@@ -159,7 +159,7 @@ proc buildDb {ch} {
 
     # x  Any
     # o  Option, i.e anything starting with -
-    # p  Option+Any (p as in option Pair)
+    # p  Option+Any i.e. (o x) (p as in option Pair)
     # s  Subcommand
     # d* Definitions. That arg defines a new command, as detailed below
     # di Define inheritance
@@ -174,7 +174,7 @@ proc buildDb {ch} {
     # e  Expression
     # E  Expression that should be in braces
     # c  Code, checked in surrounding context
-    #    If an integer is added to it, that number of argumenst are added to the
+    #    If an integer is added to it, that number of arguments are added to the
     #    code to emulate a command prefix. (cg has this too)
     # cg Code, checked in global context
     # cn Code, checked in virtual namespace
@@ -192,9 +192,20 @@ proc buildDb {ch} {
     # * Zero or more
     # . One or nothing at all
 
-    # * after x swallows all the rest and must be last
     # s may only have .
     # e and c may not have any modifier
+
+    # If a token is followed by a parenthesis it denotes a type.
+    # The local variable in the proc is marked with this type.
+    # Any modifier goes after the parens.
+    # E.g.   x(varName)   x(script)?
+    
+    # If a token is followed by a number it is token dependent.
+    # Any modifier goes after the number.
+    # E.g.   c2   cg4?
+
+    # If a token is followed by =, it is a token dependent modifier.
+    # E.g   do=_stdclass_oo
 
     # If a syntax for a subcommand is defined, it is used to check the rest
 

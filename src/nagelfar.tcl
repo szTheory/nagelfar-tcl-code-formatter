@@ -1203,6 +1203,7 @@ proc WA {{debug {}}} {
     }
 }
 
+# Take a syntax token and extract all parts
 proc SplitToken {token tokName tokCountName typeName modName lenName} {
     upvar 1 $tokName tok $tokCountName tokCount $typeName type $modName mod \
             $lenName len
@@ -1222,6 +1223,7 @@ proc SplitToken {token tokName tokCountName typeName modName lenName} {
         return
     }
     set tok $tokL
+    # Some tokens eat multiple arguments
     switch $tokL {
         dp - dm - dmp { set len 3 }
         dk - p - cv { set len 2 }
@@ -1272,6 +1274,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
     #puts "Checking $cmd ([lindex $argv]) against syntax $syn"
 
     # Check if the syntax definition has multiple entries
+    # Extract the valid one and continue as normal below
     if {[string index [lindex $syn 0] end] == ":"} {
         set na [expr {$argc - $firsti}]
         set newsyn {}
@@ -1459,8 +1462,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                             if {![info exists ::syntax($objname)]} {
                                 set ::syntax($objname) "s x*"
                             }
-                            set copymap [list _obj,$copyFrom $objname]
                             if {$copyFrom ne ""} {
+                                set copymap [list _obj,$copyFrom $objname]
                                 CopyCmdInDatabase $copyFrom $name    $copymap
                                 CopyCmdInDatabase $copyFrom $objname $copymap
                             } else {
