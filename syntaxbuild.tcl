@@ -157,43 +157,43 @@ proc buildDb {ch} {
     # If a token is an integer, just check the number of arguments against it.
     # r min ?max?  Specifies a range for number of arguments
 
-    # x  Any
-    # o  Option, i.e anything starting with -
-    # p  Option+Any i.e. (o x) (p as in option Pair)
-    # s  Subcommand
-    # d* Definitions. That arg defines a new command, as detailed below
-    # di Define inheritance
-    # dc Define with copy, if followed by =cmd, it copies syntax from cmd.
-    # do Define object, if followed by =cmd, it copies syntax from cmd.
-    # dk Define constructor (args+body)
-    # dd Define destructor (just body)
-    # dp Define procedure (name+args+body)
-    # dm Define method (name+args+body)
+    # The following token names are recognised. A token name is alphabetic
+    # and may be mixed case. A token may cover and consume multiple arguments.
+    # x   Any
+    # o   Option, i.e anything starting with -.
+    #     An option may consume a second arg if the option database says so.
+    # p   Option+Any i.e. (o x) (p as in option Pair)
+    # s   Subcommand
+    # d*  Definitions. That arg defines a new command, as detailed below
+    # di  Define inheritance
+    # dc  Define with copy, if followed by =cmd, it copies syntax from cmd.
+    # do  Define object, if followed by =cmd, it copies syntax from cmd.
+    # dk  Define constructor (args+body)
+    # dd  Define destructor (just body)
+    # dp  Define procedure (name+args+body)
+    # dm  Define method (name+args+body)
     # dmp Define metod/procedure (name+args+body)
     # div Define implicit variable
-    # e  Expression
-    # E  Expression that should be in braces
-    # c  Code, checked in surrounding context
-    #    If an integer is added to it, that number of arguments are added to the
-    #    code to emulate a command prefix. (cg has this too)
-    # cg Code, checked in global context
-    # cn Code, checked in virtual namespace
-    # cl Code, checked in its own local context
-    # cv Code, checked in its own local context, preceded by variable list
-    # n, v and l all marks variable names. Those arguments will not be
-    #   checked against known variables to detect missing $.
-    # n  The variable does not have to exist, and is set by the command.
-    # v  The variable must exist. It is not marked as set.
-    # l  Does not have to exist. It will be marked as known, but not set.
-    # nl Like n, but a list of variable names
+    # e   Expression
+    # E   Expression that should be in braces
+    # c   Code, checked in surrounding context
+    #     If an integer is added to it, that number of arguments are added to
+    #     the code to emulate a command prefix. (cg has this too)
+    # cg  Code, checked in global context
+    # cn  Code, checked in virtual namespace
+    # cl  Code, checked in its own local context
+    # cv  Code, checked in its own local context, preceded by variable list
+    #     n, v and l all marks variable names. Those arguments will not be
+    #     checked against known variables to detect missing $.
+    # n   The variable does not have to exist, and is set by the command.
+    # v   The variable must exist. It is not marked as set.
+    # l   Does not have to exist. It will be marked as known, but not set.
+    # nl  Like n, but a list of variable names
 
     # Modifiers that apply to some of the above
     # ? Zero or One
-    # * Zero or more
+    # * Zero or more  (not supported by all tokens)
     # . One or nothing at all
-
-    # s may only have .
-    # e and c may not have any modifier
 
     # If a token is followed by a parenthesis it denotes a type.
     # The local variable in the proc is marked with this type.
@@ -208,6 +208,7 @@ proc buildDb {ch} {
     # E.g   do=_stdclass_oo
 
     # If a syntax for a subcommand is defined, it is used to check the rest
+    # If a syntax for an option is defined, it is used to check the next arg.
 
 
     # Syntax for Tcl core commands

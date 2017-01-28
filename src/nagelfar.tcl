@@ -1204,14 +1204,16 @@ proc WA {{debug {}}} {
 }
 
 # Take a syntax token and extract all parts
-proc SplitToken {token tokName tokCountName typeName modName lenName} {
+proc SplitToken {token tokName tokCountName typeName modName lenName fromName} {
     upvar 1 $tokName tok $tokCountName tokCount $typeName type $modName mod \
-            $lenName len
+            $lenName len $fromName from
     set mod ""
     set tokCount ""
     set type ""
     set tok _baad_
     set len 1
+    set from ""
+
     if {[regexp {^(\w+)\((.*)\)$} $token -> tokL type]} {
         # Type in parenthesis
     } elseif {[regexp {^(\w+)\((.*)\)(\W.*)$} $token -> tokL type mod]} {
@@ -1222,6 +1224,12 @@ proc SplitToken {token tokName tokCountName typeName modName lenName} {
         #echo "Unsupported token '$token'"
         return
     }
+    # Look for the "=xx" part of a modifier
+    if {[regexp {^=(.+?)(\W*)$} $mod -> m1 m2]} {
+        set from $m1
+        set mod $m2
+    }
+
     set tok $tokL
     # Some tokens eat multiple arguments
     switch $tokL {
@@ -1324,22 +1332,34 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 
     if {![info exists ::cacheMinArgs($syn)]} {
         set minargs 0
+        set minargsend 0
+        set optSeen 0
         set i 0
         set last [llength $syn]
         foreach token $syn {
-            SplitToken $token _ _ _ mod tokLen
+            SplitToken $token _ _ _ mod tokLen _
             incr i
 
             if {$mod eq ""} {
+                # Count mandatory args
                 incr minargs $tokLen
+                if {$optSeen} {
+                    incr minargsend $tokLen
+                }
             } else {
-                set last $i
+                # Note an optional, start counting end args
+                set minargsend 0
+                set optSeen 1
             }
         }
-        set ::cacheEndArgs($syn) [expr {[llength $syn] - $last}]
+        # Number of mandatory args at end
+        set ::cacheEndArgs($syn) $minargsend
+        # Number of mandatory args
         set ::cacheMinArgs($syn) $minargs
     }
     set anyOptional  [expr {($argc - $firsti) > $::cacheMinArgs($syn)}]
+    # Points at last optional + 1. I.e. an exclusive end-of-range
+    # In other words it points to the first of final mandatory args.
     set lastOptional [expr {$argc - $::cacheEndArgs($syn)}]
 
     # Treat syn as a stack. That way a token can replace itself without
@@ -1351,7 +1371,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set token [lindex $syn 0]
         set syn [lrange $syn 1 end]
 
-        SplitToken $token tok tokCount _ mod tokLen
+        SplitToken $token tok tokCount _ mod tokLen tokFrom
         # Is it optional and there can't be any optional?
         if {$mod ne "" && !$anyOptional} {
             continue
@@ -1364,47 +1384,57 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		    break
 		}
 	    }
-	    "*" - "." { # No more arguments is ok.
+	    "*" { # No more arguments is ok.
 		if {$i >= $argc} {
 		    set i $argc
 		    break
 		}
+                # Supported by token?
+                if {$tok ni {x xComm div nl l v n o p}} {
+		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
+                            syntax for \"$cmd\"."
+                }
 	    }
+	    "." { # No more arguments is ok.
+		if {$i >= $argc} {
+		    set i $argc
+		    break
+		}
+                # Supported by all tokens since the above check is all needed
+	    }
+            "?" { # No more optional arguments is ok.
+		if {$i >= $lastOptional} {
+                    continue
+		}
+                # Supported by all tokens since the above check is all needed
+            }
+            default {
+		echo "Unsupported token \"$token\" in syntax for \"$cmd\""
+            }
 	}
+
+        # Common init
+        # ei is an exclusive end-of-range for indexes covered by this token
+        set ei [expr {$i + 1}]
+        if {$mod eq "*"} {
+            set ei $lastOptional
+        }
+
+        # Main token interpretation
 	switch -- $tok {
 	    x - xComm {
                 # xComm is a special token used internally to handle if 0 as
                 # a comment. xComm will not be investigated for inline comments
 
-		# x* matches anything
-		if {$mod eq "*"} {
-                    set ei $lastOptional
-                    if {$tok != "xComm"} {
-                        checkForCommentL [lrange $argv $i $ei] \
-                                [lrange $wordstatus $i $ei] \
-                                [lrange $indices $i $ei]
-                    }
-		    set i $ei
-		    continue
-		}
-		if {$mod ne "?" || $i < $argc} {
-                    # Check braced for comments
-                    if {([lindex $wordstatus $i] & 2) && $tok != "xComm"} {
-                        checkForComment [lindex $argv $i] [lindex $indices $i]
-                    }
-		    incr i
-		}
+                set li [expr {$ei - 1}]
+                if {$tok != "xComm"} {
+                    checkForCommentL [lrange $argv $i $li] \
+                            [lrange $wordstatus $i $li] \
+                            [lrange $indices $i $li]
+                }
+                set i $ei
 	    }
             div { # Define implicit variable for this namespace
-		if {$mod ne "" && $mod ne "*"} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
-		set ei [expr {$i + 1}]
-                if {$mod eq "*"} {
-		    set ei $lastOptional
-                    set mod [string range $mod 0 end-1]
-		}
                 set currNs [currentNamespace]
                 while {$i < $ei} {
                     set var [lindex $argv $i]
@@ -1414,10 +1444,6 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 }
             }
             di { # Define inheritance
-		if {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
                 # Superclass
                 set superclass [lindex $argv $i]
                 set superObjCmd _obj,[namespace tail $superclass]
@@ -1438,7 +1464,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     errorMsg N "Non constant definition \"[lindex $argv $i]\".\
                             Skipping." [lindex $indices $i] 1
                 } else {
-                    set copyFrom [string range $mod 1 end]
+                    set copyFrom $tokFrom
                     set name [lindex $argv $i]
                     #decho "Defining '$name', from '$copyFrom'"
                     if {$name eq "%AUTO%"} {
@@ -1492,10 +1518,6 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
             dp -
             dm -
             dmp { # Define proc and/or method
-		if {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
                 if {$tok eq "dd"} { # One arg
                     if {$i > ($argc - 1)} {
                         break
@@ -1555,10 +1577,6 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
             }
             E -
 	    e { # An expression
-		if {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     if {$tok == "E"} {
                         errorMsg W "No braces around expression in\
@@ -1580,15 +1598,6 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		incr i
 	    }
 	    c - cg - cl - cn { # A code block
-                if {$mod eq "?"} {
-		    if {$i >= $argc} {
-			set i $argc
-			break
-		    }
-		} elseif {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
                     # No braces around non constant code.
                     checkNonConstantCode $cmd [lindex $argv $i] $tok \
@@ -1640,15 +1649,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		incr i
 	    }
 	    cv { # A code block with a variable definition and local context
-                if {$mod eq "?"} {
-		    if {$i >= $argc} {
-			set i $argc
-			break
-		    }
-		} elseif {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
+                # Needs two args
                 if {$i > ($argc - 2)} {
                     break
                 }
@@ -1683,10 +1684,6 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		incr i
 	    }
 	    s { # A subcommand
-		if {$mod ne "" && $mod ne "."} {
-		    echo "Modifier \"$mod\" is not supported for \"s\" in\
-                            syntax for $cmd."
-		}
 		lappend constantsDontCheck $i
 		if {([lindex $wordstatus $i] & 1) == 0} { # Non constant
 		    errorMsg N "Non static subcommand to \"$cmd\"" \
@@ -1742,27 +1739,12 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 	    l -
 	    v -
 	    n { # A call by name
-                if {[string index $mod end] eq "?"} {
-		    if {$i >= $argc} {
-			set i $argc
-			break
-		    }
-                    set mod [string range $mod 0 end-1]
-		}
-		set ei [expr {$i + 1}]
-                if {[string index $mod end] eq "*"} {
-		    set ei $lastOptional
-                    set mod [string range $mod 0 end-1]
-		}
-                set typeFromToken ""
+                set typeFromToken $tokFrom
                 set isArray unknown
-                if {[string index $mod 0] eq "="} {
-                    set typeFromToken [string range $mod 1 end]
-                    if {$typeFromToken eq "array"} {
-                        set isArray yes
-                    } elseif {$typeFromToken eq "scalar"} {
-                        set isArray known
-                    }
+                if {$typeFromToken eq "array"} {
+                    set isArray yes
+                } elseif {$typeFromToken eq "scalar"} {
+                    set isArray known
                 }
 		while {$i < $ei} {
 		    if {$tok eq "v"} {
@@ -1812,10 +1794,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 		}
 	    }
 	    o {
-                set max [expr {$lastOptional - $i}]
-                if {$mod ne "*"} {
-                    set max 1
-                }
+                set max [expr {$ei - $i}]
                 set oSyn [checkOptions $cmd $argv $wordstatus $indices $i $max]
                 set used [llength $oSyn]
                 if {$used == 0 && ($mod == "" || $mod == ".")} {
@@ -1832,8 +1811,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 }
             }
 	    p {
-                set max [expr {$lastOptional - $i}]
-                if {$mod ne "*"} {
+                set max [expr {$ei - $i}]
+                if {$max < 2} {
                     set max 2
                 }
                 set oSyn [checkOptions $cmd $argv $wordstatus $indices $i \
@@ -1854,8 +1833,8 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
 	    default {
 		echo "Unsupported token \"$token\" in syntax for \"$cmd\""
 	    }
-	}
-    }
+	} ;# End switch Main token interpretation
+    } ; # End while
     # Have we used up all arguments?
     if {$i != $argc} {
 	WA
@@ -3361,7 +3340,7 @@ proc parseArgs {procArgs indexArgs syn knownVarsName} {
 	knownVar knownVars $var
         dict set knownVars $var local 1
         dict set knownVars $var set   1
-        SplitToken [lindex $syn $i] tok _ type _ _
+        SplitToken [lindex $syn $i] tok _ type _ _ _
         if {$type eq "" && $tok in {v n l}} {
             # The token indicates a variable name
             set type varName
@@ -3455,7 +3434,7 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVars} {
             }
         } else {
             foreach token $syn {
-                SplitToken $token tok tokCount _ mod n
+                SplitToken $token tok tokCount _ mod n _
                 if {$mod == ""} {
                     incr prevmin $n
                     incr prevmax $n
@@ -4398,7 +4377,7 @@ proc loadDatabases {{addDb {}}} {
         eval lappend ::knownGlobals [_ipset ::knownGlobals]
     }
     if {[_ipexists ::knownCommands]} {
-        eval [linsert [_ipset ::knownCommands] 0 lappend "::knownCommands"] 
+        eval [linsert [_ipset ::knownCommands] 0 lappend "::knownCommands"]
     }
     if {[_ipexists ::knownPackages]} {
         eval lappend ::knownPackages [_ipset ::knownPackages]

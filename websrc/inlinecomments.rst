@@ -123,7 +123,9 @@ Syntax database
 
 All these provides access directly into the syntax database that
 usually is loaded from syntaxdb.tcl.
-Check syntaxbuild.tcl for more info.
+Check
+:ref:`syntax-tokens-label`.
+and syntaxbuild.tcl for more info.
 
 Examples:
 

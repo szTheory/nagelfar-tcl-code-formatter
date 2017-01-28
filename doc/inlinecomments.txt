@@ -107,8 +107,8 @@ Syntax database
    ##nagelfar copy from to
 
 All these provides access directly into the syntax database that
-usually is loaded from syntaxdb.tcl. Check syntaxbuild.tcl for more
-info.
+usually is loaded from syntaxdb.tcl. Check Syntax Tokens. and
+syntaxbuild.tcl for more info.
 
 Examples:
 

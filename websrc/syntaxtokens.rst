@@ -1,58 +1,90 @@
+.. _syntax-tokens-label:
+
 Syntax Tokens
 =============
 
 Nagelfar's syntax descriptions for a command consists of little language
 describing the arguments to the command.
            
-An entry must be a valid list of tokens as described below.
-
 Check the syntax database (syntaxdb.tcl) or in the database browser in the
 gui for examples.
+
+Entry
+-----
+
+For each command there is a syntax entry in the database.
+An entry must be a valid list.
+
+If an entry is an integer, the number of arguments are just checked against it.
+
+If an entry is of the format "r min ?max?" it specifies a range for allowed
+number of arguments.
+
+Otherwise an entry must be a valid list of tokens as described below.
 
 Tokens
 ------
    
 * x Anything, the argument is not checked
-* o Option, i.e anything starting with -
+* o Option, i.e anything starting with -.
+  An option may consume a second arg if the option database says so.
 * p Option+Any (p as in option Pair)
 * s Subcommand
 * e Expression
 * E Expression that should be in braces
-
-* dc Define new command, if followed by =cmd, it copies syntax from cmd.
-
-* c  Code, checked in surrounding context
-* cg Code, checked in global context
-* cn Code, checked in a virtual namespace
-* cl Code, checked in its own local context
-* cv Code, checked in its own local context, preceded by variable list
-
+*    
 * n, v and l all marks variable names.  Those arguments will not be
   checked against known variables to detect missing $.
 * n The variable does not have to exist, and is set by the command.
 * v The variable must exist.  It is not marked as set.
 * l Does not have to exist.  It will be marked as known, but not set.
+*
+* c  Code, checked in surrounding context
+  If an integer is added to it, that number of arguments are added to
+  the code to emulate a command prefix. (cg has this too)
+* cg Code, checked in global context
+* cn Code, checked in a virtual namespace
+* cl Code, checked in its own local context
+* cv Code, checked in its own local context, preceded by variable list
+*
+* All d* tokens are definitions. Most of them define a new command.
+* dc  Define new command. If followed by =cmd, it copies syntax from cmd.
+* do  Define object. If followed by =cmd, it copies syntax from cmd.
+* di  Define inheritance
+* dk  Define constructor (args+body)
+* dd  Define destructor (just body)
+* dp  Define procedure (name+args+body)
+* dm  Define method (name+args+body)
+* dmp Define metod/procedure (name+args+body)
+* div Define implicit variable
 
-If a token is an integer, just check the number of arguments against
-it.  This is equivalent to that many "x"es.
-
-* r min ?max?  Specify a range for number of arguments
 
 Modifiers
 ^^^^^^^^^
 
-These apply to some of the tokens.
+A modifier is put after the token (no spaces).
 
 * ? Zero or One
-* \* Zero or more
+* \* Zero or more  ( not supported by all tokens)
 * . One or nothing at all
 
-* A * after an x swallows all the rest and must be last.
-* Token s may only have modifier .
-* Tokens e and c may not have any modifier.
+If a token is followed by a parenthesis it denotes a type.
+The local variable in the proc is marked with this type.
+Any modifier goes after the parens.
+
+Example:   x(varName)   x(script)?
+
+If a token is followed by a number it is token dependent.
+Any modifier goes after the number.
+
+Example:   c2   cg4?
+
+If a token is followed by =, it is a token dependent modifier.
+
+Example:   do=_stdclass_oo
 
 Subcommands
-^^^^^^^^^^^
+-----------
 
 For commands that have subcommands (as indicated by token "s"),
 separate descriptions can be set up for each subcommand.
@@ -64,8 +96,42 @@ If a syntax for a subcommand is defined, it is used to check the rest.
  ##nagelfar syntax string\ bytelength 1
  ##nagelfar syntax string\ compare    o* x x
 
+The allowed list of subcommands is defined by the "subcmd" syntax. To
+add to the list, use "subcmd+"
+
+.. code:: tcl
+
+ ##nagelfar subcmd string bytelength compare equal is
+ ##nagelfar subcmd+ file mystat
+
+Options
+-------
+
+For commands that have options (as indicated by tokens "o" and "p"),
+the options database provides details.
+To list the allowed options the "option" syntax is used, and to add
+to a known list "option+" is used.
+
+.. code:: tcl
+
+ ##nagelfar option send -- async -displayof
+ ##nagelfar option string\ is -failindex -strict
+
+The syntax for the parameter of an option is set like this.
+
+.. code:: tcl
+
+ ##nagelfar option send\ -displayof x
+ ##nagelfar option string\ is\ -failindex n
+
+For the "p" token, an option always take a parameter and it defaults
+to "x" syntax.
+For the "o" token, on option only takes a parameter if a parameter syntax
+is set up. Otherwise it is assumed the option is stand-alone.
+
+
 Different syntax for different number of arguments
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------
 
 If the first token ends with : it means that there are different syntax
 descriptions for different number of arguments.  Any token ending
@@ -73,3 +139,6 @@ with : starts a syntax for the number of arguments that the number
 preceding it says. A lone : starts the default syntax.
 
 Example: "1: x 2: n n : e x*"
+
+If this is checked against a call with two args, the "n n" part
+is extracted and used as the entry according to all other rules.

@@ -1,3 +1,6 @@
+2017-01-28
+ Overhaul of token-parsing code and documentation.
+
 2017-01-27
  Allow x* token to be used before final mandatory args.
  Corrected syntax db for dict create. [Bug #13]
