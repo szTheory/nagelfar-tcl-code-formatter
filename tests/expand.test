@@ -6,7 +6,7 @@
 
 test expand-1.1 {
     Standard cases
-} -constraints {runin85} -body {
+} -body {
     createTestFile {
         set apa [list hej hopp]
         set bepa [list {*}$apa]
@@ -16,7 +16,7 @@ test expand-1.1 {
 
 test expand-1.2 {
     Standard cases
-} -constraints {runin85}  -body {
+} -body {
     createTestFile {
         set apa [list hej hopp]
         {*}$apa hej hopp apa
@@ -26,7 +26,7 @@ test expand-1.2 {
 
 test expand-2.1 {
     Simple errors
-} -constraints {runin85}  -body {
+} -body {
     createTestFile {
         set apa [list hej hopp]
         {*}$bepa hej hopp apa
@@ -36,7 +36,7 @@ test expand-2.1 {
 
 test expand-2.2 {
     Simple errors
-} -constraints {runin85}  -body {
+} -body {
     createTestFile {
         set apa [list hej hopp]
         {*}$bepa hej hopp apa
@@ -46,7 +46,7 @@ test expand-2.2 {
 
 test expand-2.3 {
     Simple errors
-} -constraints {runin85}  -body {
+} -body {
     createTestFile {
         set apa {*}{hej}
         set bepa {*}{hej hopp}
@@ -56,7 +56,7 @@ test expand-2.3 {
 
 test expand-2.4 {
     Simple errors, this was a bug with line numbers
-} -constraints {runin85}  -body {
+} -body {
     createTestFile "
         {*}\[list \\
                     \$bepa\]
@@ -66,7 +66,7 @@ test expand-2.4 {
 
 test expand-3.1 {
     New syntax warning
-} -constraints {runin85} -body {
+} -body {
     createTestFile {
         set apa [list hej hopp]
         set bepa [list {*} $apa]

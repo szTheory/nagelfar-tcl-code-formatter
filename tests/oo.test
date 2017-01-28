@@ -92,7 +92,7 @@ foreach style {1 2 3} {
                 list $records
             }
         }
-        execTestFile -s syntaxdb86.tcl
+        execTestFile
     } -result {%%Line  16: E Wrong number of arguments (2) to "Base new"
 Line  20: E Wrong number of arguments (1) to "_obj,Base id"}
 }
@@ -125,7 +125,7 @@ foreach style {1 2 3} {
                 my Hej $apa $bepa apa bepa
             }
         }
-        execTestFile -s syntaxdb86.tcl
+        execTestFile
     } -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
 }
 
@@ -157,7 +157,7 @@ foreach style {1 2 3} {
                 my Hej $apa $bepa apa bepa
             }
         }
-        execTestFile -s syntaxdb86.tcl
+        execTestFile
     } -result {%%Line  14: E Wrong number of arguments (2) to "_obj,Bas id"}
 }
 
@@ -180,7 +180,7 @@ foreach style {1 2 3} {
                 list $cepa $depa $y
             }
         }
-        execTestFile -s syntaxdb86.tcl
+        execTestFile
     } -result {%%Line  14: E Unknown variable "depa"}
 }
 
@@ -215,7 +215,7 @@ foreach style {1 2 3} {
             method Upper {} {
             }
         }
-        execTestFile -s syntaxdb86.tcl
+        execTestFile
     } -result {%%Line  12: W Unknown command "expurt"}
 }
 

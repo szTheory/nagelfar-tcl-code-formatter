@@ -19,9 +19,9 @@ TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd1.0
 TEXTSEARCH = /home/peter/src/textsearch
 
 # Path to the interpreter used for generating the syntax database
-TCLSHDB  = ~/tcl/install/bin/wish8.5
-TCLSHDB2 = ~/tcl/install/bin/wish8.6
-DB2NAME  = syntaxdb86.tcl
+TCLSHDB  = ~/tcl/install/bin/wish8.6
+TCLSHDB2 = ~/tcl/install/bin/wish8.5
+DB2NAME  = syntaxdb85.tcl
 # Path to the interpreter used for running tests
 TCLSH85  = ~/tcl/install/bin/tclsh8.5
 TCLSH86  = ~/tcl/install/bin/tclsh8.6
@@ -87,16 +87,16 @@ check: nagelfar.tcl nagelfar_h.syntax
 	@./nagelfar.tcl -strictappend -plugin nfplugin.tcl nagelfar_h.syntax $(SRCFILES)
 
 test: clean base
-	@$(TCLSH85) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
-
-testgui: base
-	@$(TCLSH85) ./tests/all.tcl -file gui.test $(TESTFLAGS)
-
-test86: base
 	@$(TCLSH86) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
 
+testgui: base
+	@$(TCLSH86) ./tests/all.tcl -file gui.test $(TESTFLAGS)
+
+test85: base
+	@$(TCLSH85) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
+
 testoo: base
-	@./nagelfar.tcl -s syntaxdb86.tcl -s snitdb.tcl ootest/*.tcl
+	@./nagelfar.tcl -s syntaxdb.tcl -s snitdb.tcl ootest/*.tcl
 
 #----------------------------------------------------------------
 # Coverage
@@ -130,7 +130,7 @@ nagelfar.tcl_i: nagelfar_dummy.tcl_i
 # Run tests to create log file.
 testcover $(LOGFILES): nagelfar.tcl_i
 	@./tests/all.tcl $(TESTFLAGS)
-	@$(TCLSH85) ./tests/all.tcl -match expand-*
+	@$(TCLSH86) ./tests/all.tcl -match expand-*
 
 # Create markup file for better view of result
 %.tcl_m: %.tcl_log 
@@ -231,7 +231,7 @@ distrib: base
 	@ln -sf $(TEXTSEARCH) lib/textsearch
 	@tar --exclude .svn -cvf nagelfar.tar nagelfar$(VERSION)/COPYING \
 		nagelfar$(VERSION)/README.txt nagelfar$(VERSION)/syntaxbuild.tcl \
-		nagelfar$(VERSION)/syntaxdb86.tcl \
+		nagelfar$(VERSION)/syntaxdb85.tcl \
 		nagelfar$(VERSION)/nagelfar.syntax nagelfar$(VERSION)/nagelfar.tcl \
 		nagelfar$(VERSION)/misctests/test.tcl nagelfar$(VERSION)/misctests/test.syntax \
 		nagelfar$(VERSION)/doc nagelfar$(VERSION)/packagedb

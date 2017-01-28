@@ -1,7 +1,7 @@
 # Automatically generated syntax database.
 
-lappend ::dbInfo {Tcl 8.5.19 unix, Tk 8.5.19 x11}
-set ::dbTclVersion 8.5
+lappend ::dbInfo {Tcl 8.6.6 unix, Tk 8.6.6 x11}
+set ::dbTclVersion 8.6
 set ::knownGlobals {argc argv argv0 auto_index auto_path env errorCode errorInfo tcl_interactive tcl_library tcl_nonwordchars tcl_patchLevel tcl_pkgPath tcl_platform tcl_rcFileName tcl_version tcl_wordchars tk_library tk_patchLevel tk_strictMotif tk_version}
 set ::knownCommands {
 .
@@ -21,6 +21,7 @@ auto_mkindex_parser::command
 auto_mkindex_parser::commandInit
 auto_mkindex_parser::fullname
 auto_mkindex_parser::hook
+auto_mkindex_parser::indexEntry
 auto_mkindex_parser::init
 auto_mkindex_parser::mkindex
 auto_mkindex_parser::slavehook
@@ -44,6 +45,7 @@ clock
 close
 concat
 continue
+coroutine
 destroy
 dict
 encoding
@@ -75,6 +77,9 @@ grid
 history
 if
 image
+image1
+image2
+image3
 incr
 info
 interp
@@ -88,6 +93,7 @@ linsert
 list
 listbox
 llength
+lmap
 load
 lower
 lrange
@@ -115,7 +121,13 @@ msgcat::mcpackagelocale
 msgcat::mcpreferences
 msgcat::mcset
 msgcat::mcunknown
+my
 namespace
+oo::class
+oo::copy
+oo::define
+oo::objdefine
+oo::object
 open
 option
 pack
@@ -148,6 +160,7 @@ scan
 scrollbar
 seek
 selection
+self
 send
 set
 socket
@@ -157,6 +170,7 @@ split
 string
 subst
 switch
+tailcall
 tcl::Lassign
 tcl::Lempty
 tcl::Lget
@@ -173,6 +187,27 @@ tcl::OptProc
 tcl::OptProcArgGiven
 tcl::SetMax
 tcl::SetMin
+tcl::array::anymore
+tcl::array::donesearch
+tcl::array::exists
+tcl::array::get
+tcl::array::names
+tcl::array::nextelement
+tcl::array::set
+tcl::array::size
+tcl::array::startsearch
+tcl::array::statistics
+tcl::array::unset
+tcl::binary::decode
+tcl::binary::decode::base64
+tcl::binary::decode::hex
+tcl::binary::decode::uuencode
+tcl::binary::encode
+tcl::binary::encode::base64
+tcl::binary::encode::hex
+tcl::binary::encode::uuencode
+tcl::binary::format
+tcl::binary::scan
 tcl::chan::blocked
 tcl::chan::close
 tcl::chan::copy
@@ -181,8 +216,12 @@ tcl::chan::eof
 tcl::chan::event
 tcl::chan::flush
 tcl::chan::gets
+tcl::chan::names
 tcl::chan::pending
+tcl::chan::pipe
+tcl::chan::pop
 tcl::chan::postevent
+tcl::chan::push
 tcl::chan::puts
 tcl::chan::read
 tcl::chan::seek
@@ -203,6 +242,7 @@ tcl::dict::incr
 tcl::dict::info
 tcl::dict::keys
 tcl::dict::lappend
+tcl::dict::map
 tcl::dict::merge
 tcl::dict::remove
 tcl::dict::replace
@@ -212,12 +252,49 @@ tcl::dict::unset
 tcl::dict::update
 tcl::dict::values
 tcl::dict::with
+tcl::file::atime
+tcl::file::attributes
+tcl::file::channels
+tcl::file::copy
+tcl::file::delete
+tcl::file::dirname
+tcl::file::executable
+tcl::file::exists
+tcl::file::extension
+tcl::file::isdirectory
+tcl::file::isfile
+tcl::file::join
+tcl::file::link
+tcl::file::lstat
+tcl::file::mkdir
+tcl::file::mtime
+tcl::file::nativename
+tcl::file::normalize
+tcl::file::owned
+tcl::file::pathtype
+tcl::file::readable
+tcl::file::readlink
+tcl::file::rename
+tcl::file::rootname
+tcl::file::separator
+tcl::file::size
+tcl::file::split
+tcl::file::stat
+tcl::file::system
+tcl::file::tail
+tcl::file::tempfile
+tcl::file::type
+tcl::file::volumes
+tcl::file::writable
+tcl::history
 tcl::info::args
 tcl::info::body
 tcl::info::cmdcount
 tcl::info::commands
 tcl::info::complete
+tcl::info::coroutine
 tcl::info::default
+tcl::info::errorstack
 tcl::info::exists
 tcl::info::frame
 tcl::info::functions
@@ -288,8 +365,33 @@ tcl::mathop::ne
 tcl::mathop::ni
 tcl::mathop::|
 tcl::mathop::~
+tcl::namespace::children
+tcl::namespace::code
+tcl::namespace::current
+tcl::namespace::delete
+tcl::namespace::ensemble
+tcl::namespace::eval
+tcl::namespace::exists
+tcl::namespace::export
+tcl::namespace::forget
+tcl::namespace::import
+tcl::namespace::inscope
+tcl::namespace::origin
+tcl::namespace::parent
+tcl::namespace::path
+tcl::namespace::qualifiers
+tcl::namespace::tail
+tcl::namespace::unknown
+tcl::namespace::upvar
+tcl::namespace::which
 tcl::pkgconfig
+tcl::prefix
+tcl::prefix
+tcl::prefix::all
+tcl::prefix::longest
+tcl::prefix::match
 tcl::string::bytelength
+tcl::string::cat
 tcl::string::compare
 tcl::string::equal
 tcl::string::first
@@ -312,7 +414,11 @@ tcl::string::trimright
 tcl::string::wordend
 tcl::string::wordstart
 tcl::tm::path
+tcl::unsupported::assemble
 tcl::unsupported::disassemble
+tcl::unsupported::getbytecode
+tcl::unsupported::inject
+tcl::unsupported::representation
 tclListValidFlags
 tclLog
 tclParseConfigSpec
@@ -326,10 +432,14 @@ tcl_wordBreakAfter
 tcl_wordBreakBefore
 tell
 text
+throw
 time
 tk
+tk::appname
+tk::busy
 tk::button
 tk::canvas
+tk::caret
 tk::checkbutton
 tk::classic::restore
 tk::classic::restore_button
@@ -359,7 +469,14 @@ tk::dialog::w2
 tk::dialog::w3
 tk::ensure_psenc_is_loaded
 tk::entry
+tk::fontchooser
+tk::fontchooser::ttk_slistbox
 tk::frame
+tk::icons::error
+tk::icons::information
+tk::icons::question
+tk::icons::warning
+tk::inactive
 tk::label
 tk::labelframe
 tk::listbox
@@ -372,12 +489,19 @@ tk::msgcat::mc
 tk::msgcat::mcmax
 tk::panedwindow
 tk::pkgconfig
+tk::ps
+tk::ps::function
+tk::ps::literal
+tk::ps::variable
 tk::radiobutton
 tk::scale
+tk::scaling
 tk::scrollbar
 tk::spinbox
 tk::text
 tk::toplevel
+tk::useinputmethods
+tk::windowingsystem
 tk_bindForTraversal
 tk_bisque
 tk_chooseColor
@@ -401,6 +525,7 @@ tk_textPaste
 tkwait
 toplevel
 trace
+try
 ttk::button
 ttk::button::activate
 ttk::checkbutton
@@ -452,8 +577,12 @@ vwait
 while
 winfo
 wm
+yield
+yieldto
+zlib
+zlib::pkgconfig
 }
-set ::knownPackages {Tcl Tk Ttk msgcat tile}
+set ::knownPackages {Tcl TclOO Tk Ttk msgcat tile zlib}
 set ::syntax(.) {s x*}
 set {::syntax(. cget)} o
 set {::syntax(. configure)} {o. x. p*}
@@ -638,6 +767,12 @@ set {::syntax(_obj,ttk::sizegrip configure)} {o. x. p*}
 set ::syntax(_obj,ttk::treeview) {s x*}
 set {::syntax(_obj,ttk::treeview cget)} o
 set {::syntax(_obj,ttk::treeview configure)} {o. x. p*}
+set ::syntax(_stdclass_oo) {s x*}
+set {::syntax(_stdclass_oo create)} {dc=_obj,_stdclass_oo x?}
+set {::syntax(_stdclass_oo destroy)} 0
+set {::syntax(_stdclass_oo new)} 0
+set {::syntax(_stdclass_oo variable)} n*
+set {::syntax(_stdclass_oo varname)} v
 set ::syntax(after) {r 1}
 set ::syntax(append) {n x*}
 set ::syntax(apply) {x x*}
@@ -659,6 +794,7 @@ set ::syntax(auto_mkindex_parser::command) 3
 set ::syntax(auto_mkindex_parser::commandInit) 3
 set ::syntax(auto_mkindex_parser::fullname) 1
 set ::syntax(auto_mkindex_parser::hook) 1
+set ::syntax(auto_mkindex_parser::indexEntry) 1
 set ::syntax(auto_mkindex_parser::init) 0
 set ::syntax(auto_mkindex_parser::mkindex) 1
 set ::syntax(auto_mkindex_parser::slavehook) 1
@@ -667,6 +803,14 @@ set ::syntax(auto_reset) 0
 set ::syntax(bell) {o* x*}
 set ::syntax(bgerror) 1
 set ::syntax(binary) {s x*}
+set {::syntax(binary decode)} {s x*}
+set {::syntax(binary decode base64)} {o* x}
+set {::syntax(binary decode hex)} {o* x}
+set {::syntax(binary decode uuencode)} {o* x}
+set {::syntax(binary encode)} {s x*}
+set {::syntax(binary encode base64)} {p* x}
+set {::syntax(binary encode hex)} x
+set {::syntax(binary encode uuencode)} {p* x}
 set {::syntax(binary scan)} {x x n n*}
 set ::syntax(bind) {x x? cg?}
 set ::syntax(bindtags) {x x?}
@@ -678,7 +822,7 @@ set ::syntax(catch) {c n? n?}
 set ::syntax(cd) {r 0 1}
 set ::syntax(chan) {s x*}
 set {::syntax(chan blocked)} x
-set {::syntax(chan close)} x
+set {::syntax(chan close)} {x x?}
 set {::syntax(chan configure)} {x o. x. p*}
 set {::syntax(chan copy)} {x x p*}
 set {::syntax(chan create)} {x x}
@@ -688,7 +832,10 @@ set {::syntax(chan flush)} x
 set {::syntax(chan gets)} {x n?}
 set {::syntax(chan names)} x?
 set {::syntax(chan pending)} {x x}
+set {::syntax(chan pipe)} 0
+set {::syntax(chan pop)} x
 set {::syntax(chan postevent)} {x x}
+set {::syntax(chan push)} {x c}
 set {::syntax(chan puts)} {1: x : o? x x?}
 set {::syntax(chan read)} {x x?}
 set {::syntax(chan seek)} {r 2 3}
@@ -701,16 +848,17 @@ set {::syntax(clock clicks)} o?
 set {::syntax(clock format)} {x p*}
 set {::syntax(clock scan)} {x p*}
 set {::syntax(clock seconds)} 0
-set ::syntax(close) 1
+set ::syntax(close) {x x?}
 set ::syntax(concat) {r 0}
 set ::syntax(console) {r 1}
 set ::syntax(continue) 0
+set ::syntax(coroutine) {x x x*}
 set ::syntax(destroy) x*
 set ::syntax(dict) {s x x*}
 set {::syntax(dict append)} {n x x*}
 set {::syntax(dict create)} x&x*
 set {::syntax(dict exists)} {x x x*}
-set {::syntax(dict filter)} {x s x*}
+set {::syntax(dict filter)} {x x x*}
 set {::syntax(dict filter key)} x*
 set {::syntax(dict filter script)} {nl c}
 set {::syntax(dict filter value)} x*
@@ -747,7 +895,7 @@ set {::syntax(file atime)} {x x?}
 set {::syntax(file attributes)} {x o. x. p*}
 set {::syntax(file channels)} x?
 set {::syntax(file copy)} {o* x x x*}
-set {::syntax(file delete)} {o* x x*}
+set {::syntax(file delete)} {o* x*}
 set {::syntax(file dirname)} x
 set {::syntax(file executable)} x
 set {::syntax(file exists)} x
@@ -757,7 +905,7 @@ set {::syntax(file isfile)} x
 set {::syntax(file join)} {x x*}
 set {::syntax(file link)} {o? x x?}
 set {::syntax(file lstat)} {x n}
-set {::syntax(file mkdir)} {x x*}
+set {::syntax(file mkdir)} x*
 set {::syntax(file mtime)} {x x?}
 set {::syntax(file nativename)} x
 set {::syntax(file normalize)} x
@@ -773,6 +921,7 @@ set {::syntax(file split)} x
 set {::syntax(file stat)} {x n}
 set {::syntax(file system)} x
 set {::syntax(file tail)} x
+set {::syntax(file tempfile)} {n? x?}
 set {::syntax(file type)} x
 set {::syntax(file volumes)} 0
 set {::syntax(file writable)} x
@@ -784,7 +933,7 @@ set ::syntax(for) {c E c c}
 set ::syntax(format) {r 1}
 set ::syntax(frame) {x p*}
 set ::syntax(gets) {x n?}
-set ::syntax(glob) {o* x x*}
+set ::syntax(glob) {o* x*}
 set ::syntax(grab) {x x*}
 set ::syntax(grid) {x x*}
 set ::syntax(history) {s x*}
@@ -792,24 +941,29 @@ set ::syntax(if) {e c}
 set ::syntax(image) {s x*}
 set ::syntax(incr) {n x?}
 set ::syntax(info) {s x*}
+set {::syntax(info class)} {s x x*}
+set {::syntax(info coroutine)} 0
 set {::syntax(info default)} {x x n}
 set {::syntax(info exists)} l
+set {::syntax(info object)} {s x x*}
 set ::syntax(interp) {s x*}
+set {::syntax(interp cancel)} {o* x? x?}
 set {::syntax(interp invokehidden)} {x o* x x*}
 set ::syntax(join) {r 1 2}
 set ::syntax(label) {x p*}
 set ::syntax(labelframe) {x p*}
 set ::syntax(lappend) {n x*}
-set ::syntax(lassign) {x n n*}
+set ::syntax(lassign) {x n*}
 set ::syntax(lindex) {r 1}
-set ::syntax(linsert) {r 3}
+set ::syntax(linsert) {r 2}
 set ::syntax(list) {r 0}
 set ::syntax(listbox) {x p*}
 set ::syntax(llength) 1
+set ::syntax(lmap) {n x c}
 set ::syntax(load) {r 1 3}
 set ::syntax(lower) {x x?}
 set ::syntax(lrange) 3
-set ::syntax(lrepeat) {r 2}
+set ::syntax(lrepeat) {r 1}
 set ::syntax(lreplace) {r 3}
 set ::syntax(lreverse) 1
 set ::syntax(lsearch) {o* x x}
@@ -833,10 +987,88 @@ set ::syntax(msgcat::mcpackagelocale) {r 1 2}
 set ::syntax(msgcat::mcpreferences) 0
 set ::syntax(msgcat::mcset) {r 2 3}
 set ::syntax(msgcat::mcunknown) {r 0}
+set ::syntax(my) {s x*}
+set {::syntax(my variable)} n*
 set ::syntax(namespace) {s x*}
 set {::syntax(namespace code)} c
 set {::syntax(namespace import)} {o* x*}
 set {::syntax(namespace which)} {o* x?}
+set ::syntax(oo::class) {s x*}
+set {::syntax(oo::class create)} {do=_stdclass_oo cn?}
+set {::syntax(oo::class create::class)} x
+set {::syntax(oo::class create::constructor)} dk
+set {::syntax(oo::class create::deletemethod)} {x x*}
+set {::syntax(oo::class create::destructor)} dd
+set {::syntax(oo::class create::export)} {x x*}
+set {::syntax(oo::class create::filter)} {o? x*}
+set {::syntax(oo::class create::forward)} {x x x*}
+set {::syntax(oo::class create::method)} dm
+set {::syntax(oo::class create::mixin)} {o? x*}
+set {::syntax(oo::class create::renamemethod)} {x x}
+set {::syntax(oo::class create::self)} x*
+set {::syntax(oo::class create::superclass)} di
+set {::syntax(oo::class create::unexport)} {x x*}
+set {::syntax(oo::class create::variable)} div*
+set ::syntax(oo::copy) {x x?}
+set ::syntax(oo::define) {2: do cn : do s x x*}
+set {::syntax(oo::define class)} x
+set {::syntax(oo::define constructor)} dk
+set {::syntax(oo::define deletemethod)} {x x*}
+set {::syntax(oo::define destructor)} dd
+set {::syntax(oo::define export)} {x x*}
+set {::syntax(oo::define filter)} {o? x*}
+set {::syntax(oo::define forward)} {x x x*}
+set {::syntax(oo::define method)} dm
+set {::syntax(oo::define mixin)} {o? x*}
+set {::syntax(oo::define renamemethod)} {x x}
+set {::syntax(oo::define self)} x*
+set {::syntax(oo::define superclass)} di
+set {::syntax(oo::define unexport)} {x x*}
+set {::syntax(oo::define variable)} div*
+set ::syntax(oo::define::class) x
+set ::syntax(oo::define::constructor) dk
+set ::syntax(oo::define::deletemethod) {x x*}
+set ::syntax(oo::define::destructor) dd
+set ::syntax(oo::define::export) {x x*}
+set ::syntax(oo::define::filter) {o? x*}
+set ::syntax(oo::define::forward) {x x x*}
+set ::syntax(oo::define::method) dm
+set ::syntax(oo::define::mixin) {o? x*}
+set ::syntax(oo::define::renamemethod) {x x}
+set ::syntax(oo::define::self) x*
+set ::syntax(oo::define::superclass) di
+set ::syntax(oo::define::unexport) {x x*}
+set ::syntax(oo::define::variable) div*
+set ::syntax(oo::objdefine) {2: do cn : do s x x*}
+set {::syntax(oo::objdefine class)} x
+set {::syntax(oo::objdefine constructor)} dk
+set {::syntax(oo::objdefine deletemethod)} {x x*}
+set {::syntax(oo::objdefine destructor)} dd
+set {::syntax(oo::objdefine export)} {x x*}
+set {::syntax(oo::objdefine filter)} {o? x*}
+set {::syntax(oo::objdefine forward)} {x x x*}
+set {::syntax(oo::objdefine method)} dm
+set {::syntax(oo::objdefine mixin)} {o? x*}
+set {::syntax(oo::objdefine renamemethod)} {x x}
+set {::syntax(oo::objdefine self)} x*
+set {::syntax(oo::objdefine superclass)} di
+set {::syntax(oo::objdefine unexport)} {x x*}
+set {::syntax(oo::objdefine variable)} div*
+set ::syntax(oo::objdefine::class) x
+set ::syntax(oo::objdefine::constructor) dk
+set ::syntax(oo::objdefine::deletemethod) {x x*}
+set ::syntax(oo::objdefine::destructor) dd
+set ::syntax(oo::objdefine::export) {x x*}
+set ::syntax(oo::objdefine::filter) {o? x*}
+set ::syntax(oo::objdefine::forward) {x x x*}
+set ::syntax(oo::objdefine::method) dm
+set ::syntax(oo::objdefine::mixin) {o? x*}
+set ::syntax(oo::objdefine::renamemethod) {x x}
+set ::syntax(oo::objdefine::self) x*
+set ::syntax(oo::objdefine::superclass) di
+set ::syntax(oo::objdefine::unexport) {x x*}
+set ::syntax(oo::objdefine::variable) div*
+set ::syntax(oo::object) {s x*}
 set ::syntax(open) {r 1 3}
 set ::syntax(option) {s x*}
 set ::syntax(pack) {x x*}
@@ -869,6 +1101,7 @@ set ::syntax(scan) {x x n*}
 set ::syntax(scrollbar) {x p*}
 set ::syntax(seek) {r 2 3}
 set ::syntax(selection) {s x*}
+set ::syntax(self) s
 set ::syntax(send) {o* x x x*}
 set ::syntax(set) {1: v=scalar : n=scalar x}
 set ::syntax(socket) {r 2}
@@ -918,6 +1151,10 @@ set ::syntax(tcl::SetMax) 2
 set ::syntax(tcl::SetMin) 2
 set ::syntax(tcl::mathfunc::max) {r 0}
 set ::syntax(tcl::mathfunc::min) {r 0}
+set ::syntax(tcl::prefix) {s x*}
+set {::syntax(tcl::prefix all)} {x x}
+set {::syntax(tcl::prefix longest)} {x x}
+set {::syntax(tcl::prefix match)} {o* x x}
 set ::syntax(tclListValidFlags) 1
 set ::syntax(tclLog) 1
 set ::syntax(tclParseConfigSpec) 4
@@ -931,6 +1168,7 @@ set ::syntax(tcl_wordBreakAfter) 2
 set ::syntax(tcl_wordBreakBefore) 2
 set ::syntax(tell) 1
 set ::syntax(text) {x p*}
+set ::syntax(throw) 2
 set ::syntax(time) {c x?}
 set ::syntax(tk) {s x*}
 set ::syntax(tk::button) {x p*}
@@ -957,6 +1195,7 @@ set ::syntax(tk::dialog::file::mc) {r 1}
 set ::syntax(tk::dialog::file::mcmax) {r 0}
 set ::syntax(tk::ensure_psenc_is_loaded) 0
 set ::syntax(tk::entry) {x p*}
+set ::syntax(tk::fontchooser::ttk_slistbox) {r 1}
 set ::syntax(tk::frame) {x p*}
 set ::syntax(tk::label) {x p*}
 set ::syntax(tk::labelframe) {x p*}
@@ -969,6 +1208,9 @@ set ::syntax(tk::message) {x p*}
 set ::syntax(tk::msgcat::mc) {r 1}
 set ::syntax(tk::msgcat::mcmax) {r 0}
 set ::syntax(tk::panedwindow) {x p*}
+set ::syntax(tk::ps::function) 2
+set ::syntax(tk::ps::literal) 1
+set ::syntax(tk::ps::variable) 2
 set ::syntax(tk::radiobutton) {x p*}
 set ::syntax(tk::scale) {x p*}
 set ::syntax(tk::scrollbar) {x p*}
@@ -1016,6 +1258,7 @@ set {::syntax(trace remove variable)} {v x x}
 set {::syntax(trace variable)} {n x x}
 set {::syntax(trace vdelete)} {v x x}
 set {::syntax(trace vinfo)} l
+set ::syntax(try) {c x*}
 set ::syntax(ttk::button) {x p*}
 set ::syntax(ttk::button::activate) 1
 set ::syntax(ttk::checkbutton) {x p*}
@@ -1077,7 +1320,29 @@ set ::syntax(vwait) n
 set ::syntax(while) {E c}
 set ::syntax(winfo) {s x x*}
 set ::syntax(wm) {s x x*}
+set ::syntax(yield) x?
+set ::syntax(yieldto) {x x*}
+set ::syntax(zlib) {s x*}
+set {::syntax(zlib adler32)} {x x?}
+set {::syntax(zlib compress)} {x x?}
+set {::syntax(zlib crc32)} {x x?}
+set {::syntax(zlib decompress)} {x x?}
+set {::syntax(zlib deflate)} {x x?}
+set {::syntax(zlib gunzip)} {x p*}
+set {::syntax(zlib gzip)} {x p*}
+set {::syntax(zlib inflate)} {x x?}
+set {::syntax(zlib push)} {s x p*}
+set {::syntax(zlib stream)} {s x*}
+set {::syntax(zlib stream compress)} p*
+set {::syntax(zlib stream decompress)} p*
+set {::syntax(zlib stream deflate)} p*
+set {::syntax(zlib stream gunzip)} 0
+set {::syntax(zlib stream gzip)} p*
+set {::syntax(zlib stream inflate)} p*
 
+set {::return(_stdclass_oo create)} _obj,_stdclass_oo
+set {::return(_stdclass_oo new)} _obj,_stdclass_oo
+set {::return(_stdclass_oo varname)} varName
 set ::return(button) _obj,button
 set ::return(canvas) _obj,canvas
 set ::return(checkbutton) _obj,checkbutton
@@ -1140,7 +1405,7 @@ set ::return(ttk::treeview) _obj,ttk::treeview
 
 set ::subCmd(.) {cget configure}
 set ::subCmd(_obj,button) {cget configure flash invoke}
-set ::subCmd(_obj,canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor index insert itemcget itemconfigure lower move postscript raise scale scan select type xview yview}
+set ::subCmd(_obj,canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
 set ::subCmd(_obj,checkbutton) {cget configure deselect flash invoke select toggle}
 set ::subCmd(_obj,entry) {bbox cget configure delete get icursor index insert scan selection validate xview}
 set ::subCmd(_obj,frame) {cget configure}
@@ -1156,8 +1421,8 @@ set ::subCmd(_obj,radiobutton) {cget configure deselect flash invoke select}
 set ::subCmd(_obj,scale) {cget configure coords get identify set}
 set ::subCmd(_obj,scrollbar) {activate cget configure delta fraction get identify set}
 set ::subCmd(_obj,spinbox) {bbox cget configure delete get icursor identify index insert invoke scan selection set validate xview}
-set ::subCmd(_obj,text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer replace scan search see tag window xview yview}
-set {::subCmd(_obj,text edit)} {modified redo reset separator undo}
+set ::subCmd(_obj,text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer pendingsync replace scan search see sync tag window xview yview}
+set {::subCmd(_obj,text edit)} {canredo canundo modified redo reset separator undo}
 set {::subCmd(_obj,text image)} {cget configure create names}
 set {::subCmd(_obj,text mark)} {gravity names next previous set unset}
 set {::subCmd(_obj,text peer)} {create names}
@@ -1165,7 +1430,7 @@ set {::subCmd(_obj,text tag)} {add bind cget configure delete lower names nextra
 set {::subCmd(_obj,text window)} {cget configure create names}
 set {::subCmd(_obj,text xview)} {moveto scroll}
 set ::subCmd(_obj,tk::button) {cget configure flash invoke}
-set ::subCmd(_obj,tk::canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor index insert itemcget itemconfigure lower move postscript raise scale scan select type xview yview}
+set ::subCmd(_obj,tk::canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
 set ::subCmd(_obj,tk::checkbutton) {cget configure deselect flash invoke select toggle}
 set ::subCmd(_obj,tk::entry) {bbox cget configure delete get icursor index insert scan selection validate xview}
 set ::subCmd(_obj,tk::frame) {cget configure}
@@ -1179,7 +1444,7 @@ set ::subCmd(_obj,tk::radiobutton) {cget configure deselect flash invoke select}
 set ::subCmd(_obj,tk::scale) {cget configure coords get identify set}
 set ::subCmd(_obj,tk::scrollbar) {activate cget configure delta fraction get identify set}
 set ::subCmd(_obj,tk::spinbox) {bbox cget configure delete get icursor identify index insert invoke scan selection set validate xview}
-set ::subCmd(_obj,tk::text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer replace scan search see tag window xview yview}
+set ::subCmd(_obj,tk::text) {bbox cget compare configure count debug delete dlineinfo dump edit get image index insert mark peer pendingsync replace scan search see sync tag window xview yview}
 set ::subCmd(_obj,tk::toplevel) {cget configure}
 set ::subCmd(_obj,toplevel) {cget configure}
 set ::subCmd(_obj,ttk::button) {cget configure identify instate invoke state}
@@ -1199,28 +1464,36 @@ set ::subCmd(_obj,ttk::scrollbar) {cget configure delta fraction get identify in
 set ::subCmd(_obj,ttk::separator) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
+set ::subCmd(_stdclass_oo) {create new destroy variable varname}
 set ::subCmd(array) {anymore donesearch exists get names nextelement set size startsearch statistics unset}
-set ::subCmd(binary) {format scan}
-set ::subCmd(chan) {blocked close configure copy create eof event flush gets names pending postevent puts read seek tell truncate}
+set ::subCmd(binary) {decode encode format scan}
+set {::subCmd(binary decode)} {base64 hex uuencode}
+set {::subCmd(binary encode)} {base64 hex uuencode}
+set ::subCmd(chan) {blocked close configure copy create eof event flush gets names pending pipe pop postevent push puts read seek tell truncate}
 set ::subCmd(clipboard) {append clear get}
 set ::subCmd(clock) {add clicks format microseconds milliseconds scan seconds}
-set ::subCmd(dict) {append create exists filter for get incr info keys lappend merge remove replace set size unset update values with}
-set {::subCmd(dict filter)} {key script value}
+set ::subCmd(dict) {append create exists filter for get incr info keys lappend map merge remove replace set size unset update values with}
 set ::subCmd(encoding) {convertfrom convertto dirs names system}
 set ::subCmd(event) {add delete generate info}
-set ::subCmd(file) {atime attributes channels copy delete dirname executable exists extension isdirectory isfile join link lstat mkdir mtime nativename normalize owned pathtype readable readlink rename rootname separator size split stat system tail type volumes writable}
+set ::subCmd(file) {atime attributes channels copy delete dirname executable exists extension isdirectory isfile join link lstat mkdir mtime nativename normalize owned pathtype readable readlink rename rootname separator size split stat system tail tempfile type volumes writable}
 set ::subCmd(font) {actual configure create delete families measure metrics names}
 set ::subCmd(history) {add change clear event info keep nextid redo}
 set ::subCmd(image) {create delete height inuse names type types width}
-set ::subCmd(info) {args body cmdcount commands complete default exists frame functions globals hostname level library loaded locals nameofexecutable patchlevel procs script sharedlibextension tclversion vars}
-set ::subCmd(interp) {alias aliases bgerror create debug delete eval exists expose hidden hide invokehidden issafe limit marktrusted recursionlimit share slaves target transfer}
+set ::subCmd(info) {args body class cmdcount commands complete coroutine default errorstack exists frame functions globals hostname level library loaded locals nameofexecutable object patchlevel procs script sharedlibextension tclversion vars}
+set {::subCmd(info class)} {call constructor definition destructor filters forward instances methods methodtype mixins subclasses superclasses variables}
+set {::subCmd(info object)} {call class definition filters forward isa methods methodtype mixins namespace variables vars}
+set ::subCmd(interp) {alias aliases bgerror cancel create debug delete eval exists expose hidden hide invokehidden issafe limit marktrusted recursionlimit share slaves target transfer}
 set ::subCmd(namespace) {children code current delete ensemble eval exists export forget import inscope origin parent path qualifiers tail unknown upvar which}
+set ::subCmd(oo::class) {create destroy}
+set ::subCmd(oo::object) {create destroy new}
 set ::subCmd(option) {add clear get readfile}
 set ::subCmd(package) {forget ifneeded names prefer present provide require unknown vcompare versions vsatisfies}
 set ::subCmd(selection) {clear get handle own}
-set ::subCmd(string) {bytelength compare equal first index is last length map match range repeat replace reverse tolower totitle toupper trim trimleft trimright wordend wordstart}
-set {::subCmd(string is)} {alnum alpha ascii boolean control digit double false graph integer list lower print punct space true upper wideinteger wordchar xdigit}
-set ::subCmd(tk) {appname caret inactive scaling useinputmethods windowingsystem}
+set ::subCmd(self) {call caller class filter method namespace next object target}
+set ::subCmd(string) {bytelength cat compare equal first index is last length map match range repeat replace reverse tolower totitle toupper trim trimleft trimright wordend wordstart}
+set {::subCmd(string is)} {alnum alpha ascii boolean control digit double entier false graph integer list lower print punct space true upper wideinteger wordchar xdigit}
+set ::subCmd(tcl::prefix) {all longest match}
+set ::subCmd(tk) {appname busy caret fontchooser inactive scaling useinputmethods windowingsystem}
 set ::subCmd(tkwait) {variable visibility window}
 set ::subCmd(trace) {add info remove variable vdelete vinfo}
 set {::subCmd(trace add)} {command execution variable}
@@ -1233,6 +1506,9 @@ set {::subCmd(ttk::style theme)} {create names settings use}
 set ::subCmd(update) idletasks
 set ::subCmd(winfo) {atom atomname cells children class colormapfull containing depth exists fpixels geometry height id interps ismapped manager name parent pathname pixels pointerx pointerxy pointery reqheight reqwidth rgb rootx rooty screen screencells screendepth screenheight screenmmheight screenmmwidth screenvisual screenwidth server toplevel viewable visual visualid visualsavailable vrootheight vrootwidth vrootx vrooty width x y}
 set ::subCmd(wm) {aspect attributes client colormapwindows command deiconify focusmodel forget frame geometry grid group iconbitmap iconify iconmask iconname iconphoto iconposition iconwindow manage maxsize minsize overrideredirect positionfrom protocol resizable sizefrom stackorder state title transient withdraw}
+set ::subCmd(zlib) {adler32 compress crc32 decompress deflate gunzip gzip inflate push stream}
+set {::subCmd(zlib push)} {compress decompress deflate gunzip gzip inflate}
+set {::subCmd(zlib stream)} {compress decompress deflate gunzip gzip inflate}
 
 set {::option(. cget)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(. configure)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
@@ -1255,8 +1531,8 @@ set {::option(_obj,label configure)} {-activebackground -activeforeground -ancho
 set {::option(_obj,label configure -textvariable)} n
 set {::option(_obj,labelframe cget)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,labelframe configure)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set {::option(_obj,listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
-set {::option(_obj,listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,listbox configure -listvariable)} n
 set {::option(_obj,menu cget)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
 set {::option(_obj,menu configure)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
@@ -1280,11 +1556,11 @@ set {::option(_obj,scrollbar configure)} {-activebackground -activerelief -backg
 set {::option(_obj,spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,spinbox configure -textvariable)} n
-set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
-set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,text dump)} {-all -command -image -mark -tag -text -window}
 set {::option(_obj,text dump -command)} x
-set {::option(_obj,text search)} {-- -all -backward -count -elide -exact -forward -nocase -nolinestop -overlap -regexp -strictlimits}
+set {::option(_obj,text search)} {-- -all -backwards -count -elide -exact -forwards -nocase -nolinestop -overlap -regexp -strictlimits}
 set {::option(_obj,text search -count)} n
 set {::option(_obj,tk::button cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,tk::button configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
@@ -1305,8 +1581,8 @@ set {::option(_obj,tk::label configure)} {-activebackground -activeforeground -a
 set {::option(_obj,tk::label configure -textvariable)} n
 set {::option(_obj,tk::labelframe cget)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,tk::labelframe configure)} {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set {::option(_obj,tk::listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
-set {::option(_obj,tk::listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,tk::listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set {::option(_obj,tk::listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,tk::listbox configure -listvariable)} n
 set {::option(_obj,tk::menubutton cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,tk::menubutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
@@ -1328,8 +1604,8 @@ set {::option(_obj,tk::scrollbar configure)} {-activebackground -activerelief -b
 set {::option(_obj,tk::spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,tk::spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,tk::spinbox configure -textvariable)} n
-set {::option(_obj,tk::text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
-set {::option(_obj,tk::text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,tk::text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(_obj,tk::text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,tk::toplevel cget)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,tk::toplevel configure)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,toplevel cget)} {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
@@ -1380,6 +1656,11 @@ set {::option(_obj,ttk::sizegrip configure)} {-takefocus -cursor -style -class}
 set {::option(_obj,ttk::treeview cget)} {-columns -displaycolumns -show -selectmode -height -padding -xscrollcommand -yscrollcommand -takefocus -cursor -style -class}
 set {::option(_obj,ttk::treeview configure)} {-columns -displaycolumns -show -selectmode -height -padding -xscrollcommand -yscrollcommand -takefocus -cursor -style -class}
 set ::option(bell) {-displayof -nice}
+set {::option(binary decode base64)} -strict
+set {::option(binary decode hex)} -strict
+set {::option(binary decode uuencode)} -strict
+set {::option(binary encode base64)} {-maxlen -wrapchar}
+set {::option(binary encode uuencode)} {-maxlen -wrapchar}
 set ::option(button) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(button -textvariable)} n
 set ::option(canvas) {-background -bd -bg -borderwidth -closeenough -confine -cursor -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -offset -relief -scrollregion -selectbackground -selectborderwidth -selectforeground -state -takefocus -width -xscrollcommand -xscrollincrement -yscrollcommand -yscrollincrement}
@@ -1406,19 +1687,21 @@ set ::option(glob) {-- -directory -join -nocomplain -path -tails -types}
 set {::option(glob -directory)} 1
 set {::option(glob -path)} 1
 set {::option(glob -types)} 1
+set {::option(interp cancel)} {-- -unwind}
 set {::option(interp invokehidden)} {-- -global -namespace}
 set {::option(interp invokehidden -namespace)} 1
 set ::option(label) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -padx -pady -relief -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(label -textvariable)} n
 set ::option(labelframe) {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set ::option(listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set ::option(listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(listbox -listvariable)} n
-set ::option(lsearch) {-all -ascii -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -subindices}
+set ::option(lsearch) {-all -ascii -bisect -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -subindices}
 set {::option(lsearch -index)} 1
 set {::option(lsearch -start)} 1
-set ::option(lsort) {-ascii -command -decreasing -dictionary -increasing -index -indices -integer -nocase -real -unique}
+set ::option(lsort) {-ascii -command -decreasing -dictionary -increasing -index -indices -integer -nocase -real -stride -unique}
 set {::option(lsort -command)} 1
 set {::option(lsort -index)} 1
+set {::option(lsort -stride)} 1
 set ::option(menu) {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
 set ::option(menubutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(menubutton -textvariable)} n
@@ -1426,6 +1709,12 @@ set ::option(message) {-anchor -aspect -background -bd -bg -borderwidth -cursor 
 set {::option(message -textvariable)} n
 set {::option(namespace which)} {-variable -command}
 set {::option(namespace which -variable)} v
+set {::option(oo::class create::filter)} {create destroy}
+set {::option(oo::class create::mixin)} {create destroy}
+set ::option(oo::define::filter) {-append -clear -set}
+set ::option(oo::define::mixin) {-append -clear -set}
+set ::option(oo::objdefine::filter) {-append -clear -set}
+set ::option(oo::objdefine::mixin) {-append -clear -set}
 set {::option(package require)} -exact
 set ::option(panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set ::option(puts) -nonewline
@@ -1456,7 +1745,10 @@ set ::option(subst) {-nobackslashes -nocommands -novariables}
 set ::option(switch) {-- -exact -glob -indexvar -matchvar -nocase -regexp}
 set {::option(switch -indexvar)} n
 set {::option(switch -matchvar)} n
-set ::option(text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set {::option(tcl::prefix match)} {-error -exact -message}
+set {::option(tcl::prefix match -error)} x
+set {::option(tcl::prefix match -message)} x
+set ::option(text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set ::option(tk::button) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::button -textvariable)} n
 set ::option(tk::canvas) {-background -bd -bg -borderwidth -closeenough -confine -cursor -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -offset -relief -scrollregion -selectbackground -selectborderwidth -selectforeground -state -takefocus -width -xscrollcommand -xscrollincrement -yscrollcommand -yscrollincrement}
@@ -1469,7 +1761,7 @@ set ::option(tk::frame) {-bd -borderwidth -class -relief -background -bg -colorm
 set ::option(tk::label) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -padx -pady -relief -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::label -textvariable)} n
 set ::option(tk::labelframe) {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
-set ::option(tk::listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
+set ::option(tk::listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(tk::listbox -listvariable)} n
 set ::option(tk::menubutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::menubutton -textvariable)} n
@@ -1484,7 +1776,7 @@ set {::option(tk::scale -variable)} n
 set ::option(tk::scrollbar) {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
 set ::option(tk::spinbox) {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(tk::spinbox -textvariable)} n
-set ::option(tk::text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set ::option(tk::text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set ::option(tk::toplevel) {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set ::option(tk_chooseColor) {-initialcolor -parent -title}
 set ::option(tk_chooseDirectory) {-initialdir -mustexist -parent -title}
@@ -1523,4 +1815,12 @@ set {::option(ttk::style theme create)} {-parent -settings}
 set ::option(ttk::treeview) {-columns -displaycolumns -show -selectmode -height -padding -xscrollcommand -yscrollcommand -takefocus -cursor -style -class}
 set ::option(unload) {-- -keeplibrary -nocomplain}
 set ::option(unset) {-nocomplain --}
+set {::option(zlib gunzip)} {-buffersize -headerVar}
+set {::option(zlib gzip)} {-header -level}
+set {::option(zlib push)} {-dictionary -header -level}
+set {::option(zlib stream compress)} {-dictionary -level}
+set {::option(zlib stream decompress)} -dictionary
+set {::option(zlib stream deflate)} {-dictionary -level}
+set {::option(zlib stream gzip)} {-header -level}
+set {::option(zlib stream inflate)} -dictionary
 

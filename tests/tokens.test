@@ -471,7 +471,7 @@ test tokens-10.2 {
         set chan xxx
         coroutine dechunk$chan ::apply lambda $chan command
     }
-    execTestFile -s syntaxdb86.tcl
+    execTestFile
 } -result {%%Line  11: N Non constant definition "dechunk$chan". Skipping.}
 
 test tokens-11.1 {

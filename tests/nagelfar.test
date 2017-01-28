@@ -1033,7 +1033,7 @@ test nagelfar-25.1 {
         # Variable should be known now
         list $epa
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   2: E Wrong number of arguments (0) to "tailcall"
 Line   5: E Wrong number of arguments (3) to "set"}
 
@@ -1045,7 +1045,7 @@ test nagelfar-25.2 {
         set w [tailcall frame .f]
         tailcall $w configure -miffo
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   4: E Bad option -miffo to "_obj,frame configure"}
 
 test nagelfar-26.1 {
@@ -1136,7 +1136,7 @@ test nagelfar-27.1 {
         try { list } on error {x y} { list $x $y } trap APA {a b} { list $a $b } finally { list }
         try { list } on error {x y} { list $x $y } trap APA {a b} { list $a $b } finally { list } finally again
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   2: E Wrong number of arguments (0) to "try"
 Line  11: E Badly formed try statement
             Found argument 'finally' after supposed last body.}
@@ -1149,7 +1149,7 @@ test nagelfar-27.2 {
         try { list } om error {x y} { list $x $y }
         try { list } on error {x y} { list $x $y } finaly { list }
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   2: E Bad word in try statement, should be on, trap or finally.
 Line   3: E Bad word in try statement, should be on, trap or finally.
 Line   4: E Bad word in try statement, should be on, trap or finally.}
@@ -1161,7 +1161,7 @@ test nagelfar-27.3 {
         try { list } on error {x y} { list $x $z }
         try { list } on error {x y} { list $x $y } trap APA {a b} { list $a $c } finally { list }
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   2: E Unknown variable "z"
 Line   3: E Unknown variable "c"}
 
@@ -1209,7 +1209,7 @@ Line   9: E Unknown variable "depa3"}
 
 test nagelfar-29.2 {
     Handling lmap combos
-} -constraints runin86 -body {
+} -body {
     createTestFile {
         lmap apa {a b c d} {
             list $apa $bepa
@@ -1221,7 +1221,7 @@ test nagelfar-29.2 {
             list $apa3 $bepa3 $cepa3 $depa3
         }
     }
-    execTestFile -flags "-s syntaxdb86.tcl"
+    execTestFile
 } -result {%%Line   3: E Unknown variable "bepa"
 Line   6: E Unknown variable "cepa2"
 Line   9: E Unknown variable "depa3"}

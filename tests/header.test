@@ -90,5 +90,5 @@ test header-3.1 {
         # The special handling of if/try should not be causing any override
         if {1 && 1} { list } else { list }
         try { list } finally { list }
-    } -flags "-s syntaxdb86.tcl"
+    }
 } -result [list "##nagelfar syntax lsort x x"]
