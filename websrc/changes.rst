@@ -1,6 +1,13 @@
 Changes
 ========
 
+Changes in v? (not released):
+
+* Allow GUI to add files without extension.
+* Added syntax data for text widget.
+* Added syntax data for many dict sub commands. [Bug #13]
+* Fixed a bad check on constant array index. [Bug #1]
+
 Changes in v1.2.5 (2017-01-09):
 
 * New inline command "vartype" to just annotate a variable with a type. Using "variable" for that purpose could mask bugs.
