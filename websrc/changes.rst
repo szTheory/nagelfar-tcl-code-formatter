@@ -1,7 +1,7 @@
 Changes
 ========
 
-Changes in v? (not released):
+Changes in v1.2.6 (not released):
 
 * Allow GUI to add files without extension.
 * Added syntax data for text widget.

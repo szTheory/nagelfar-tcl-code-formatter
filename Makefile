@@ -3,9 +3,9 @@
 #----------------------------------------------------------------------
 
 # This string is used to generate release file names
-VERSION = 125
+VERSION = 126
 # This string is used to show the version number in the source
-DOTVERSION = 1.2.5
+DOTVERSION = 1.2.6
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/peter/tclkit
