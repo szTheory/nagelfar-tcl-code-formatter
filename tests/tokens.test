@@ -675,3 +675,74 @@ test tokens-16.4 {
     }
     execTestFile
 } -result {%%}
+
+test tokens-17.1 {
+    Double token, redefinition check
+} -body {
+    createTestFile {
+        ##nagelfar syntax bepa x x&x*
+
+        proc bepa {h args} {
+            list $h
+        }
+    }
+    execTestFile
+} -result {%%}
+
+test tokens-17.2 {
+    Double token
+} -body {
+    createTestFile {
+        ##nagelfar syntax bepa x x&x*
+
+        bepa a
+        bepa a b
+        bepa a b c
+        bepa a b c d
+        bepa a b c d e
+    }
+    execTestFile
+} -result {%%Line   5: E Wrong number of arguments (2) to "bepa"
+Line   7: E Wrong number of arguments (4) to "bepa"}
+
+test tokens-17.3 {
+    Double token
+} -body {
+    createTestFile {
+        dict create a
+        dict create a b
+        dict create a b c
+        dict create a b c d
+    }
+    execTestFile
+} -result {%%Line   2: E Wrong number of arguments (2) to "dict create"
+Line   4: E Wrong number of arguments (4) to "dict create"}
+
+test tokens-17.4 {
+    Double token
+} -body {
+    createTestFile {
+        set d [dict create a b]
+        dict update d x y m n {
+            list $y $n $z
+        }
+    }
+    execTestFile
+} -result {%%Line   4: E Unknown variable "z"}
+
+test tokens-17.5 {
+    Tripple token
+} -body {
+    createTestFile {
+        ##nagelfar syntax bepa x x&x&x*
+
+        bepa a
+        bepa a b
+        bepa a b c
+        bepa a b c d
+        bepa a b c d e
+    }
+    execTestFile
+} -result {%%Line   5: E Wrong number of arguments (2) to "bepa"
+Line   6: E Wrong number of arguments (3) to "bepa"
+Line   8: E Wrong number of arguments (5) to "bepa"}

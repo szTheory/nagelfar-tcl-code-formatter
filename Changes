@@ -1,4 +1,7 @@
 2017-01-28
+ Added multi tokens to support syntax of some commands.
+ 
+2017-01-28
  Overhaul of token-parsing code and documentation.
 
 2017-01-27

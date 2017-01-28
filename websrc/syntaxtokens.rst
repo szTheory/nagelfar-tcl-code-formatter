@@ -83,6 +83,20 @@ If a token is followed by =, it is a token dependent modifier.
 
 Example:   do=_stdclass_oo
 
+Multi-tokens
+^^^^^^^^^^^^
+
+Multiple tokens can be joined with "&" to consume multiple arguments.
+Such a multi token must have an * or ? modifier. If they are mandatory
+they can be just separated. The point of multi-tokens is to have them
+repeat as a group. The individual tokens may not have modifiers that
+make them optional, but may use e.g. parenthesis.
+
+.. code:: tcl
+
+ ##nagelfar syntax dict\ create x&x*
+
+
 Subcommands
 -----------
 

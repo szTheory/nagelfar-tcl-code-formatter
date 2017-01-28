@@ -405,7 +405,7 @@ proc buildDb {ch} {
         set syntax(catch)        "c n? n?" ;# FIXA make a test for this
         set syntax(dict)          "s x x*"
         set syntax(dict\ append)  "n x x*"
-        set syntax(dict\ create)  "x*"
+        set syntax(dict\ create)  "x&x*"
         set syntax(dict\ exists)  "x x x*"
         set syntax(dict\ for)     "nl x c"
         set syntax(dict\ incr)    "n x x*"
@@ -423,11 +423,8 @@ proc buildDb {ch} {
         set syntax(dict\ size)    "x"
         set syntax(dict\ unset)   "n x x*"
         set syntax(dict\ values)  "x x?"
-        set syntax(dict\ update)  "l x x x* c"
+        set syntax(dict\ update)  "l x n x&n* c"
         set syntax(dict\ with)    "l x* c"
-        # FIXA: dict create takes an even number of arguments: (x x)*
-        # Update has pairs of alternating (x n)*
-        # A new syntax token or similar would be needed to fix that.
         
         # Initialising incr
         set syntax(incr)       "n x?"

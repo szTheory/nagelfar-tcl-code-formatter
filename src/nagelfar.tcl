@@ -1371,6 +1371,27 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set token [lindex $syn 0]
         set syn [lrange $syn 1 end]
 
+        # Look for multi token.
+        # A multi token is separated by & and always has a modifier.
+        if {[string match "*&*" $token]} {
+            set mod [string index $token end]
+            set newToks [split [string range $token 0 end-1] "&"]
+            if {$mod ni {* ?}} {
+                echo "Modifier \"$mod\" is not supported for \"$syn\" in\
+                            syntax for \"$cmd\"."
+            }
+            set room [expr {$lastOptional - $i}]
+            if {!$anyOptional || $room < [llength $newToks]} continue
+            # Feed back tokens to the stack
+            if {$mod eq "*"} {
+                # Include the multi-token if it repeats
+                set syn [linsert $syn 0 {*}$newToks $token]
+            } else {
+                set syn [linsert $syn 0 {*}$newToks]
+            }
+            continue
+        }
+
         SplitToken $token tok tokCount _ mod tokLen tokFrom
         # Is it optional and there can't be any optional?
         if {$mod ne "" && !$anyOptional} {
@@ -3434,6 +3455,15 @@ proc parseArgsToSyn {name procArgs indexArgs syn knownVars} {
             }
         } else {
             foreach token $syn {
+                # Look for multi token
+                if {[regexp {&.*(.)$} $token -> mod]} {
+                    if {$mod == "?"} {
+                        incr prevmax 2
+                    } elseif {$mod == "*"} {
+                        set prevunlim 1
+                    }
+                    continue
+                }
                 SplitToken $token tok tokCount _ mod n _
                 if {$mod == ""} {
                     incr prevmin $n
