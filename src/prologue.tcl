@@ -28,7 +28,7 @@ exec tclsh "$0" "$@"
 #----------------------------------------------------------------------
 
 set debug 0
-package require Tcl 8.4
+package require Tcl 8.5
 
 package provide app-nagelfar 1.0
 # This variable should be overwritten by the build process

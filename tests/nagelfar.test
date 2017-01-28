@@ -181,20 +181,6 @@ test nagelfar-3.4 {
     execTestFile
 } -result {%%Line   3: N Suspicious variable name "$apa"}
 
-test nagelfar-3.5 {
-    Basic errors
-} -constraints runin84 -body {
-    createTestFile {
-        proc apa {w} {
-            set Miffo(gurka) 1
-
-            incr Miffo(hampa)
-            incr Miffo(gurka)
-        }
-    }
-    execTestFile -flags "-s syntaxdb84.tcl"
-} -result {%%Line   5: E Unknown variable "Miffo(hampa)"}
-
 test nagelfar-3.6 {
     Basic errors
 } -body {
@@ -370,19 +356,9 @@ test nagelfar-6.1 {
     execTestFile
 } -result {%%Line   2: E Bad expression: can't use empty string as operand of "+"}
 
-test nagelfar-6.2.1  {
+test nagelfar-6.2 {
     Expression checking
-} -constraints runin84 -body {
-    createTestFile {
-        set apa 1
-        expr {1 + $apa /}
-    }
-    execTestFile
-} -result {%%Line   3: E Bad expression: premature end of expression}
-
-test nagelfar-6.2.2 {
-    Expression checking
-} -constraints runin85 -body {
+} -body {
     createTestFile {
         set apa 1
         expr {1 + $apa /}

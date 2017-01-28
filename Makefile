@@ -9,9 +9,6 @@ DOTVERSION = 1.2.6
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/peter/tclkit
-TCLKIT_LINUX   = $(TCLKIT)/v84/tclkit-linux-x86
-TCLKIT_WIN     = $(TCLKIT)/v84/tclkit-win32.upx.exe
-TCLKITSH_WIN   = $(TCLKIT)/v84/tclkitsh-win32.upx.exe
 TCLKIT85_LINUX = $(TCLKIT)/v85/tclkit-linux-x86
 TCLKIT85_WIN   = $(TCLKIT)/v85/tclkit-win32.upx.exe
 TCLKITSH85_WIN = $(TCLKIT)/v85/tclkitsh-win32.upx.exe
@@ -23,12 +20,9 @@ TEXTSEARCH = /home/peter/src/textsearch
 
 # Path to the interpreter used for generating the syntax database
 TCLSHDB  = ~/tcl/install/bin/wish8.5
-TCLSHDB2 = ~/tcl/install/bin/wish8.4
-DB2NAME  = syntaxdb84.tcl
-TCLSHDB3 = ~/tcl/install/bin/wish8.6
-DB3NAME  = syntaxdb86.tcl
+TCLSHDB2 = ~/tcl/install/bin/wish8.6
+DB2NAME  = syntaxdb86.tcl
 # Path to the interpreter used for running tests
-TCLSH84  = tclsh
 TCLSH85  = ~/tcl/install/bin/tclsh8.5
 TCLSH86  = ~/tcl/install/bin/tclsh8.6
 
@@ -47,8 +41,6 @@ min: nagelfar.tcl misctest
 #	cd nagelfar.vfs/lib/app-nagelfar ; ln -s ../../../nagelfar.tcl
 #nagelfar.vfs/lib/app-nagelfar/syntaxdb.tcl:
 #	cd nagelfar.vfs/lib/app-nagelfar ; ln -s ../../../syntaxdb.tcl
-#nagelfar.vfs/lib/app-nagelfar/syntaxdb84.tcl:
-#	cd nagelfar.vfs/lib/app-nagelfar ; ln -s ../../../syntaxdb84.tcl
 #nagelfar.vfs/lib/app-nagelfar/packagedb:
 #	cd nagelfar.vfs/lib/app-nagelfar ; ln -s ../../../packagedb
 nagelfar.vfs/lib/tkdnd:
@@ -102,9 +94,6 @@ testgui: base
 
 test86: base
 	@$(TCLSH86) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
-
-test84: base
-	@$(TCLSH84) ./tests/all.tcl $(TESTFLAGS)
 
 testoo: base
 	@./nagelfar.tcl -s syntaxdb86.tcl -s snitdb.tcl ootest/*.tcl
@@ -215,10 +204,7 @@ syntaxdb.tcl: syntaxbuild.tcl $(TCLSHDB)
 $(DB2NAME): syntaxbuild.tcl $(TCLSHDB2)
 	$(TCLSHDB2) syntaxbuild.tcl $(DB2NAME)
 
-$(DB3NAME): syntaxbuild.tcl $(TCLSHDB3)
-	$(TCLSHDB3) syntaxbuild.tcl $(DB3NAME)
-
-db: syntaxdb.tcl $(DB2NAME) $(DB3NAME)
+db: syntaxdb.tcl $(DB2NAME)
 
 #----------------------------------------------------------------
 # Packaging/Releasing
@@ -245,7 +231,6 @@ distrib: base
 	@ln -sf $(TEXTSEARCH) lib/textsearch
 	@tar --exclude .svn -cvf nagelfar.tar nagelfar$(VERSION)/COPYING \
 		nagelfar$(VERSION)/README.txt nagelfar$(VERSION)/syntaxbuild.tcl \
-		nagelfar$(VERSION)/syntaxdb.tcl nagelfar$(VERSION)/syntaxdb84.tcl \
 		nagelfar$(VERSION)/syntaxdb86.tcl \
 		nagelfar$(VERSION)/nagelfar.syntax nagelfar$(VERSION)/nagelfar.tcl \
 		nagelfar$(VERSION)/misctests/test.tcl nagelfar$(VERSION)/misctests/test.syntax \

@@ -455,7 +455,7 @@ proc scanWord {str len index i} {
     set si2 $i
     set c [string index $str $i]
 
-    if {$c eq "\{" && $::Nagelfar(allowExpand)} {
+    if {$c eq "\{"} {
         if {[string range $str $i [expr {$i + 2}]] eq "{*}"} {
             set ni [expr {$i + 3}]
             set nc [string index $str $ni]
@@ -4422,19 +4422,6 @@ proc loadDatabases {{addDb {}}} {
     } else {
         set ::Nagelfar(dbTclVersion) [package present Tcl]
     }
-    # {*} expansion requires that Nagelfar is run in 8.5 since the checks
-    # for it does not work otherwise.
-    # It also naturally requires an 8.5 database to indicate that it is
-    # checking 8.5 scripts
-    set ::Nagelfar(allowExpand) 0
-    if {[package vcompare $::Nagelfar(dbTclVersion) 8.5] >= 0 && \
-            [package vcompare $::tcl_version 8.5] >= 0} {
-        ##nagelfar ignore
-        if {![catch {list {*}{hej}}]} {
-            set ::Nagelfar(allowExpand) 1
-        }
-    }
-
     if {$addDb eq ""} {
         # Clean up if we are loading all databases
         catch {unset ::syntax}
