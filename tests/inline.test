@@ -211,6 +211,21 @@ Line  15: W Unknown command "Miffo"
 Line  17: N Expr called in expression
 Line  19: E Wrong number of arguments (1) to "lrange"}
 
+test inline-6.5 {
+    ignore/filter this is for use of ignore together with -H
+} -body {
+    createTestFile {
+        ##nagelfar ignore
+        set apa [Miffo a b c]
+        set apa [Miffo2 a b c]
+        # PRAGMA: nocheck
+        set apa [Miffo a b c]
+        set apa [Miffo2 a b c]
+    }
+    execTestFile -flags -H
+} -result {%%_testfile_: 4: W Unknown command "Miffo2"
+_testfile_: 7: W Unknown command "Miffo2"}
+
 test inline-7.1 {
     Inline in syntax file
 } -body {

@@ -108,6 +108,23 @@ proc Text2Html {data} {
     string map {\& \&amp; \< \&lt; \> \&gt; \" \&quot;} $data
 }
 
+# Moved out of errorMsg so message and line-filter use the same
+# text
+proc errorMsgLinePrefix {line appendStr} {
+    set pre ""
+    if {$::currentFile != ""} {
+        set pre "$::currentFile: "
+    }
+    if {$::Prefs(prefixFile)} {
+        # Use a shorter format when -H flag is used
+        # This format can be parsed by e.g. emacs compile
+        set pre "${pre}$line: "
+    } else {
+        set pre "${pre}Line [format %3d $line]: "
+    }
+    return $pre$appendStr
+}
+
 # Standard error message.
 # severity : How severe a message is E/W/N for Error/Warning/Note
 proc errorMsg {severity msg i {notAllowedinFirst 0}} {
@@ -140,26 +157,16 @@ proc errorMsg {severity msg i {notAllowedinFirst 0}} {
         }
     }
 
-    set pre ""
-    if {$::currentFile != ""} {
-        set pre "$::currentFile: "
-    }
     set line [calcLineNo $i]
-
-    switch $severity {
-        E { set color "#DD0000"; set severityMsg "ERROR" }
-        W { set color "#FFAA00"; set severityMsg "WARNING" }
-        N { set color "#66BB00"; set severityMsg "NOTICE" }
-    }
-    if {$::Prefs(prefixFile)} {
-        # Use a shorter format when -H flag is used
-        # This format can be parsed by e.g. emacs compile
-        set pre "${pre}$line: $severity "
-    } else {
-        set pre "${pre}Line [format %3d $line]: $severity "
-    }
     if {$::Prefs(html)} {
+	switch $severity {
+	    E { set color "#DD0000"; set severityMsg "ERROR" }
+	    W { set color "#FFAA00"; set severityMsg "WARNING" }
+	    N { set color "#66BB00"; set severityMsg "NOTICE" }
+	}
         set pre "<a href=#$::Prefs(htmlprefix)$line>Line [format %3d $line]</a>: <font color=$color><strong>$severityMsg</strong></font>: "
+    } else {
+	set pre [errorMsgLinePrefix $line "$severity "]
     }
 
     set ::Nagelfar(indent) [string repeat " " [string length $pre]]
@@ -383,10 +390,10 @@ proc checkComment {str index knownVarsName} {
                     incr line
                 }
                 switch -- $first {
-                    N { addFilter "*Line* $line: N *[join $rest]*" }
-                    W { addFilter "*Line* $line: \[NW\] *[join $rest]*" }
-                    E { addFilter "*Line* $line:*[join $rest]*" }
-                    default { addFilter "*Line* $line:*$first [join $rest]*" }
+                    N { addFilter [errorMsgLinePrefix $line "N *[join $rest]*"] }
+                    W { addFilter [errorMsgLinePrefix $line "\[NW\] *[join $rest]*"] }
+                    E { addFilter [errorMsgLinePrefix $line "*[join $rest]*"] }
+                    default { addFilter [errorMsgLinePrefix $line "*$first [join $rest]*"] }
                 }
             }
             default {
@@ -398,7 +405,7 @@ proc checkComment {str index knownVarsName} {
         # Support Frink's inline comment
         set line [calcLineNo $index]
         incr line
-        addFilter "*Line* $line:*"
+        addFilter [errorMsgLinePrefix $line "*"]
     }
 }
 
