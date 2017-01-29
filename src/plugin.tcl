@@ -269,10 +269,13 @@ proc pluginHandleLateExpr {expName knownVarsName index} {
     PluginHandle lateExpr $exp outdata knownVars $index
 
     # A replacement expression must not have commands in it
-    if {[string first "\[" $outdata] == -1} {
-        set exp $outdata
-    } else {
-        errorMsg E "Plugin $::Nagelfar(plugin) returned malformed replacement from lateExpr" $index
+    if {$exp ne $outdata} {
+        # It has been replaced
+        if {[string first "\[" $outdata] == -1} {
+            set exp $outdata
+        } else {
+            errorMsg E "Plugin $::Nagelfar(plugin) returned malformed replacement from lateExpr" $index
+        }
     }
 }
 
