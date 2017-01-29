@@ -32,7 +32,7 @@ Tokens
 * s Subcommand
 * e Expression
 * E Expression that should be in braces
-* re regular expression like regexp/regsub
+* re Regular expression like regexp/regsub
 *
 * n, v and l all marks variable names.  Those arguments will not be
   checked against known variables to detect missing $.

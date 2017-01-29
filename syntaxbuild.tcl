@@ -334,8 +334,8 @@ proc buildDb {ch} {
     set syntax(puts)            "1: x : o? x x?"
     set syntax(pwd)              0
     set syntax(read)            "r 1 2"
-    set syntax(regexp)          "o* x x n*"
-    set syntax(regsub)          "o* x x x n?"
+    set syntax(regexp)          "o* re x n*"
+    set syntax(regsub)          "o* re x x n?"
     set syntax(rename)           2   ;# Maybe treat rename specially?
     set syntax(return)          "p* x?"
     set syntax(scan)            "x x n*"

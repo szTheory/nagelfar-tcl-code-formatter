@@ -746,3 +746,18 @@ test tokens-17.5 {
 } -result {%%Line   5: E Wrong number of arguments (2) to "bepa"
 Line   6: E Wrong number of arguments (3) to "bepa"
 Line   8: E Wrong number of arguments (5) to "bepa"}
+
+test tokens-18.1 {
+    Regexp token
+} -body {
+    createTestFile {
+	regexp {??} "test"
+	regexp {.*} "test"
+	regexp {(?:abc)test\1} "test"
+	regexp {(test1|value} "test"
+	regexp -- {-} "test"
+    }
+    execTestFile
+} -result {%%Line   2: E Bad regexp: couldn't compile regular expression pattern: quantifier operand invalid
+Line   4: E Bad regexp: couldn't compile regular expression pattern: invalid backreference number
+Line   5: E Bad regexp: couldn't compile regular expression pattern: parentheses () not balanced}

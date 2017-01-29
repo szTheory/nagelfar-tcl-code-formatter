@@ -1852,15 +1852,11 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                 }
 	    }
 	    re {
-		if {$mod ne ""} {
-		    echo "Modifier \"$mod\" is not supported for \"$tok\" in\
-                            syntax for $cmd."
-		}
+                # Check only constant
 		if {([lindex $wordstatus $i] & 1) != 0} {
-		    # check only non constant
 		    set re [lindex $argv $i]
 		    if {[catch [list regexp -- $re "test"] msg]} {
-			errorMsg E $msg $index
+			errorMsg E "Bad regexp: $msg" $index
 		    }
 		}
 		incr i

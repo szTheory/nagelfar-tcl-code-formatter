@@ -1,3 +1,6 @@
+2017-01-29
+ Added regexp check. (Patch from Tobias Mark)
+
 2017-01-28
  Made 8.6 default.
  Ditched 8.4 support.
