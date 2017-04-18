@@ -184,3 +184,154 @@ test proc-4.1 {
     execTestFile
 } -result {%%}
 
+test proc-5.1 {
+    Procedure, check single use name
+} -body {
+    createTestFile {
+        proc p1 {} {
+	    set a "Hello"
+	    set b "you"
+	    return $b
+        }
+	proc p2 {para} {
+	    return ""
+        }
+
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%Line   2: W Variable "a" is never read
+Line   7: W Variable "para" is never read}
+
+test proc-5.2 {
+    Procedure, check single use name
+} -body {
+    createTestFile {
+	namespace eval test {
+	    variable val
+	    proc init {} {
+		variable val "test"
+	    }
+	    proc run {} {
+		variable val2
+		puts "test"
+	    }
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%Line   7: W Variable "val2" is never read}
+
+test proc-5.3 {
+    Procedure, check single use name
+} -body {
+    createTestFile {
+	set g "a"
+	proc init {} {
+	    puts "$::g"
+	}
+	proc run {dummy} {
+	}
+    }
+    execTestFile -flags {-Wunusedvar} -WunusedvarFilter dummy
+} -result {%%}
+
+test proc-5.4 {
+    Procedure, check single use name
+} -body {
+    createTestFile {
+	proc init {} {
+	    global g
+	}
+	proc run {} {
+	    global g
+	    array get g
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%Line   2: W Variable "g" is never read}
+
+test proc-5.5 {
+    Detect set as read
+} -body {
+    createTestFile {
+	proc run {} {
+	    set a "value"
+	    set a
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%}
+
+test proc-5.6 {
+    Supress with inline comment
+} -body {
+    createTestFile {
+	proc run {} {
+	    set a "value"
+	    ##nagelfar varused a
+	}
+	proc run2 {} {
+	    set b "value"
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%Line   6: W Variable "b" is never read}
+
+test proc-5.7 {
+    Set global value ok
+} -body {
+    createTestFile {
+	proc run {} {
+	    global a
+	    set a "value"
+	}
+	proc run2 {} {
+	    global a
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%Line   6: W Variable "a" is never read}
+
+test proc-5.8 {
+    Global array
+} -body {
+    createTestFile {
+	proc run {} {
+	    global a
+	    set a(x) "value"
+	}
+	proc run {} {
+	    global a
+	    puts $a(x)
+	}
+
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%}
+
+test proc-5.9 {
+    info exists array
+} -body {
+    createTestFile {
+	proc run {} {
+	    global a
+	    info exists a(x)
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+} -result {%%}
+
+test proc-5.11 {
+    combination with oo::define
+} -body {
+    createTestFile {
+	::oo::class create myclass {
+	    variable a
+	    method run1 {} {
+		set x 23
+		puts "run2"
+	    }
+	}
+    }
+    execTestFile -flags {-Wunusedvar}
+
+} -result {%%Line   4: W Variable "x" is never read}

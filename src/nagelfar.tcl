@@ -45,6 +45,7 @@
 # knownVars $var local     : Variable is local in a procedure.
 # knownVars $var set       : A set of this variable has been seen.
 # knownVars $var read      : A read of this variable seen before any set.
+# knownVars $var used      : A read of this variable seen.
 # knownVars $var type      : The variable's type if known.
 # knownVars $var array     : The variable is an array
 # knownVars $var namespace : Variable belongs to this namespace. (unless local)
@@ -57,6 +58,7 @@ proc knownVar {knownVarsName var} {
     dict set knownVars $var local 0
     dict set knownVars $var set   0
     dict set knownVars $var read  0
+    dict set knownVars $var used  0
     dict set knownVars $var type  ""
     # The array field can be unknown or boolean
     dict set knownVars $var array ""
@@ -405,6 +407,9 @@ proc checkComment {str index knownVarsName} {
                     default { addFilter [errorMsgLinePrefix $line "*$first [join $rest]*"] }
                 }
             }
+	    varused {
+		setVarUsed knownVars $first
+	    }
             default {
                 errorMsg N "Bad type in ##nagelfar comment" $index 1
                 return
@@ -828,7 +833,7 @@ proc splitList {str index iName wsName} {
     return $lstr
 }
 
-# Parse a variable name, check for existance
+# Parse a variable name, check for existence
 # This is called when a $ is encountered
 # "i" points to the first char after $
 # Returns the type of the variable
@@ -924,6 +929,10 @@ proc parseVar {str len index iName knownVarsName} {
     # Allow a plugin to have a look at the variable read
     if {$::Nagelfar(pluginVarRead)} {
         pluginHandleVarRead var knownVars $index
+    }
+    setVarUsed knownVars $var
+    if {$vararr} {
+	setVarUsed knownVars $var\($varindex\)
     }
 
     if {[string match ::* $var]} {
@@ -1679,6 +1688,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                         }
                         addImplicitVariablesNs $cmd [lindex $indices $i] locCtxVars
                         parseBody $body [lindex $indices $i] locCtxVars
+			checkForUnusedVar locCtxVars [lindex $indices $i]
                     } else {
                         parseBody $body [lindex $indices $i] knownVars
                     }
@@ -1717,6 +1727,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     # Check in local context
                     #puts "Cmd '$cmd' NS '[currentNamespace]'"
                     parseBody $body [lindex $indices $i] locCtxVars
+		    checkForUnusedVar locCtxVars [lindex $indices $i]
                 }
                 incr i
             }
@@ -1791,6 +1802,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                         if {$::Nagelfar(pluginVarRead)} {
                             pluginHandleVarRead var knownVars $index
                         }
+			setVarUsed knownVars $var
                         if {[string match ::* $var]} {
                             # Skip qualified names until we handle
                             # namespace better. FIXA
@@ -1824,7 +1836,16 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                         markVariable [lindex $argv $i] \
                                 [lindex $wordstatus $i] [lindex $wordtype $i] 0 \
                                 [lindex $indices $i] $isArray knownVars ""
-                    }
+
+			# not strictly speaking used but info exists etc
+			# may cause a lot of false-positive without this
+			set var [lindex $argv $i]
+			set varBase [lindex [split [lindex $argv $i] "("] 0]
+			setVarUsed knownVars $varBase
+			if {$var ne $varBase} {
+			    setVarUsed knownVars $var
+			}
+		    }
 
                     lappend constantsDontCheck $i
                     incr i
@@ -2023,6 +2044,7 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
             }
             if {$check == 1} {
                 dict set knownVars $var set 1
+		setVarUsed knownVars $var
             }
         }
     }
@@ -2038,6 +2060,42 @@ proc setVariableType {var type index knownVarsName} {
         return
     }
     dict set knownVars $varBase "type" $type
+}
+
+# Check if a name in knownVars has a used count of <= 1
+proc checkForUnusedVar {knownVarsName {idx 0}} {
+    upvar $knownVarsName knownVars
+
+    if {$::Nagelfar(firstpass)} {
+	return
+    }
+    if {$::Prefs(noVar) || !$::Prefs(warnUnusedVar)} {
+	return
+    }
+
+    dict for {var info} $knownVars {
+	# ignore qualified names and everything starting with "_"
+	if {$var eq "" || [string first "::" $var] >= 0 || [string index $var 0] eq "_"} {
+	    continue
+	}
+	if {$var in $::Prefs(warnUnusedVarFilter)} {
+	    continue
+	}
+	if {![dict exists $info used]} {
+	    continue
+	}
+	set val [dict get $info used]
+	if {$val == 0 || ($val == -1 && ![dict get $info set])} {
+            errorMsg W "Variable \"$var\" is never read" $idx
+	}
+    }
+}
+
+proc setVarUsed {knownVarsName var {kind 1}} {
+    upvar $knownVarsName knownVars
+    if {[dict exists $knownVars $var used]} {
+       dict set knownVars $var used $kind
+    }
 }
 
 # This is called when an unknown command is encountered.
@@ -2117,6 +2175,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             foreach var $argv ws $wordstatus {
                 if {$ws & 1} {
                     knownVar knownVars $var
+		    setVarUsed knownVars $var -1
                 } else {
                     errorMsg N "Non constant argument to $cmd: $var" $index
                 }
@@ -2151,10 +2210,13 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                         dict set knownVars $var namespace $ns
                         if {$i < $argc - 1} {
                             dict set knownVars $var set 1
+                            dict set knownVars $var used 1
                             dict set knownVars $var array 0
                             # FIXA: What if it is an array element?
                             # Should the array be marked?
-                        }
+                        } else {
+			    setVarUsed knownVars $var -1
+			}
                         lappend constantsDontCheck $i
                     } else {
                         errorMsg N "Non constant argument to $cmd: $var" \
@@ -2214,6 +2276,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                     errorMsg N "Suspicious upvar variable \"$var\"" $index
                 } else {
                     knownVar knownVars $var
+                    setVarUsed knownVars $var -1
                     lappend constantsDontCheck $i
                     if {$other eq $var} { # Allow "upvar xx xx" construct
                         lappend constantsDontCheck [expr {$i - 1}]
@@ -2248,6 +2311,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 if {$::Nagelfar(pluginVarRead)} {
                     pluginHandleVarRead var knownVars $index
                 }
+                setVarUsed knownVars $var
                 if {[string match ::* $var]} {
                     # Skip qualified names until we handle
                     # namespace better. FIXA
@@ -2269,6 +2333,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 WA
             }
             lappend constantsDontCheck 0
+
             set type $wtype
         }
         foreach - lmap { # Special check of "foreach" and "lmap" commands
@@ -3549,6 +3614,9 @@ proc addImplicitVariablesNs {cmd index knownVarsName} {
         set type    [lindex $var 1]
         markVariable $varName 1 "" 1n \
                 $index unknown knownVars type
+        # not every implicit var is used inside a method
+        # so always mark as used
+        setVarUsed knownVars $varName
     }
 }
 
@@ -3641,6 +3709,10 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
         }
         pushProc $name
         parseBody $body [lindex $indices 2] knownVars
+        if {[string trim $body] ne ""} {
+            # check only if not an empty 'dummy' function
+            checkForUnusedVar knownVars [lindex $indices 0]
+        }
         popProc
         if {$isProc} {
             popNamespace

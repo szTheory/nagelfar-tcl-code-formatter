@@ -185,3 +185,6 @@ namespace where the inline comment resides is used.
  namespace path [list {*}[namespace path] ::apa]
  # The corresponing inline directive would be:
  ##nagelfar nspath current ::apa
+
+When -WunusedVar is active missing read detections can be added with
+ ##nagelfar varused <name>

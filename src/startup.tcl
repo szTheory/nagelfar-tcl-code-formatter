@@ -41,6 +41,8 @@ proc usage {} {
  -WsubN            : Sets subcommand warning level to N.
    1 (def)         = Warn about shortened subcommands.
  -WelseN           : Enforce else keyword. Default 1.
+ -Wunusedvar	   : Check for unused variables.
+ -WunusedvarFilter : List of names to ignore for unused check.
  -strictappend     : Enforce having an initialised variable in (l)append.
  -tab <size>       : Tab size, default is 8.
  -len <len>        : Enforce max line length.
@@ -337,6 +339,14 @@ if {![info exists gurka]} {
             -novar {
                 set ::Prefs(noVar) 1
             }
+	    -Wunusedvar {
+                set ::Prefs(warnUnusedVar) 1
+	    }
+	    -WunusedvarFilter {
+		incr i
+                set arg [lindex $argv $i]
+                lappend ::Prefs(warnUnusedVarFilter) $arg
+	    }
             -dbpicky { # A debug thing to help make a more complete database
                 set ::Nagelfar(dbpicky) 1
             }

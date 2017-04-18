@@ -43,6 +43,8 @@ proc getOptions {} {
         prefixFile 0
         forceElse 1
         noVar 0
+	warnUnusedVar 0
+	warnUnusedVarFilter {args}
         severity N
         editFileBackup 1
         editFileFont {Courier 10}
