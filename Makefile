@@ -22,9 +22,12 @@ TEXTSEARCH = /home/peter/src/textsearch
 TCLSHDB  = ~/tcl/install/bin/wish8.6
 TCLSHDB2 = ~/tcl/install/bin/wish8.5
 DB2NAME  = syntaxdb85.tcl
+TCLSHDB3 = ~/tcl/install/bin/wish8.7
+DB3NAME  = syntaxdb87.tcl
 # Path to the interpreter used for running tests
 TCLSH85  = ~/tcl/install/bin/tclsh8.5
 TCLSH86  = ~/tcl/install/bin/tclsh8.6
+TCLSH87  = ~/tcl/install/bin/tclsh8.7
 
 all: base
 
@@ -204,7 +207,10 @@ syntaxdb.tcl: syntaxbuild.tcl $(TCLSHDB)
 $(DB2NAME): syntaxbuild.tcl $(TCLSHDB2)
 	$(TCLSHDB2) syntaxbuild.tcl $(DB2NAME)
 
-db: syntaxdb.tcl $(DB2NAME)
+$(DB3NAME): syntaxbuild.tcl $(TCLSHDB3)
+	$(TCLSHDB3) syntaxbuild.tcl $(DB3NAME)
+
+db: syntaxdb.tcl $(DB2NAME) $(DB3NAME)
 
 #----------------------------------------------------------------
 # Packaging/Releasing
