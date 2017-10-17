@@ -238,6 +238,8 @@ distrib: base
 	@tar --exclude .svn -cvf nagelfar.tar nagelfar$(VERSION)/COPYING \
 		nagelfar$(VERSION)/README.txt nagelfar$(VERSION)/syntaxbuild.tcl \
 		nagelfar$(VERSION)/syntaxdb85.tcl \
+		nagelfar$(VERSION)/syntaxdb.tcl \
+		nagelfar$(VERSION)/syntaxdb87.tcl \
 		nagelfar$(VERSION)/nagelfar.syntax nagelfar$(VERSION)/nagelfar.tcl \
 		nagelfar$(VERSION)/misctests/test.tcl nagelfar$(VERSION)/misctests/test.syntax \
 		nagelfar$(VERSION)/doc nagelfar$(VERSION)/packagedb
