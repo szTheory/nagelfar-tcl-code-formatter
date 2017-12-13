@@ -1,8 +1,7 @@
-
 Syntax Tokens
 *************
 
-Nagelfar's syntax descriptions for a command consists of little
+Nagelfar’s syntax descriptions for a command consists of little
 language describing the arguments to the command.
 
 Check the syntax database (syntaxdb.tcl) or in the database browser in
@@ -18,7 +17,7 @@ must be a valid list.
 If an entry is an integer, the number of arguments are just checked
 against it.
 
-If an entry is of the format "r min ?max?" it specifies a range for
+If an entry is of the format “r min ?max?” it specifies a range for
 allowed number of arguments.
 
 Otherwise an entry must be a valid list of tokens as described below.
@@ -117,7 +116,7 @@ Example:   do=_stdclass_oo
 Multi-tokens
 ------------
 
-Multiple tokens can be joined with "&" to consume multiple arguments.
+Multiple tokens can be joined with “&” to consume multiple arguments.
 Such a multi token must have an * or ? modifier. If they are mandatory
 they can be just separated. The point of multi-tokens is to have them
 repeat as a group. The individual tokens may not have modifiers that
@@ -129,7 +128,7 @@ make them optional, but may use e.g. parenthesis.
 Subcommands
 ===========
 
-For commands that have subcommands (as indicated by token "s"),
+For commands that have subcommands (as indicated by token “s”),
 separate descriptions can be set up for each subcommand. If a syntax
 for a subcommand is defined, it is used to check the rest.
 
@@ -137,8 +136,8 @@ for a subcommand is defined, it is used to check the rest.
    ##nagelfar syntax string\ bytelength 1
    ##nagelfar syntax string\ compare    o* x x
 
-The allowed list of subcommands is defined by the "subcmd" syntax. To
-add to the list, use "subcmd+"
+The allowed list of subcommands is defined by the “subcmd” syntax. To
+add to the list, use “subcmd+”
 
    ##nagelfar subcmd string bytelength compare equal is
    ##nagelfar subcmd+ file mystat
@@ -147,9 +146,9 @@ add to the list, use "subcmd+"
 Options
 =======
 
-For commands that have options (as indicated by tokens "o" and "p"),
+For commands that have options (as indicated by tokens “o” and “p”),
 the options database provides details. To list the allowed options the
-"option" syntax is used, and to add to a known list "option+" is used.
+“option” syntax is used, and to add to a known list “option+” is used.
 
    ##nagelfar option send -- async -displayof
    ##nagelfar option string\ is -failindex -strict
@@ -159,8 +158,8 @@ The syntax for the parameter of an option is set like this.
    ##nagelfar option send\ -displayof x
    ##nagelfar option string\ is\ -failindex n
 
-For the "p" token, an option always take a parameter and it defaults
-to "x" syntax. For the "o" token, on option only takes a parameter if
+For the “p” token, an option always take a parameter and it defaults
+to “x” syntax. For the “o” token, on option only takes a parameter if
 a parameter syntax is set up. Otherwise it is assumed the option is
 stand-alone.
 
@@ -173,7 +172,7 @@ syntax descriptions for different number of arguments.  Any token
 ending with : starts a syntax for the number of arguments that the
 number preceding it says. A lone : starts the default syntax.
 
-Example: "1: x 2: n n : e x*"
+Example: “1: x 2: n n : e x*”
 
-If this is checked against a call with two args, the "n n" part is
+If this is checked against a call with two args, the “n n” part is
 extracted and used as the entry according to all other rules.

@@ -1,4 +1,3 @@
-
 Inline Comments
 ***************
 
@@ -9,7 +8,7 @@ Whenever <file>.tcl is checked, any <file>.syntax is run through the
 syntax checker first.  Thus you can put your comments in such a
 separate file instead of your source if that is not suitable.
 
-A comment should start with "##nagelfar" to be recognized as special.
+A comment should start with “##nagelfar” to be recognized as special.
 The comment must be a valid Tcl list.
 
 
@@ -21,11 +20,11 @@ Ignoring messages
 
 These two are equivalent and adds a message filter rule for the line
 following it. The string argument will be part of the filter pattern,
-which is a glob pattern built like this: "*Line* $line:*$string*" If
-the string is preceded by "N", "W" or "E", anything from that severity
+which is a glob pattern built like this: “*Line* $line:*$string*” If
+the string is preceded by “N”, “W” or “E”, anything from that severity
 level and down is ignored. If the string is preceded by an offset like
-"+2", a line further down is marked for filtering. No given offset
-corresponds to "+1".
+“+2”, a line further down is marked for filtering. No given offset
+corresponds to “+1”.
 
 Examples:
 
@@ -37,8 +36,8 @@ Examples:
    set apa [expr 1 + 2]
    ##nagelfar ignore N
 
-Nagelfar also recognizes "# PRAGMA: nocheck", which is equivalent to
-"##nagelfar ignore", and ignores messages on the next line.
+Nagelfar also recognizes “# PRAGMA: nocheck”, which is equivalent to
+“##nagelfar ignore”, and ignores messages on the next line.
 
 
 Specifying variables
@@ -46,10 +45,10 @@ Specifying variables
 
    ##nagelfar variable name ?type?
 
-This will make "name" a known variable and optionally set its type.
-Types are still experimental in Nagelfar. The type "varName" can be
+This will make “name” a known variable and optionally set its type.
+Types are still experimental in Nagelfar. The type “varName” can be
 used to tell Nagelfar that a variable contains a variable name, which
-suppresses some warnings. Another type is "script" which also
+suppresses some warnings. Another type is “script” which also
 suppresses some warnings.
 
 Example:
@@ -61,8 +60,8 @@ Example:
 
    ##nagelfar vartype name type
 
-This will set the type of the variable "name". The variable must
-already be known. Using "variable" for just annotating the type could
+This will set the type of the variable “name”. The variable must
+already be known. Using “variable” for just annotating the type could
 mask bugs since you will not notice if the variable is missing.
 
 Example:
@@ -151,7 +150,7 @@ Other handling
 
 Nagelfar tries to pick up namespace path commands to track command
 resolution. It is possible to manually provide namespace path
-information, as shown below. If the namespace is given as "current",
+information, as shown below. If the namespace is given as “current”,
 the surrounding namespace where the inline comment resides is used.
 
    ##nagelfar nspath ns paths
