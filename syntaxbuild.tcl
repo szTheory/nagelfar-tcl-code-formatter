@@ -595,7 +595,7 @@ proc buildDb {ch} {
         # New options
         set option(lsort\ -stride) 1
     }
-        
+
 
     # Some special Tcl commands
     set syntax(dde)             "o? s x*"  ;# FIXA: is this correct?
@@ -924,6 +924,36 @@ proc buildDb {ch} {
             } elseif {![info exists special($apa)]} {
                 # Debug helper
                 #puts "No syntax defined for cmd '$apa'"
+            }
+        }
+    }
+
+    # Special handling of tcl::math*
+    foreach ns {mathop mathfunc} {
+        foreach fun [info commands tcl::${ns}::*] {
+            # Remove ::
+            set fun [string range $fun 2 end]
+            #if {[info exists syntax($fun)]} continue
+            # Try to figure it out
+            set minArg 0
+            set maxArg 1000
+            set e0 [catch {$fun}]
+            set e1 [catch {$fun 1}]
+            set e2 [catch {$fun 1 2}]
+            set e5 [catch {$fun 1 2 1 2 1}]
+            set spec ""
+            switch $e0$e1$e2$e5 {
+                0111 {set spec 0 }
+                1011 {set spec 1 }
+                1101 {set spec 2 }
+                0000 {set spec "r 0"}
+                1000 {set spec "r 1"}
+                default {
+                    puts "$fun $e0 $e1 $e2 $e5"
+                }
+            }
+            if {$spec ne ""} {
+                set syntax($fun) $spec
             }
         }
     }

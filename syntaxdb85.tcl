@@ -916,8 +916,60 @@ set ::syntax(tcl::OptProc) 3
 set ::syntax(tcl::OptProcArgGiven) 1
 set ::syntax(tcl::SetMax) 2
 set ::syntax(tcl::SetMin) 2
-set ::syntax(tcl::mathfunc::max) {r 0}
-set ::syntax(tcl::mathfunc::min) {r 0}
+set ::syntax(tcl::mathfunc::abs) 1
+set ::syntax(tcl::mathfunc::acos) 1
+set ::syntax(tcl::mathfunc::asin) 1
+set ::syntax(tcl::mathfunc::atan) 1
+set ::syntax(tcl::mathfunc::atan2) 2
+set ::syntax(tcl::mathfunc::bool) 1
+set ::syntax(tcl::mathfunc::ceil) 1
+set ::syntax(tcl::mathfunc::cos) 1
+set ::syntax(tcl::mathfunc::cosh) 1
+set ::syntax(tcl::mathfunc::double) 1
+set ::syntax(tcl::mathfunc::entier) 1
+set ::syntax(tcl::mathfunc::exp) 1
+set ::syntax(tcl::mathfunc::floor) 1
+set ::syntax(tcl::mathfunc::fmod) 2
+set ::syntax(tcl::mathfunc::hypot) 2
+set ::syntax(tcl::mathfunc::int) 1
+set ::syntax(tcl::mathfunc::isqrt) 1
+set ::syntax(tcl::mathfunc::log) 1
+set ::syntax(tcl::mathfunc::log10) 1
+set ::syntax(tcl::mathfunc::max) {r 1}
+set ::syntax(tcl::mathfunc::min) {r 1}
+set ::syntax(tcl::mathfunc::pow) 2
+set ::syntax(tcl::mathfunc::rand) 0
+set ::syntax(tcl::mathfunc::round) 1
+set ::syntax(tcl::mathfunc::sin) 1
+set ::syntax(tcl::mathfunc::sinh) 1
+set ::syntax(tcl::mathfunc::sqrt) 1
+set ::syntax(tcl::mathfunc::srand) 1
+set ::syntax(tcl::mathfunc::tan) 1
+set ::syntax(tcl::mathfunc::tanh) 1
+set ::syntax(tcl::mathfunc::wide) 1
+set ::syntax(tcl::mathop::!) 1
+set ::syntax(tcl::mathop::!=) 2
+set ::syntax(tcl::mathop::%) 2
+set ::syntax(tcl::mathop::&) {r 0}
+set ::syntax(tcl::mathop::*) {r 0}
+set ::syntax(tcl::mathop::**) {r 0}
+set ::syntax(tcl::mathop::+) {r 0}
+set ::syntax(tcl::mathop::-) {r 1}
+set ::syntax(tcl::mathop::/) {r 1}
+set ::syntax(tcl::mathop::<) {r 0}
+set ::syntax(tcl::mathop::<<) 2
+set ::syntax(tcl::mathop::<=) {r 0}
+set ::syntax(tcl::mathop::==) {r 0}
+set ::syntax(tcl::mathop::>) {r 0}
+set ::syntax(tcl::mathop::>=) {r 0}
+set ::syntax(tcl::mathop::>>) 2
+set ::syntax(tcl::mathop::^) {r 0}
+set ::syntax(tcl::mathop::eq) {r 0}
+set ::syntax(tcl::mathop::in) 2
+set ::syntax(tcl::mathop::ne) 2
+set ::syntax(tcl::mathop::ni) 2
+set ::syntax(tcl::mathop::|) {r 0}
+set ::syntax(tcl::mathop::~) 1
 set ::syntax(tclListValidFlags) 1
 set ::syntax(tclLog) 1
 set ::syntax(tclParseConfigSpec) 4
