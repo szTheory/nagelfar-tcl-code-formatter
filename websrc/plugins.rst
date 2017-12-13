@@ -225,7 +225,7 @@ Allow custom operator
  }
 
 Look for operator usage
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: tcl
 

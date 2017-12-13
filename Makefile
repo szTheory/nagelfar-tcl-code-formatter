@@ -14,7 +14,7 @@ TCLKIT85_WIN   = $(TCLKIT)/v85/tclkit-win32.upx.exe
 TCLKITSH85_WIN = $(TCLKIT)/v85/tclkitsh-win32.upx.exe
 
 # Path to the libraries used
-TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd1.0
+TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd2.4
 #CTEXT   = /home/peter/src/ctext
 TEXTSEARCH = /home/peter/src/textsearch
 
