@@ -26,6 +26,9 @@ proc PluginSearchPath {} {
     lappend dirs [file join $::thisDir .. ..]
     lappend dirs [file join $::thisDir .. .. plugins]
     lappend dirs [file join $::thisDir .. plugins]
+    foreach d $::Nagelfar(pluginPath) {
+	lappend dirs $d
+    }
     return $dirs
 }
 
@@ -62,7 +65,6 @@ proc createPluginInterp {plugin} {
     if {$src eq ""} {
         return ""
     }
-
     # Create interpreter
     set pi [interp create -safe]
 
@@ -76,43 +78,49 @@ proc createPluginInterp {plugin} {
     interp hide $pi close
 
     # Set global variables
-    set ::Nagelfar(pluginStatementRaw) [expr {[$pi eval info proc statementRaw] ne ""}]
-    set ::Nagelfar(pluginStatementWords) [expr {[$pi eval info proc statementWords] ne ""}]
-    set ::Nagelfar(pluginEarlyExpr) [expr {[$pi eval info proc earlyExpr] ne ""}]
-    set ::Nagelfar(pluginLateExpr) [expr {[$pi eval info proc lateExpr] ne ""}]
-    set ::Nagelfar(pluginVarWrite) [expr {[$pi eval info proc varWrite] ne ""}]
-    set ::Nagelfar(pluginVarRead) [expr {[$pi eval info proc varRead] ne ""}]
-
+    foreach func {statementRaw statementWords earlyExpr lateExpr varWrite
+                  varRead syntaxComment
+    } {
+	if {[$pi eval info proc $func] ne ""} {
+            # var names start with uppercase
+            set func [string toupper $func 0 0]
+            lappend ::Nagelfar(pluginHooks$func) $pi
+            set ::Nagelfar(plugin$func) 1
+	}
+    }
     return $pi
 }
 
-proc initPlugin {} {
-    set ::Nagelfar(pluginStatementRaw) 0
-    set ::Nagelfar(pluginStatementWords) 0
-    set ::Nagelfar(pluginEarlyExpr) 0
-    set ::Nagelfar(pluginLateExpr) 0
-    set ::Nagelfar(pluginVarWrite) 0
-    set ::Nagelfar(pluginVarRead) 0
-    set ::Nagelfar(pluginInterp) ""
+proc resetPluginData {} {
+    foreach func {StatementRaw StatementWords EarlyExpr LateExpr VarWrite
+                  VarRead SyntaxComment
+    } {
+        set ::Nagelfar(pluginHooks$func) {}
+        set ::Nagelfar(plugin$func) 0
+    }
+    set ::Nagelfar(pluginInterp) {}
+}
 
-    if {$::Nagelfar(plugin) ne ""} {
-        set pinterp [createPluginInterp $::Nagelfar(plugin)]
+proc initPlugin {} {
+    resetPluginData
+    foreach plugin $::Nagelfar(plugin) {
+        set pinterp [createPluginInterp $plugin]
         if {$pinterp eq ""} {
-            puts "Bad plugin: $::Nagelfar(plugin)"
+            puts "Bad plugin: $plugin"
             printPlugins
             exit 1
         }
-        set ::Nagelfar(pluginInterp) $pinterp
+        lappend ::Nagelfar(pluginInterp) $pinterp
+        set ::Nagelfar(pluginNames,$pinterp) $plugin
     }
 }
 
 proc finalizePlugin {} {
-    if {$::Nagelfar(pluginInterp) ne ""} {
-        set pi $::Nagelfar(pluginInterp)
+    foreach pi $::Nagelfar(pluginInterp) {
         if {[$pi eval info proc finalizePlugin] ne ""} {
             set x [$pi eval finalizePlugin]
             if {[catch {llength $x}] || ([llength $x] % 2) != 0} {
-                errorMsg E "Plugin $::Nagelfar(plugin) returned malformed list from finalizePlugin" 0
+                errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed list from finalizePlugin" 0
             } else {
                 foreach {cmd value} $x {
                     switch $cmd {
@@ -120,23 +128,33 @@ proc finalizePlugin {} {
                         warning { errorMsg W $value 0 }
                         note    { errorMsg N $value 0 }
                         default {
-                            errorMsg E "Plugin $::Nagelfar(plugin) returned bad keyword '$cmd' from finalizePlugin" 0
+                            errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned bad keyword '$cmd' from finalizePlugin" 0
                         }
                     }
                 }
             }
         }
 
-        interp delete $::Nagelfar(pluginInterp)
+        interp delete $pi
+        unset ::Nagelfar(pluginNames,$pi)
     }
 
-    set ::Nagelfar(pluginStatementRaw) 0
-    set ::Nagelfar(pluginStatementWords) 0
-    set ::Nagelfar(pluginEarlyExpr) 0
-    set ::Nagelfar(pluginLateExpr) 0
-    set ::Nagelfar(pluginVarWrite) 0
-    set ::Nagelfar(pluginVarRead) 0
-    set ::Nagelfar(pluginInterp) ""
+    resetPluginData
+}
+
+proc pluginHandleWriteHeader {ch} {
+    foreach pi $::Nagelfar(pluginInterp) {
+        if {[$pi eval info proc writeHeader] ne ""} {
+            set x [$pi eval writeHeader]
+            foreach value $x {
+                if {![regexp "^\#\#nagelfar\[^\n\]" $value]} {
+                    errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned illegal comment" 0
+                } else {
+                    puts $ch $value
+                }
+            }
+        }
+    }
 }
 
 proc printPlugin {plugin} {
@@ -191,8 +209,8 @@ proc printPlugins {} {
     }
 }
 
-# Generic handler to call plugin,
-proc PluginHandle {what indata outdataName knownVarsName index} {
+# Generic handler to call plugin
+proc PluginHandle {pi what indata outdataName knownVarsName index} {
     upvar 1 $outdataName outdata $knownVarsName knownVars
 
     set outdata $indata
@@ -202,10 +220,10 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
                       firstpass $::Nagelfar(firstpass) \
 		      vars $knownVars]
 
-    set x [$::Nagelfar(pluginInterp) eval [list $what $indata $info]]
+    set x [$pi eval [list $what $indata $info]]
 
     if {[catch {llength $x}] || ([llength $x] % 2) != 0} {
-        errorMsg E "Plugin $::Nagelfar(plugin) returned malformed list from $what" $index
+        errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed list from $what" $index
         return
     }
 
@@ -223,7 +241,7 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
             warning {errorMsg W $value $index 1}
             note    {errorMsg N $value $index 1}
             default {
-                errorMsg E "Plugin $::Nagelfar(plugin) returned bad keyword '$cmd' from $what" $index
+                errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned bad keyword '$cmd' from $what" $index
             }
         }
     }
@@ -232,67 +250,86 @@ proc PluginHandle {what indata outdataName knownVarsName index} {
 # This is called to let a plugin react to a statement, pre-substitution
 proc pluginHandleStatementRaw {stmtName knownVarsName index} {
     upvar 1 $stmtName stmt $knownVarsName knownVars
-    if {!$::Nagelfar(pluginStatementRaw)} return
 
-    PluginHandle statementRaw $stmt outdata knownVars $index
+    set outdata $stmt
+    foreach pi $::Nagelfar(pluginHooksStatementRaw) {
+	PluginHandle $pi statementRaw $stmt outdata knownVars $index
+    }
     set stmt $outdata
 }
 
 # This is called to let a plugin react to a statement, pre-substitution
 proc pluginHandleStatementWords {wordsName knownVarsName index} {
     upvar 1 $wordsName words $knownVarsName knownVars
-    if {!$::Nagelfar(pluginStatementWords)} return
 
-    PluginHandle statementWords $words outdata knownVars $index
-    # A replacement must be a list
-    if {[string is list $outdata]} {
-        set words $outdata
-    } else {
-        errorMsg E "Plugin $::Nagelfar(plugin) returned malformed replacement from statementWords" $index
+    foreach pi $::Nagelfar(pluginHooksStatementWords) {
+	PluginHandle $pi statementWords $words outdata knownVars $index
+	# A replacement must be a list
+	if {[string is list $outdata]} {
+	    set words $outdata
+	} else {
+	    errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from statementWords" $index
+	}
     }
 }
 
 # This is called to let a plugin react to an expression, pre-substitution
 proc pluginHandleEarlyExpr {expName knownVarsName index} {
     upvar 1 $expName exp $knownVarsName knownVars
-    if {!$::Nagelfar(pluginEarlyExpr)} return
 
-    PluginHandle earlyExpr $exp outdata knownVars $index
+    set outdata $exp
+    foreach pi $::Nagelfar(pluginHooksEarlyExpr) {
+	PluginHandle $pi earlyExpr $exp outdata knownVars $index
+    }
     set exp $outdata
 }
 
 # This is called to let a plugin react to an expression, post-substitution
 proc pluginHandleLateExpr {expName knownVarsName index} {
     upvar 1 $expName exp $knownVarsName knownVars
-    if {!$::Nagelfar(pluginLateExpr)} return
 
-    PluginHandle lateExpr $exp outdata knownVars $index
+    foreach pi $::Nagelfar(pluginHooksLateExpr) {
+	PluginHandle $pi lateExpr $exp outdata knownVars $index
 
-    # A replacement expression must not have commands in it
-    if {$exp ne $outdata} {
-        # It has been replaced
-        if {[string first "\[" $outdata] == -1} {
-            set exp $outdata
-        } else {
-            errorMsg E "Plugin $::Nagelfar(plugin) returned malformed replacement from lateExpr" $index
-        }
+        # A replacement expression must not have commands in it
+        if {$exp ne $outdata} {
+            # It has been replaced
+            if {[string first "\[" $outdata] == -1} {
+                set exp $outdata
+            } else {
+                errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from lateExpr" $index
+            }
+	}
     }
 }
 
 # This is called to let a plugin react to a variable write
 proc pluginHandleVarWrite {varName knownVarsName index} {
     upvar 1 $varName var $knownVarsName knownVars
-    if {!$::Nagelfar(pluginVarWrite)} return
 
-    PluginHandle varWrite $var outdata knownVars $index
-    set var $outdata
+    foreach pi $::Nagelfar(pluginHooksVarWrite) {
+        PluginHandle $pi varWrite $var outdata knownVars $index
+        set var $outdata
+    }
 }
 
 # This is called to let a plugin react to a variable read
 proc pluginHandleVarRead {varName knownVarsName index} {
     upvar 1 $varName var $knownVarsName knownVars
-    if {!$::Nagelfar(pluginVarRead)} return
 
-    PluginHandle varRead $var outdata knownVars $index
-    set var $outdata
+    foreach pi $::Nagelfar(pluginHooksVarRead) {
+        PluginHandle $pi varRead $var outdata knownVars $index
+        set var $outdata
+    }
+}
+
+# This is called to let a plugin see syntax comments
+proc pluginHandleComment {type opts} {
+    set res false
+    foreach pi $::Nagelfar(pluginHooksSyntaxComment) {
+	if {[$pi eval syntaxComment $type $opts]} {
+	    set res true
+	}
+    }
+    return $res
 }

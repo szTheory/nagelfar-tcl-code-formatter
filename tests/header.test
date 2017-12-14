@@ -92,3 +92,18 @@ test header-3.1 {
         try { list } finally { list }
     }
 } -result [list "##nagelfar syntax lsort x x"]
+
+test header-4.1 {
+    Header writing Plugin
+} -body {
+    createTestFile {##Nagelfar Plugin : Deprecation Notice
+        proc writeHeader {} {
+            return {
+                "##nagelfar syntax plugin_cmd"
+                "##nagelfar syntax plugin_cmd2"
+                "#illegal value is ignored"
+            }
+        }
+    } 2
+    headerTestFile {} -plugin _testfile_.plugin.tcl
+} -result [list "##nagelfar syntax plugin_cmd" "##nagelfar syntax plugin_cmd2"]
