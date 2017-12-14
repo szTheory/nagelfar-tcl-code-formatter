@@ -27,7 +27,7 @@ proc PluginSearchPath {} {
     lappend dirs [file join $::thisDir .. .. plugins]
     lappend dirs [file join $::thisDir .. plugins]
     foreach d $::Nagelfar(pluginPath) {
-	lappend dirs $d
+        lappend dirs $d
     }
     return $dirs
 }
@@ -77,16 +77,16 @@ proc createPluginInterp {plugin} {
     #interp expose $pi fconfigure ;# ??
     interp hide $pi close
 
-    # Set global variables
+    # Register what hooks it has in the global variables
     foreach func {statementRaw statementWords earlyExpr lateExpr varWrite
                   varRead syntaxComment
     } {
-	if {[$pi eval info proc $func] ne ""} {
+        if {[$pi eval info proc $func] ne ""} {
             # var names start with uppercase
             set func [string toupper $func 0 0]
             lappend ::Nagelfar(pluginHooks$func) $pi
             set ::Nagelfar(plugin$func) 1
-	}
+        }
     }
     return $pi
 }
@@ -218,7 +218,7 @@ proc PluginHandle {pi what indata outdataName knownVarsName index} {
                       caller [currentProc] \
                       file $::currentFile \
                       firstpass $::Nagelfar(firstpass) \
-		      vars $knownVars]
+                      vars $knownVars]
 
     set x [$pi eval [list $what $indata $info]]
 
@@ -253,7 +253,7 @@ proc pluginHandleStatementRaw {stmtName knownVarsName index} {
 
     set outdata $stmt
     foreach pi $::Nagelfar(pluginHooksStatementRaw) {
-	PluginHandle $pi statementRaw $stmt outdata knownVars $index
+        PluginHandle $pi statementRaw $stmt outdata knownVars $index
     }
     set stmt $outdata
 }
@@ -263,13 +263,13 @@ proc pluginHandleStatementWords {wordsName knownVarsName index} {
     upvar 1 $wordsName words $knownVarsName knownVars
 
     foreach pi $::Nagelfar(pluginHooksStatementWords) {
-	PluginHandle $pi statementWords $words outdata knownVars $index
-	# A replacement must be a list
-	if {[string is list $outdata]} {
-	    set words $outdata
-	} else {
-	    errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from statementWords" $index
-	}
+        PluginHandle $pi statementWords $words outdata knownVars $index
+        # A replacement must be a list
+        if {[string is list $outdata]} {
+            set words $outdata
+        } else {
+            errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from statementWords" $index
+        }
     }
 }
 
@@ -279,7 +279,7 @@ proc pluginHandleEarlyExpr {expName knownVarsName index} {
 
     set outdata $exp
     foreach pi $::Nagelfar(pluginHooksEarlyExpr) {
-	PluginHandle $pi earlyExpr $exp outdata knownVars $index
+        PluginHandle $pi earlyExpr $exp outdata knownVars $index
     }
     set exp $outdata
 }
@@ -289,7 +289,7 @@ proc pluginHandleLateExpr {expName knownVarsName index} {
     upvar 1 $expName exp $knownVarsName knownVars
 
     foreach pi $::Nagelfar(pluginHooksLateExpr) {
-	PluginHandle $pi lateExpr $exp outdata knownVars $index
+        PluginHandle $pi lateExpr $exp outdata knownVars $index
 
         # A replacement expression must not have commands in it
         if {$exp ne $outdata} {
@@ -299,7 +299,7 @@ proc pluginHandleLateExpr {expName knownVarsName index} {
             } else {
                 errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from lateExpr" $index
             }
-	}
+        }
     }
 }
 
@@ -327,9 +327,9 @@ proc pluginHandleVarRead {varName knownVarsName index} {
 proc pluginHandleComment {type opts} {
     set res false
     foreach pi $::Nagelfar(pluginHooksSyntaxComment) {
-	if {[$pi eval syntaxComment $type $opts]} {
-	    set res true
-	}
+        if {[$pi eval syntaxComment $type $opts]} {
+            set res true
+        }
     }
     return $res
 }

@@ -3,6 +3,9 @@ Changes
 
 Changes in v1.3 (not released):
 
+* Support multiple plugins.
+* Added -pluginpath option.
+* New plugin hooks, "writeHeader" and "syntaxComment".
 * Include mathop and mathfunc in database.
 * Added regexp check. (re token)
 * Added multi tokens to support syntax of some commands.

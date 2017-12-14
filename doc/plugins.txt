@@ -192,7 +192,7 @@ Read Inline Comments
 
 "proc syntaxComment {type opts} {}"
 
-If declared, receives any "##nagelfar <type> <opts...>" in the input.
+If declared, receives any “##nagelfar <type> <opts…>” in the input.
 May return true to disable default action, e.g. if the type is plugin
 specific.
 

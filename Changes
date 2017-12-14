@@ -1,4 +1,11 @@
 2017-12-13
+ Included patches from Tobias Mark:
+ Support multiple plugins.
+ Plugin hook "writeHeader".
+ Plugin hook "syntaxComment".
+ New option -pluginpath.
+
+2017-12-13
  Include mathop and mathfunc in database.
 
 2017-10-17
