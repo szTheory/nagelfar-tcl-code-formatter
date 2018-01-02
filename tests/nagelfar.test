@@ -1264,3 +1264,4 @@ test preferences-30.4 {
     set res [list [execTestFile -tab 5 -len 29]]
     lappend res [execTestFile -tab 5 -len 30]
 } -result {{%%Line   1: W Too long line} %%}
+

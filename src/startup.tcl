@@ -54,8 +54,12 @@ proc usage {} {
  -plugin <plugin>  : Run with this plugin.
  -plugindump <plugin> : Print contents of plugin source
  -pluginlist       : List known plugins
+ -pluginpath <dir> : Configure plugin search path.
  -H                : Prefix each error line with file name.
- -exitcode         : Return status code 2 for any error or 1 for warning.}
+ -exitcode         : Return status code 2 for any error or 1 for warning.
+ -dbpicky          : Enable checking of syntax DB.
+ -pkgpicky         : Warn about redudant package require.
+ -trace <file>     : Output debug info to file}
     exit
 }
 
@@ -82,7 +86,7 @@ proc StartUp {} {
     set ::Nagelfar(procs) {}
     set ::Nagelfar(stop) 0
     set ::Nagelfar(trace) ""
-    set ::Nagelfar(plugin) ""
+    set ::Nagelfar(plugin) {}
 
     if {![info exists ::Nagelfar(embedded)]} {
         set ::Nagelfar(embedded) 0
@@ -113,7 +117,7 @@ proc synCheck {fpath dbPath {iscontents 0}} {
     set ::Nagelfar(embedded) 1
     set ::Nagelfar(chkResult) ""
     # FIXA: Allow control of plugin when embedded?
-    set ::Nagelfar(plugin) ""
+    set ::Nagelfar(plugin) {}
     initPlugin
     doCheck
     if {$iscontents} {
@@ -191,6 +195,8 @@ if {![info exists gurka]} {
     set pdbDir [file join $::dbDir packagedb]
     eval lappend apa [glob -nocomplain [file join $pdbDir *db*.tcl]]
 
+    set ::Nagelfar(pluginPath) {}
+
     foreach file $apa {
         if {[file isfile $file] && [file readable $file] && \
                 [lsearch $::Nagelfar(allDb) $file] == -1} {
@@ -238,17 +244,17 @@ if {![info exists gurka]} {
                     }
                 }
             }
- 	    -editor {
+            -editor {
                 incr i
                 set arg [lindex $argv $i]
-		switch -glob -- $arg {
-		    ema*    {set ::Prefs(editor) emacs}
-		    inte*   {set ::Prefs(editor) internal}
-		    vi*     {set ::Prefs(editor) vim}
-		    default {
+                switch -glob -- $arg {
+                    ema*    {set ::Prefs(editor) emacs}
+                    inte*   {set ::Prefs(editor) internal}
+                    vi*     {set ::Prefs(editor) vim}
+                    default {
                         puts stderr "Bad -editor option: \"$arg\""
                     }
-		}
+                }
             }
             -encoding {
                 incr i
@@ -308,12 +314,12 @@ if {![info exists gurka]} {
                 set arg [lindex $argv $i]
                 set ::Nagelfar(idir) $arg
             }
- 	    -plugin {
+            -plugin {
                 incr i
                 set arg [lindex $argv $i]
-                set ::Nagelfar(plugin) $arg
+                lappend ::Nagelfar(plugin) $arg
             }
- 	    -plugindump {
+            -plugindump {
                 incr i
                 set arg [lindex $argv $i]
                 printPlugin $arg
@@ -322,6 +328,11 @@ if {![info exists gurka]} {
             -pluginlist {
                 printPlugins
                 exit
+            }
+            -pluginpath {
+                incr i
+                set arg [lindex $argv $i]
+                lappend ::Nagelfar(pluginPath) $arg
             }
             -novar {
                 set ::Prefs(noVar) 1
@@ -373,7 +384,7 @@ if {![info exists gurka]} {
                 }
                 set ::Nagelfar(lineLen) $arg
             }
- 	    -tab {
+            -tab {
                 incr i
                 set arg [lindex $argv $i]
                 if {![string is integer -strict $arg] || \
@@ -474,7 +485,7 @@ if {![info exists gurka]} {
     }
 
     doCheck
-    
+
     #_dumplogme
     #if {[array size _stats] > 0} {
     #    array set _apa [array get _stats]

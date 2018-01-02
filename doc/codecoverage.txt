@@ -1,4 +1,3 @@
-
 Code Coverage
 *************
 
@@ -17,16 +16,16 @@ being called from the test, if all other files are accessed through
 source.
 
 You do not need to keep the instrumented name. You can rename them
-back to the original if you cannot use _i or the automatic "source"
+back to the original if you cannot use _i or the automatic “source”
 redirection for some reason.
 
-The source under test must terminate using the "exit" command.  The
+The source under test must terminate using the “exit” command.  The
 instrumentation uses the exit command to produce the result, thus it
 needs to be called to work as expected.
 
-If you cannot end your tests with "exit", you can call the internal
+If you cannot end your tests with “exit”, you can call the internal
 command "::_instrument_::cleanup" manually. Note that this command
-name is not guaranteed, so try to use "exit".
+name is not guaranteed, so try to use “exit”.
 
 Running tests creates "apa.tcl_log". Coverage data is accumulated in
 the log file so multiple tests can be run.  Make sure the log file is
@@ -53,7 +52,7 @@ with "-idir <dir>".
 Example
 =======
 
-Nagelfar's testsuite has code like this to automatically run the
+Nagelfar’s testsuite has code like this to automatically run the
 instrumented file:
 
    set file nagelfar.tcl
@@ -99,7 +98,7 @@ Naming conventions
 
 When "xxx" is instrumented, result is called "xxx_i".
 
-The "source" command is overloaded to prefer "xxx_i" if it exists,
+The “source” command is overloaded to prefer "xxx_i" if it exists,
 when "xxx" is sourced.
 
 Instrumented files can be renamed to the original before running, if
@@ -108,9 +107,9 @@ that is desired.
 The log files for "xxx_i" or "xxx" is called "xxx_log". At startup any
 existing log is read, to accumulate info.
 
-The "exit" command is overloaded to call "::_instrument_::cleanup",
-which produces the logs.  If you cannot end your tests with "exit",
+The “exit” command is overloaded to call "::_instrument_::cleanup",
+which produces the logs.  If you cannot end your tests with “exit”,
 you can call "::_instrument_::cleanup manually". Note that this
-command name is not guaranteed, so try to use "exit".
+command name is not guaranteed, so try to use “exit”.
 
 Markup of "xxx" reads "xxx_log" and produces "xxx_m".

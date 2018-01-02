@@ -14,7 +14,7 @@ TCLKIT85_WIN   = $(TCLKIT)/v85/tclkit-win32.upx.exe
 TCLKITSH85_WIN = $(TCLKIT)/v85/tclkitsh-win32.upx.exe
 
 # Path to the libraries used
-TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd1.0
+TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd2.4
 #CTEXT   = /home/peter/src/ctext
 TEXTSEARCH = /home/peter/src/textsearch
 
@@ -22,9 +22,12 @@ TEXTSEARCH = /home/peter/src/textsearch
 TCLSHDB  = ~/tcl/install/bin/wish8.6
 TCLSHDB2 = ~/tcl/install/bin/wish8.5
 DB2NAME  = syntaxdb85.tcl
+TCLSHDB3 = ~/tcl/install/bin/wish8.7
+DB3NAME  = syntaxdb87.tcl
 # Path to the interpreter used for running tests
 TCLSH85  = ~/tcl/install/bin/tclsh8.5
 TCLSH86  = ~/tcl/install/bin/tclsh8.6
+TCLSH87  = ~/tcl/install/bin/tclsh8.7
 
 all: base
 
@@ -204,7 +207,10 @@ syntaxdb.tcl: syntaxbuild.tcl $(TCLSHDB)
 $(DB2NAME): syntaxbuild.tcl $(TCLSHDB2)
 	$(TCLSHDB2) syntaxbuild.tcl $(DB2NAME)
 
-db: syntaxdb.tcl $(DB2NAME)
+$(DB3NAME): syntaxbuild.tcl $(TCLSHDB3)
+	$(TCLSHDB3) syntaxbuild.tcl $(DB3NAME)
+
+db: syntaxdb.tcl $(DB2NAME) $(DB3NAME)
 
 #----------------------------------------------------------------
 # Packaging/Releasing
@@ -232,6 +238,8 @@ distrib: base
 	@tar --exclude .svn -cvf nagelfar.tar nagelfar$(VERSION)/COPYING \
 		nagelfar$(VERSION)/README.txt nagelfar$(VERSION)/syntaxbuild.tcl \
 		nagelfar$(VERSION)/syntaxdb85.tcl \
+		nagelfar$(VERSION)/syntaxdb.tcl \
+		nagelfar$(VERSION)/syntaxdb87.tcl \
 		nagelfar$(VERSION)/nagelfar.syntax nagelfar$(VERSION)/nagelfar.tcl \
 		nagelfar$(VERSION)/misctests/test.tcl nagelfar$(VERSION)/misctests/test.syntax \
 		nagelfar$(VERSION)/doc nagelfar$(VERSION)/packagedb

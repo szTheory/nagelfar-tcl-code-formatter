@@ -1,8 +1,22 @@
+2017-12-13
+ Included patches from Tobias Mark:
+ Support multiple plugins.
+ Plugin hook "writeHeader".
+ Plugin hook "syntaxComment".
+ New option -pluginpath.
+
+2017-12-13
+ Include mathop and mathfunc in database.
+
+2017-10-17
+ Include an 8.7 database.
+
+2017-01-29
+ Added regexp check. (Patch from Tobias Mark)
+
 2017-01-28
  Made 8.6 default.
  Ditched 8.4 support.
-
-Version 1.2.6
 
 2017-01-28
  Added multi tokens to support syntax of some commands.

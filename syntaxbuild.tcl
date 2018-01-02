@@ -176,6 +176,7 @@ proc buildDb {ch} {
     # div Define implicit variable
     # e   Expression
     # E   Expression that should be in braces
+    # re  regexp
     # c   Code, checked in surrounding context
     #     If an integer is added to it, that number of arguments are added to
     #     the code to emulate a command prefix. (cg has this too)
@@ -333,8 +334,8 @@ proc buildDb {ch} {
     set syntax(puts)            "1: x : o? x x?"
     set syntax(pwd)              0
     set syntax(read)            "r 1 2"
-    set syntax(regexp)          "o* x x n*"
-    set syntax(regsub)          "o* x x x n?"
+    set syntax(regexp)          "o* re x n*"
+    set syntax(regsub)          "o* re x x n?"
     set syntax(rename)           2   ;# Maybe treat rename specially?
     set syntax(return)          "p* x?"
     set syntax(scan)            "x x n*"
@@ -594,7 +595,7 @@ proc buildDb {ch} {
         # New options
         set option(lsort\ -stride) 1
     }
-        
+
 
     # Some special Tcl commands
     set syntax(dde)             "o? s x*"  ;# FIXA: is this correct?
@@ -923,6 +924,36 @@ proc buildDb {ch} {
             } elseif {![info exists special($apa)]} {
                 # Debug helper
                 #puts "No syntax defined for cmd '$apa'"
+            }
+        }
+    }
+
+    # Special handling of tcl::math*
+    foreach ns {mathop mathfunc} {
+        foreach fun [info commands tcl::${ns}::*] {
+            # Remove ::
+            set fun [string range $fun 2 end]
+            #if {[info exists syntax($fun)]} continue
+            # Try to figure it out
+            set minArg 0
+            set maxArg 1000
+            set e0 [catch {$fun}]
+            set e1 [catch {$fun 1}]
+            set e2 [catch {$fun 1 2}]
+            set e5 [catch {$fun 1 2 1 2 1}]
+            set spec ""
+            switch $e0$e1$e2$e5 {
+                0111 {set spec 0 }
+                1011 {set spec 1 }
+                1101 {set spec 2 }
+                0000 {set spec "r 0"}
+                1000 {set spec "r 1"}
+                default {
+                    puts "$fun $e0 $e1 $e2 $e5"
+                }
+            }
+            if {$spec ne ""} {
+                set syntax($fun) $spec
             }
         }
     }

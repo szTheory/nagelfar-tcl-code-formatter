@@ -1,8 +1,15 @@
 Changes
 ========
 
-Changes in v1.2.6 (not released):
+Changes in v1.3 (not released):
 
+* Support multiple plugins.
+* Added -pluginpath option.
+* New plugin hooks, "writeHeader" and "syntaxComment".
+* Include mathop and mathfunc in database.
+* Added regexp check. (re token)
+* Added multi tokens to support syntax of some commands.
+* Database for 8.6 default, 8.7 added, 8.4 removed.
 * Allow GUI to add files without extension.
 * Added syntax data for text widget.
 * Added syntax data for many dict sub commands. [Bug #13]

@@ -1,3 +1,7 @@
+*.exe
+*.kit
+*.gz
+*.zip
 nagelfar.tcl
 nagelfar_h.syntax
 nagelfar.vfs/lib/griffin
