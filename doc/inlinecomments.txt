@@ -24,7 +24,9 @@ which is a glob pattern built like this: “*Line* $line:*$string*” If
 the string is preceded by “N”, “W” or “E”, anything from that severity
 level and down is ignored. If the string is preceded by an offset like
 “+2”, a line further down is marked for filtering. No given offset
-corresponds to “+1”.
+corresponds to “+1”. If the string is preceeded by a count like “#2”,
+multiple following lines are marked for filtering. No given range
+corresponds to “#1”.
 
 Examples:
 

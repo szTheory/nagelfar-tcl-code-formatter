@@ -202,13 +202,26 @@ proc flushMsg {} {
     set msgs [lsort -integer -index 0 $::Nagelfar(messages)]
 
     foreach msg $msgs {
+	set line [lindex $msg 0]
         set text [lindex $msg 1]
         set print 1
         foreach filter $::Nagelfar(filter) {
-            if {[string match $filter $text]} {
-                set print 0
-                break
-            }
+	    lassign $filter pat start_line end_line
+	    if {$start_line > 0} {
+		# line specific filter
+		if {$line >= $start_line && $line <= $end_line} {
+		    set final_pat [errorMsgLinePrefix $line $pat]
+		    if {[string match $final_pat $text]} {
+			set print 0
+		    }
+		}
+	    } else {
+		# general filter
+		if {[string match $pat $text]} {
+		    set print 0
+		    break
+		}
+	    }
         }
         if {$print} {
             incr ::Nagelfar(messageCnt)
@@ -388,21 +401,28 @@ proc checkComment {str index knownVarsName} {
             }
             ignore -
             filter {
-                # FIXA, syntax for several lines
                 set line [calcLineNo $index]
-                # Allow an offset to ignore a line further down
                 if {[regexp {^\+\d+$} $first]} {
+		    # Allow an offset to ignore a line further down
                     incr line $first
+                    incr line_to $line
+                    set first [lindex $rest 0]
+                    set rest [lrange $rest 1 end]
+		} elseif {[regexp {^\#(\d+)$} $first dummy range]} {
+		    # Allow a range of lines to ignore
+		    incr line
+		    incr line_to [expr {$line + $range - 1}]
                     set first [lindex $rest 0]
                     set rest [lrange $rest 1 end]
                 } else {
                     incr line
+                    incr line_to $line
                 }
                 switch -- $first {
-                    N { addFilter [errorMsgLinePrefix $line "N *[join $rest]*"] }
-                    W { addFilter [errorMsgLinePrefix $line "\[NW\] *[join $rest]*"] }
-                    E { addFilter [errorMsgLinePrefix $line "*[join $rest]*"] }
-                    default { addFilter [errorMsgLinePrefix $line "*$first [join $rest]*"] }
+                    N { addFilter "N *[join $rest]*" $line $line_to }
+                    W { addFilter "\[NW\] *[join $rest]*" $line $line_to }
+                    E { addFilter "*[join $rest]*" $line $line_to }
+                    default { addFilter "*$first [join $rest]*" $line $line_to }
                 }
             }
             default {
@@ -414,7 +434,7 @@ proc checkComment {str index knownVarsName} {
         # Support Frink's inline comment
         set line [calcLineNo $index]
         incr line
-        addFilter [errorMsgLinePrefix $line "*"]
+        addFilter "*" $line $line
     }
 }
 
@@ -4264,9 +4284,10 @@ proc instrumentMarkup {filename full} {
 }
 
 # Add a message filter
-proc addFilter {pat {reapply 0}} {
-    if {[lsearch -exact $::Nagelfar(filter) $pat] < 0} {
-        lappend ::Nagelfar(filter) $pat
+proc addFilter {pat {start_line -1} {end_line -1} {reapply 0}} {
+    set flt [list $pat $start_line $end_line]
+    if {[lsearch -exact $::Nagelfar(filter) $flt] < 0} {
+        lappend ::Nagelfar(filter) $flt
     }
     if {$reapply} {
         set w $::Nagelfar(resultWin)

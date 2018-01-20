@@ -226,6 +226,32 @@ test inline-6.5 {
 } -result {%%_testfile_: 4: W Unknown command "Miffo2"
 _testfile_: 7: W Unknown command "Miffo2"}
 
+
+test inline-6.6 {
+    ignore lines with +X syntax
+} -body {
+    createTestFile {
+        ##nagelfar ignore +2
+	puts $unknown1
+	puts $unknown2
+	puts $unknown3
+    }
+    execTestFile
+} -result {%%Line   3: E Unknown variable "unknown1"
+Line   5: E Unknown variable "unknown3"}
+
+test inline-6.7 {
+    ignore lines with +# syntax
+} -body {
+    createTestFile {
+        ##nagelfar ignore #2
+	puts $unknown1
+	puts $unknown2
+	puts $unknown3
+    }
+    execTestFile
+} -result {%%Line   5: E Unknown variable "unknown3"}
+
 test inline-7.1 {
     Inline in syntax file
 } -body {

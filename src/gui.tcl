@@ -232,14 +232,14 @@ proc resultPopup {x y X Y} {
     }
     if {[regexp {^(.*): Line\s+\d+:\s*(.*)$} $line -> pre post]} {
         .popup add command -label "Filter this message" \
-                -command [list addFilter "*$pre*$post*" 1]
+                -command [list addFilter "*$pre*$post*" -1 -1 1]
         .popup add command -label "Filter this message in all files" \
-                -command [list addFilter "*$post*" 1]
+                -command [list addFilter "*$post*" -1 -1 1]
         regsub {".+?"} $post {"*"} post2
         regsub -all {\d+} $post2 "*" post2
         if {$post2 ne $post} {
             .popup add command -label "Filter this generic message" \
-                    -command [list addFilter "*$post2*" 1]
+                    -command [list addFilter "*$post2*" -1 -1 1]
         }
     }
     # FIXA: This should be handled abit better.
