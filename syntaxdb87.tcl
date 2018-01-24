@@ -1707,8 +1707,8 @@ set {::option(_obj,ttk::radiobutton cget)} {-variable -value -command -takefocus
 set {::option(_obj,ttk::radiobutton configure)} {-variable -value -command -takefocus -justify -text -textvariable -underline -width -image -compound -padding -state -cursor -style -class}
 set {::option(_obj,ttk::radiobutton configure -textvariable)} n
 set {::option(_obj,ttk::radiobutton configure -variable)} n
-set {::option(_obj,ttk::scale cget)} {-command -variable -orient -from -to -value -length -takefocus -cursor -style -class}
-set {::option(_obj,ttk::scale configure)} {-command -variable -orient -from -to -value -length -takefocus -cursor -style -class}
+set {::option(_obj,ttk::scale cget)} {-command -variable -orient -from -to -value -length -state -takefocus -cursor -style -class}
+set {::option(_obj,ttk::scale configure)} {-command -variable -orient -from -to -value -length -state -takefocus -cursor -style -class}
 set {::option(_obj,ttk::scale configure -variable)} n
 set {::option(_obj,ttk::scrollbar cget)} {-command -orient -takefocus -cursor -style -class}
 set {::option(_obj,ttk::scrollbar configure)} {-command -orient -takefocus -cursor -style -class}
@@ -1869,7 +1869,7 @@ set {::option(ttk::progressbar -variable)} n
 set ::option(ttk::radiobutton) {-variable -value -command -takefocus -justify -text -textvariable -underline -width -image -compound -padding -state -cursor -style -class}
 set {::option(ttk::radiobutton -textvariable)} n
 set {::option(ttk::radiobutton -variable)} n
-set ::option(ttk::scale) {-command -variable -orient -from -to -value -length -takefocus -cursor -style -class}
+set ::option(ttk::scale) {-command -variable -orient -from -to -value -length -state -takefocus -cursor -style -class}
 set {::option(ttk::scale -variable)} n
 set ::option(ttk::scrollbar) {-command -orient -takefocus -cursor -style -class}
 set ::option(ttk::separator) {-orient -takefocus -cursor -style -class}

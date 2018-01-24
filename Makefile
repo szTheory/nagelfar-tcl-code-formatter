@@ -8,15 +8,15 @@ VERSION = 126
 DOTVERSION = 1.2.6
 
 # Path to the TclKits used for creating StarPacks.
-TCLKIT = /home/peter/tclkit
+TCLKIT = /home/$(USER)/tclkit
 TCLKIT85_LINUX = $(TCLKIT)/v85/tclkit-linux-x86
 TCLKIT85_WIN   = $(TCLKIT)/v85/tclkit-win32.upx.exe
 TCLKITSH85_WIN = $(TCLKIT)/v85/tclkitsh-win32.upx.exe
 
 # Path to the libraries used
-TKDND   = /home/peter/src/packages/tkdnd/lib/tkdnd2.4
-#CTEXT   = /home/peter/src/ctext
-TEXTSEARCH = /home/peter/src/textsearch
+TKDND   = /home/$(USER)/src/packages/tkdnd/lib/tkdnd2.4
+#CTEXT   = /home/$(USER)/src/ctext
+TEXTSEARCH = /home/$(USER)/src/textsearch
 
 # Path to the interpreter used for generating the syntax database
 TCLSHDB  = ~/tcl/install/bin/wish8.6
