@@ -294,7 +294,8 @@ proc pluginHandleLateExpr {expName knownVarsName index} {
         # A replacement expression must not have commands in it
         if {$exp ne $outdata} {
             # It has been replaced
-            if {[string first "\[" $outdata] == -1} {
+	    # a '[' is forbidden but an '\[' is ok
+	    if {![regexp {^\[|[^\\]\[} $outdata]} {
                 set exp $outdata
             } else {
                 errorMsg E "Plugin $::Nagelfar(pluginNames,$pi) returned malformed replacement from lateExpr" $index

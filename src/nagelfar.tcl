@@ -1624,6 +1624,17 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     incr i 2
                     set synConstr [parseProc $procArgV $indicesV 0 0 $cmd]
                     set ::syntax($constructorCmd) $synConstr
+		    # tcl::oo also knows the create constructor with a name
+		    # for the new object:
+                    set constructorCmd "[currentObjectOrig] create"
+                    unset -nocomplain ::syntax($constructorCmd)
+		    set objtype "_obj,[currentObjectOrig]"
+		    if {[string is integer $synConstr]} {
+			set synConstr "dc=$objtype [string repeat "x " $synConstr]"
+		    } else {
+			set synConstr "dc=$objtype $synConstr"
+		    }
+                    set ::syntax($constructorCmd) $synConstr
                 } else {
                     set procArgV [lrange $argv $i $iplus2]
                     set indicesV [lrange $indices $i $iplus2]

@@ -250,3 +250,29 @@ test oo-6.1 {
     }
     execTestFile -flags "-s _ -s snitdb.tcl"
 } -result {%%} -match glob
+
+test oo-7.1 {
+    Test class create vs class new
+} -body {
+    createTestFile {
+	::oo::class create mycla {
+	    variable v1
+	    variable v2
+	    constructor {a1 a2} {
+		set v1 $a1
+		set v2 $a2
+	    }
+	    method dosomething {} {
+		puts "$v1: $v2"
+	    }
+	}
+	mycla create "obj1" 1 2
+	set obj2 [mycla new 4 5]
+	obj1 dosomething
+	$obj2 dosomething
+	obj1 unknown
+	$obj2 unknown
+    }
+    execTestFile
+} -result {%%Line  17: E Unknown subcommand "unknown" to "obj1"
+Line  18: E Unknown subcommand "unknown" to "_obj,mycla"}
