@@ -15,6 +15,8 @@ foreach gurkmeja [array names auto_index] {
 if {[info exists gurkmeja]} {
     unset gurkmeja
 }
+# Remove this that might leak in from package install
+catch {rename tkpath::load_package {}}
 
 
 # First get some data about the system

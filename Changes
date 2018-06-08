@@ -1,5 +1,7 @@
 2018-06-08
- Use type varName to silince note about upvar usage.
+ Include syntaxdb86 to keep compatibility with scripts refering to it
+ before 8.6 was default.
+ Use type varName to silince note about upvar usage. [Bug #15]
 
 2017-12-13
  Included patches from Tobias Mark:

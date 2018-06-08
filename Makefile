@@ -20,6 +20,7 @@ TEXTSEARCH = /home/$(USER)/src/textsearch
 
 # Path to the interpreter used for generating the syntax database
 TCLSHDB  = ~/tcl/install/bin/wish8.6
+DB1NAME  = syntaxdb86.tcl
 TCLSHDB2 = ~/tcl/install/bin/wish8.5
 DB2NAME  = syntaxdb85.tcl
 TCLSHDB3 = ~/tcl/install/bin/wish8.7
@@ -203,6 +204,7 @@ webt: web
 
 syntaxdb.tcl: syntaxbuild.tcl $(TCLSHDB)
 	$(TCLSHDB) syntaxbuild.tcl syntaxdb.tcl
+	cp syntaxdb.tcl $(DB1NAME)
 
 $(DB2NAME): syntaxbuild.tcl $(TCLSHDB2)
 	$(TCLSHDB2) syntaxbuild.tcl $(DB2NAME)
@@ -238,6 +240,7 @@ distrib: base
 	@tar --exclude .svn -cvf nagelfar.tar nagelfar$(VERSION)/COPYING \
 		nagelfar$(VERSION)/README.txt nagelfar$(VERSION)/syntaxbuild.tcl \
 		nagelfar$(VERSION)/syntaxdb85.tcl \
+		nagelfar$(VERSION)/syntaxdb86.tcl \
 		nagelfar$(VERSION)/syntaxdb.tcl \
 		nagelfar$(VERSION)/syntaxdb87.tcl \
 		nagelfar$(VERSION)/nagelfar.syntax nagelfar$(VERSION)/nagelfar.tcl \
