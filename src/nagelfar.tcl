@@ -2294,17 +2294,23 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             if {$hasLevel} {
                 set tmp [lrange $argv 1 end]
                 set tmpWS [lrange $wordstatus 1 end]
+                set tmpT [lrange $wordtype 1 end]
                 set i 2
             } else {
                 set tmp $argv
                 set tmpWS $wordstatus
+                set tmpT $wordtype
                 set i 1
             }
 
-            foreach {other var} $tmp {wsO wsV} $tmpWS {
+            foreach {other var} $tmp {wsO wsV} $tmpWS {tO tV} $tmpT {
                 if {($wsV & 1) == 0} {
                     # The variable name contains substitutions
-                    errorMsg N "Suspicious upvar variable \"$var\"" $index
+                    if {$tV eq "varName"} {
+                        # It is OK
+                    } else {
+                        errorMsg N "Suspicious upvar variable \"$var\"" $index
+                    }
                 } else {
                     knownVar knownVars $var
                     setVarUsed knownVars $var -1

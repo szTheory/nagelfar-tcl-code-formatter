@@ -482,6 +482,18 @@ test nagelfar-7.2 {
     execTestFile
 } -result {%%Line   3: N Suspicious upvar variable "$x"}
 
+# The varName type should silence that note
+test nagelfar-7.2b {
+    Command: upvar
+} -body {
+    createTestFile {
+        set x hej
+        ##nagelfar vartype x varName
+        upvar 1 bepa $x
+    }
+    execTestFile
+} -result {%%}
+
 test nagelfar-7.3 {
     Command: upvar
 } -body {
