@@ -116,11 +116,16 @@ msgcat::mcloadedlocales
 msgcat::mclocale
 msgcat::mcmax
 msgcat::mcmset
+msgcat::mcn
 msgcat::mcpackageconfig
 msgcat::mcpackagelocale
+msgcat::mcpackagenamespaceget
 msgcat::mcpreferences
 msgcat::mcset
 msgcat::mcunknown
+msgcat::mcutil
+msgcat::mcutil::getpreferences
+msgcat::mcutil::getsystemlocale
 my
 namespace
 oo::class
@@ -191,6 +196,7 @@ tcl::SetMin
 tcl::array::anymore
 tcl::array::donesearch
 tcl::array::exists
+tcl::array::for
 tcl::array::get
 tcl::array::names
 tcl::array::nextelement
@@ -399,6 +405,12 @@ tcl::prefix
 tcl::prefix::all
 tcl::prefix::longest
 tcl::prefix::match
+tcl::process
+tcl::process
+tcl::process::autopurge
+tcl::process::list
+tcl::process::purge
+tcl::process::status
 tcl::string::bytelength
 tcl::string::cat
 tcl::string::compare
@@ -530,6 +542,7 @@ tk_setPalette
 tk_textCopy
 tk_textCut
 tk_textPaste
+tkpath::load_package
 tkwait
 toplevel
 trace
@@ -980,7 +993,7 @@ set ::syntax(lsort) {o* x}
 set ::syntax(menu) {x p*}
 set ::syntax(menubutton) {x p*}
 set ::syntax(message) {x p*}
-set ::syntax(msgcat::mc) {r 1}
+set ::syntax(msgcat::mc) {r 0}
 set ::syntax(msgcat::mcexists) {r 0}
 set ::syntax(msgcat::mcflmset) 1
 set ::syntax(msgcat::mcflset) {r 1 2}
@@ -990,11 +1003,15 @@ set ::syntax(msgcat::mcloadedlocales) 1
 set ::syntax(msgcat::mclocale) {r 0}
 set ::syntax(msgcat::mcmax) {r 0}
 set ::syntax(msgcat::mcmset) 2
+set ::syntax(msgcat::mcn) {r 2}
 set ::syntax(msgcat::mcpackageconfig) {r 2 3}
-set ::syntax(msgcat::mcpackagelocale) {r 1 2}
-set ::syntax(msgcat::mcpreferences) 0
+set ::syntax(msgcat::mcpackagelocale) {r 1}
+set ::syntax(msgcat::mcpackagenamespaceget) 0
+set ::syntax(msgcat::mcpreferences) {r 0}
 set ::syntax(msgcat::mcset) {r 2 3}
 set ::syntax(msgcat::mcunknown) {r 0}
+set ::syntax(msgcat::mcutil::getpreferences) 1
+set ::syntax(msgcat::mcutil::getsystemlocale) 0
 set ::syntax(my) {s x*}
 set {::syntax(my variable)} n*
 set ::syntax(namespace) {s x*}
@@ -1250,12 +1267,12 @@ set ::syntax(tk::classic::restore_panedwindow) {r 0}
 set ::syntax(tk::classic::restore_scale) {r 0}
 set ::syntax(tk::classic::restore_scrollbar) {r 0}
 set ::syntax(tk::classic::restore_text) {r 0}
-set ::syntax(tk::dialog::color::mc) {r 1}
+set ::syntax(tk::dialog::color::mc) {r 0}
 set ::syntax(tk::dialog::color::mcmax) {r 0}
 set ::syntax(tk::dialog::error::bgerror) 1
-set ::syntax(tk::dialog::file::chooseDir::mc) {r 1}
+set ::syntax(tk::dialog::file::chooseDir::mc) {r 0}
 set ::syntax(tk::dialog::file::chooseDir::mcmax) {r 0}
-set ::syntax(tk::dialog::file::mc) {r 1}
+set ::syntax(tk::dialog::file::mc) {r 0}
 set ::syntax(tk::dialog::file::mcmax) {r 0}
 set ::syntax(tk::ensure_psenc_is_loaded) 0
 set ::syntax(tk::entry) {x p*}
@@ -1264,12 +1281,12 @@ set ::syntax(tk::frame) {x p*}
 set ::syntax(tk::label) {x p*}
 set ::syntax(tk::labelframe) {x p*}
 set ::syntax(tk::listbox) {x p*}
-set ::syntax(tk::mc) {r 1}
+set ::syntax(tk::mc) {r 0}
 set ::syntax(tk::mcmax) {r 0}
 set ::syntax(tk::mcmaxamp) {r 0}
 set ::syntax(tk::menubutton) {x p*}
 set ::syntax(tk::message) {x p*}
-set ::syntax(tk::msgcat::mc) {r 1}
+set ::syntax(tk::msgcat::mc) {r 0}
 set ::syntax(tk::msgcat::mcmax) {r 0}
 set ::syntax(tk::panedwindow) {x p*}
 set ::syntax(tk::ps::function) 2
@@ -1300,6 +1317,7 @@ set ::syntax(tk_setPalette) {r 0}
 set ::syntax(tk_textCopy) 1
 set ::syntax(tk_textCut) 1
 set ::syntax(tk_textPaste) 1
+set ::syntax(tkpath::load_package) 1
 set ::syntax(tkwait) {s x}
 set {::syntax(tkwait variable)} l
 set ::syntax(toplevel) {x p*}
@@ -1468,7 +1486,7 @@ set ::return(ttk::treeview) _obj,ttk::treeview
 
 set ::subCmd(.) {cget configure}
 set ::subCmd(_obj,button) {cget configure flash invoke}
-set ::subCmd(_obj,canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
+set ::subCmd(_obj,canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor image imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
 set ::subCmd(_obj,checkbutton) {cget configure deselect flash invoke select toggle}
 set ::subCmd(_obj,entry) {bbox cget configure delete get icursor index insert scan selection validate xview}
 set ::subCmd(_obj,frame) {cget configure}
@@ -1493,7 +1511,7 @@ set {::subCmd(_obj,text tag)} {add bind cget configure delete lower names nextra
 set {::subCmd(_obj,text window)} {cget configure create names}
 set {::subCmd(_obj,text xview)} {moveto scroll}
 set ::subCmd(_obj,tk::button) {cget configure flash invoke}
-set ::subCmd(_obj,tk::canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
+set ::subCmd(_obj,tk::canvas) {addtag bbox bind canvasx canvasy cget configure coords create dchars delete dtag find focus gettags icursor image imove index insert itemcget itemconfigure lower move moveto postscript raise rchars scale scan select type xview yview}
 set ::subCmd(_obj,tk::checkbutton) {cget configure deselect flash invoke select toggle}
 set ::subCmd(_obj,tk::entry) {bbox cget configure delete get icursor index insert scan selection validate xview}
 set ::subCmd(_obj,tk::frame) {cget configure}
@@ -1528,7 +1546,7 @@ set ::subCmd(_obj,ttk::separator) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
 set ::subCmd(_stdclass_oo) {create new destroy variable varname}
-set ::subCmd(array) {anymore donesearch exists get names nextelement set size startsearch statistics unset}
+set ::subCmd(array) {anymore donesearch exists for get names nextelement set size startsearch statistics unset}
 set ::subCmd(binary) {decode encode format scan}
 set {::subCmd(binary decode)} {base64 hex uuencode}
 set {::subCmd(binary encode)} {base64 hex uuencode}
@@ -1544,7 +1562,7 @@ set ::subCmd(history) {add change clear event info keep nextid redo}
 set ::subCmd(image) {create delete height inuse names type types width}
 set ::subCmd(info) {args body class cmdcount commands complete coroutine default errorstack exists frame functions globals hostname level library loaded locals nameofexecutable object patchlevel procs script sharedlibextension tclversion vars}
 set {::subCmd(info class)} {call constructor definition destructor filters forward instances methods methodtype mixins subclasses superclasses variables}
-set {::subCmd(info object)} {call class definition filters forward isa methods methodtype mixins namespace variables vars}
+set {::subCmd(info object)} {call class creationid definition filters forward isa methods methodtype mixins namespace variables vars}
 set ::subCmd(interp) {alias aliases bgerror cancel create debug delete eval exists expose hidden hide invokehidden issafe limit marktrusted recursionlimit share slaves target transfer}
 set ::subCmd(namespace) {children code current delete ensemble eval exists export forget import inscope origin parent path qualifiers tail unknown upvar which}
 set ::subCmd(oo::class) {create destroy}
@@ -1584,8 +1602,8 @@ set {::option(_obj,checkbutton cget)} {-activebackground -activeforeground -anch
 set {::option(_obj,checkbutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -offvalue -onvalue -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -variable -width -wraplength}
 set {::option(_obj,checkbutton configure -textvariable)} n
 set {::option(_obj,checkbutton configure -variable)} n
-set {::option(_obj,entry cget)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
-set {::option(_obj,entry configure)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set {::option(_obj,entry cget)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set {::option(_obj,entry configure)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
 set {::option(_obj,entry configure -textvariable)} n
 set {::option(_obj,frame cget)} {-bd -borderwidth -class -relief -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,frame configure)} {-bd -borderwidth -class -relief -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
@@ -1616,8 +1634,8 @@ set {::option(_obj,scale configure)} {-activebackground -background -bigincremen
 set {::option(_obj,scale configure -variable)} n
 set {::option(_obj,scrollbar cget)} {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
 set {::option(_obj,scrollbar configure)} {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
-set {::option(_obj,spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
-set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set {::option(_obj,spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set {::option(_obj,spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,spinbox configure -textvariable)} n
 set {::option(_obj,text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
@@ -1634,8 +1652,8 @@ set {::option(_obj,tk::checkbutton cget)} {-activebackground -activeforeground -
 set {::option(_obj,tk::checkbutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -offvalue -onvalue -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -variable -width -wraplength}
 set {::option(_obj,tk::checkbutton configure -textvariable)} n
 set {::option(_obj,tk::checkbutton configure -variable)} n
-set {::option(_obj,tk::entry cget)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
-set {::option(_obj,tk::entry configure)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set {::option(_obj,tk::entry cget)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set {::option(_obj,tk::entry configure)} {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
 set {::option(_obj,tk::entry configure -textvariable)} n
 set {::option(_obj,tk::frame cget)} {-bd -borderwidth -class -relief -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set {::option(_obj,tk::frame configure)} {-bd -borderwidth -class -relief -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
@@ -1664,8 +1682,8 @@ set {::option(_obj,tk::scale configure)} {-activebackground -background -bigincr
 set {::option(_obj,tk::scale configure -variable)} n
 set {::option(_obj,tk::scrollbar cget)} {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
 set {::option(_obj,tk::scrollbar configure)} {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
-set {::option(_obj,tk::spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
-set {::option(_obj,tk::spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set {::option(_obj,tk::spinbox cget)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set {::option(_obj,tk::spinbox configure)} {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(_obj,tk::spinbox configure -textvariable)} n
 set {::option(_obj,tk::text cget)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set {::option(_obj,tk::text configure)} {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
@@ -1680,11 +1698,11 @@ set {::option(_obj,ttk::checkbutton cget)} {-variable -onvalue -offvalue -comman
 set {::option(_obj,ttk::checkbutton configure)} {-variable -onvalue -offvalue -command -takefocus -justify -text -textvariable -underline -width -image -compound -padding -state -cursor -style -class}
 set {::option(_obj,ttk::checkbutton configure -textvariable)} n
 set {::option(_obj,ttk::checkbutton configure -variable)} n
-set {::option(_obj,ttk::combobox cget)} {-height -postcommand -values -exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
-set {::option(_obj,ttk::combobox configure)} {-height -postcommand -values -exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
+set {::option(_obj,ttk::combobox cget)} {-height -postcommand -values -exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
+set {::option(_obj,ttk::combobox configure)} {-height -postcommand -values -exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
 set {::option(_obj,ttk::combobox configure -textvariable)} n
-set {::option(_obj,ttk::entry cget)} {-exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
-set {::option(_obj,ttk::entry configure)} {-exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
+set {::option(_obj,ttk::entry cget)} {-exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
+set {::option(_obj,ttk::entry configure)} {-exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
 set {::option(_obj,ttk::entry configure -textvariable)} n
 set {::option(_obj,ttk::frame cget)} {-borderwidth -padding -relief -width -height -takefocus -cursor -style -class}
 set {::option(_obj,ttk::frame configure)} {-borderwidth -padding -relief -width -height -takefocus -cursor -style -class}
@@ -1734,7 +1752,7 @@ set {::option(checkbutton -variable)} n
 set {::option(clock clicks)} {-microseconds -milliseconds}
 set {::option(clock format)} {-format -gmt -locale -timezone}
 set {::option(clock scan)} {-base -format -gmt -locale -timezone}
-set ::option(entry) {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set ::option(entry) {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
 set {::option(entry -textvariable)} n
 set ::option(exec) {-- -ignorestderr -keepnewline}
 set ::option(fconfigure) {-blocking -buffering -buffersize -encoding -eofchar -error -handshake -lasterror -mode -peername -pollinterval -queue -sockname -sysbuffer -timeout -translation -ttycontrol -ttystatus -xchar}
@@ -1758,7 +1776,7 @@ set {::option(label -textvariable)} n
 set ::option(labelframe) {-bd -borderwidth -class -fg -font -foreground -labelanchor -labelwidget -relief -text -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set ::option(listbox) {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(listbox -listvariable)} n
-set ::option(lsearch) {-all -ascii -bisect -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -subindices}
+set ::option(lsearch) {-all -ascii -bisect -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -stride -subindices}
 set {::option(lsearch -index)} 1
 set {::option(lsearch -start)} 1
 set ::option(lsort) {-ascii -command -decreasing -dictionary -increasing -index -indices -integer -nocase -real -stride -unique}
@@ -1794,7 +1812,7 @@ set ::option(scrollbar) {-activebackground -activerelief -background -bd -bg -bo
 set ::option(send) {-- -async -displayof}
 set {::option(send -displayof)} 1
 set ::option(source) -encoding
-set ::option(spinbox) {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set ::option(spinbox) {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(spinbox -textvariable)} n
 set {::option(string compare)} {-length -nocase}
 set {::option(string compare -length)} 1
@@ -1818,7 +1836,7 @@ set ::option(tk::canvas) {-background -bd -bg -borderwidth -closeenough -confine
 set ::option(tk::checkbutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -offrelief -offvalue -onvalue -overrelief -padx -pady -relief -selectcolor -selectimage -state -takefocus -text -textvariable -tristateimage -tristatevalue -underline -variable -width -wraplength}
 set {::option(tk::checkbutton -textvariable)} n
 set {::option(tk::checkbutton -variable)} n
-set ::option(tk::entry) {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
+set ::option(tk::entry) {-background -bd -bg -borderwidth -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -readonlybackground -relief -selectbackground -selectborderwidth -selectforeground -show -state -takefocus -textvariable -validate -validatecommand -vcmd -width -xscrollcommand}
 set {::option(tk::entry -textvariable)} n
 set ::option(tk::frame) {-bd -borderwidth -class -relief -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
 set ::option(tk::label) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -compound -cursor -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -padx -pady -relief -state -takefocus -text -textvariable -underline -width -wraplength}
@@ -1837,7 +1855,7 @@ set {::option(tk::radiobutton -variable)} n
 set ::option(tk::scale) {-activebackground -background -bigincrement -bd -bg -borderwidth -command -cursor -digits -fg -font -foreground -from -highlightbackground -highlightcolor -highlightthickness -label -length -orient -relief -repeatdelay -repeatinterval -resolution -showvalue -sliderlength -sliderrelief -state -takefocus -tickinterval -to -troughcolor -variable -width}
 set {::option(tk::scale -variable)} n
 set ::option(tk::scrollbar) {-activebackground -activerelief -background -bd -bg -borderwidth -command -cursor -elementborderwidth -highlightbackground -highlightcolor -highlightthickness -jump -orient -relief -repeatdelay -repeatinterval -takefocus -troughcolor -width}
-set ::option(tk::spinbox) {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
+set ::option(tk::spinbox) {-activebackground -background -bd -bg -borderwidth -buttonbackground -buttoncursor -buttondownrelief -buttonuprelief -command -cursor -disabledbackground -disabledforeground -exportselection -fg -font -foreground -format -from -highlightbackground -highlightcolor -highlightthickness -increment -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -invalidcommand -invcmd -justify -placeholder -placeholderforeground -relief -readonlybackground -repeatdelay -repeatinterval -selectbackground -selectborderwidth -selectforeground -state -takefocus -textvariable -to -validate -validatecommand -values -vcmd -width -wrap -xscrollcommand}
 set {::option(tk::spinbox -textvariable)} n
 set ::option(tk::text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
 set ::option(tk::toplevel) {-bd -borderwidth -class -menu -relief -screen -use -background -bg -colormap -container -cursor -height -highlightbackground -highlightcolor -highlightthickness -padx -pady -takefocus -visual -width}
@@ -1852,9 +1870,9 @@ set {::option(ttk::button -textvariable)} n
 set ::option(ttk::checkbutton) {-variable -onvalue -offvalue -command -takefocus -justify -text -textvariable -underline -width -image -compound -padding -state -cursor -style -class}
 set {::option(ttk::checkbutton -textvariable)} n
 set {::option(ttk::checkbutton -variable)} n
-set ::option(ttk::combobox) {-height -postcommand -values -exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
+set ::option(ttk::combobox) {-height -postcommand -values -exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
 set {::option(ttk::combobox -textvariable)} n
-set ::option(ttk::entry) {-exportselection -font -invalidcommand -justify -show -state -textvariable -validate -validatecommand -width -xscrollcommand -foreground -background -takefocus -cursor -style -class}
+set ::option(ttk::entry) {-exportselection -font -invalidcommand -justify -placeholder -show -state -textvariable -validate -validatecommand -width -xscrollcommand -background -foreground -placeholderforeground -takefocus -cursor -style -class}
 set {::option(ttk::entry -textvariable)} n
 set ::option(ttk::frame) {-borderwidth -padding -relief -width -height -takefocus -cursor -style -class}
 set ::option(ttk::label) {-background -foreground -font -borderwidth -relief -anchor -justify -wraplength -takefocus -justify -text -textvariable -underline -width -image -compound -padding -state -cursor -style -class}
