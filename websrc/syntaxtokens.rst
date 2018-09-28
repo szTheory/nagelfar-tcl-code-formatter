@@ -37,7 +37,9 @@ Tokens
 * n, v and l all marks variable names.  Those arguments will not be
   checked against known variables to detect missing $.
 * n The variable does not have to exist, and is set by the command.
+  (out parameter)
 * v The variable must exist.  It is not marked as set.
+  (in or inout parameter)
 * l Does not have to exist.  It will be marked as known, but not set.
 *
 * c  Code, checked in surrounding context

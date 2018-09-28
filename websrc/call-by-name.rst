@@ -15,7 +15,10 @@ Example, the following procedure:
      set var [expr {$var + $val}]
  }
 
-will get the syntax description "v x" where "v" indicates variable name.
+will get the syntax description "v x" where "v" indicates a variable name.
+With "v" the variable needs to already be set (in or inout parameter).
+"n" would be used for an out parameter. See also
+:ref:`syntax-tokens-label`.
 
 There are limitations to this detection though, in that it is neither
 100% accurate unless the code is straightforward, and it is only detected
