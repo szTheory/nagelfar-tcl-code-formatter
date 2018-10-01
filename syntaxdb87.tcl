@@ -128,11 +128,13 @@ msgcat::mcutil::getpreferences
 msgcat::mcutil::getsystemlocale
 my
 namespace
+oo::abstract
 oo::class
 oo::copy
 oo::define
 oo::objdefine
 oo::object
+oo::singleton
 open
 option
 pack
@@ -194,6 +196,7 @@ tcl::Pkg::source
 tcl::SetMax
 tcl::SetMin
 tcl::array::anymore
+tcl::array::default
 tcl::array::donesearch
 tcl::array::exists
 tcl::array::for
@@ -305,6 +308,7 @@ tcl::history
 tcl::info::args
 tcl::info::body
 tcl::info::cmdcount
+tcl::info::cmdtype
 tcl::info::commands
 tcl::info::complete
 tcl::info::coroutine
@@ -440,6 +444,21 @@ tcl::unsupported::disassemble
 tcl::unsupported::getbytecode
 tcl::unsupported::inject
 tcl::unsupported::representation
+tcl::zipfs::canonical
+tcl::zipfs::exists
+tcl::zipfs::find
+tcl::zipfs::info
+tcl::zipfs::list
+tcl::zipfs::lmkimg
+tcl::zipfs::lmkzip
+tcl::zipfs::mkimg
+tcl::zipfs::mkkey
+tcl::zipfs::mkzip
+tcl::zipfs::mount
+tcl::zipfs::mount_data
+tcl::zipfs::root
+tcl::zipfs::tcl_library
+tcl::zipfs::unmount
 tclListValidFlags
 tclLog
 tclParseConfigSpec
@@ -599,6 +618,7 @@ winfo
 wm
 yield
 yieldto
+zipfs
 zlib
 zlib::pkgconfig
 }
@@ -1235,6 +1255,7 @@ set ::syntax(tcl::prefix) {s x*}
 set {::syntax(tcl::prefix all)} {x x}
 set {::syntax(tcl::prefix longest)} {x x}
 set {::syntax(tcl::prefix match)} {o* x x}
+set ::syntax(tcl::zipfs::find) 1
 set ::syntax(tclListValidFlags) 1
 set ::syntax(tclLog) 1
 set ::syntax(tclParseConfigSpec) 4
@@ -1544,7 +1565,7 @@ set ::subCmd(_obj,ttk::separator) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
 set ::subCmd(_stdclass_oo) {create new destroy variable varname}
-set ::subCmd(array) {anymore donesearch exists for get names nextelement set size startsearch statistics unset}
+set ::subCmd(array) {anymore default donesearch exists for get names nextelement set size startsearch statistics unset}
 set ::subCmd(binary) {decode encode format scan}
 set {::subCmd(binary decode)} {base64 hex uuencode}
 set {::subCmd(binary encode)} {base64 hex uuencode}
@@ -1558,7 +1579,7 @@ set ::subCmd(file) {atime attributes channels copy delete dirname executable exi
 set ::subCmd(font) {actual configure create delete families measure metrics names}
 set ::subCmd(history) {add change clear event info keep nextid redo}
 set ::subCmd(image) {create delete height inuse names type types width}
-set ::subCmd(info) {args body class cmdcount commands complete coroutine default errorstack exists frame functions globals hostname level library loaded locals nameofexecutable object patchlevel procs script sharedlibextension tclversion vars}
+set ::subCmd(info) {args body class cmdcount cmdtype commands complete coroutine default errorstack exists frame functions globals hostname level library loaded locals nameofexecutable object patchlevel procs script sharedlibextension tclversion vars}
 set {::subCmd(info class)} {call constructor definition destructor filters forward instances methods methodtype mixins subclasses superclasses variables}
 set {::subCmd(info object)} {call class creationid definition filters forward isa methods methodtype mixins namespace variables vars}
 set ::subCmd(interp) {alias aliases bgerror cancel create debug delete eval exists expose hidden hide invokehidden issafe limit marktrusted recursionlimit share slaves target transfer}
@@ -1613,8 +1634,8 @@ set {::option(_obj,labelframe configure)} {-bd -borderwidth -class -fg -font -fo
 set {::option(_obj,listbox cget)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,listbox configure)} {-activestyle -background -bd -bg -borderwidth -cursor -disabledforeground -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -justify -relief -selectbackground -selectborderwidth -selectforeground -selectmode -setgrid -state -takefocus -width -xscrollcommand -yscrollcommand -listvariable}
 set {::option(_obj,listbox configure -listvariable)} n
-set {::option(_obj,menu cget)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
-set {::option(_obj,menu configure)} {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
+set {::option(_obj,menu cget)} {-activebackground -activeborderwidth -activeforeground -activerelief -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
+set {::option(_obj,menu configure)} {-activebackground -activeborderwidth -activeforeground -activerelief -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
 set {::option(_obj,menubutton cget)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,menubutton configure)} {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(_obj,menubutton configure -textvariable)} n
@@ -1781,7 +1802,7 @@ set ::option(lsort) {-ascii -command -decreasing -dictionary -increasing -index 
 set {::option(lsort -command)} 1
 set {::option(lsort -index)} 1
 set {::option(lsort -stride)} 1
-set ::option(menu) {-activebackground -activeborderwidth -activeforeground -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
+set ::option(menu) {-activebackground -activeborderwidth -activeforeground -activerelief -background -bd -bg -borderwidth -cursor -disabledforeground -fg -font -foreground -postcommand -relief -selectcolor -takefocus -tearoff -tearoffcommand -title -type}
 set ::option(menubutton) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -cursor -direction -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -indicatoron -justify -menu -padx -pady -relief -compound -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(menubutton -textvariable)} n
 set ::option(message) {-anchor -aspect -background -bd -bg -borderwidth -cursor -fg -font -foreground -highlightbackground -highlightcolor -highlightthickness -justify -padx -pady -relief -takefocus -text -textvariable -width}
@@ -1790,10 +1811,10 @@ set {::option(namespace which)} {-variable -command}
 set {::option(namespace which -variable)} v
 set {::option(oo::class create::filter)} {create destroy}
 set {::option(oo::class create::mixin)} {create destroy}
-set ::option(oo::define::filter) {-append -clear -set}
-set ::option(oo::define::mixin) {-append -clear -set}
-set ::option(oo::objdefine::filter) {-append -clear -set}
-set ::option(oo::objdefine::mixin) {-append -clear -set}
+set ::option(oo::define::filter) {-append -clear -prepend -remove -set}
+set ::option(oo::define::mixin) {-append -clear -prepend -remove -set}
+set ::option(oo::objdefine::filter) {-append -clear -prepend -remove -set}
+set ::option(oo::objdefine::mixin) {-append -clear -prepend -remove -set}
 set {::option(package require)} -exact
 set ::option(panedwindow) {-background -bd -bg -borderwidth -cursor -handlepad -handlesize -height -opaqueresize -orient -proxybackground -proxyborderwidth -proxyrelief -relief -sashcursor -sashpad -sashrelief -sashwidth -showhandle -width}
 set ::option(puts) -nonewline
