@@ -73,3 +73,16 @@ test expand-3.1 {
     }
     execTestFile
 } -result {%%Line   3: N Standalone {*} can be confused with argument expansion. I recommend "*".}
+
+test expand-4.1 {
+    Interaction with variables
+} -body {
+    createTestFile {
+        set apa [list hej hopp]
+        set bepa {*}$apa
+        puts $bepa
+        lappend cepa {*}$apa
+        puts $cepa
+    }
+    execTestFile
+} -result {%%}

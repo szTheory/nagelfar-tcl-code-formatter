@@ -106,7 +106,7 @@ test nagelfar-2.4 {
     Basic functionality
 } -body {
     createTestFile {
-        # A test to just excersise parsing
+        # A test to just exercise parsing
         proc apa {w} {
             set apa 1
             set bepa(x) 1

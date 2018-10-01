@@ -1,3 +1,6 @@
+2018-10-01
+ Handle argument expansion with lappend.
+
 2018-06-08
  Include syntaxdb86 to keep compatibility with scripts refering to it
  before 8.6 was default.

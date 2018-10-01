@@ -1235,6 +1235,11 @@ proc checkForCommentL {words wordstatus indices} {
 # It should not be called from anywhere else.
 proc WA {{debug {}}} {
     upvar 1 "cmd" cmd "index" index "argc" argc "argv" argv "indices" indices
+    upvar 1 "firstExpand" firstExpand
+    # Suppress message if expansions is present. We cannot know.
+    if {$firstExpand >= 0} {
+        return
+    }
     errorMsg E "Wrong number of arguments ($argc) to \"$cmd\"$debug" $index 1
 
     set t 1
@@ -1314,7 +1319,8 @@ proc checkNonConstantCode {cmd arg tok type index} {
 # Returns the return type of the command
 # This is a helper for parseStatement, it should not be called from
 # anywhere but checkCommand/parseStatement
-proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
+proc checkCommand {cmd index argv wordstatus wordtype indices \
+                   firstExpand {firsti 0}} {
     upvar 1 "constantsDontCheck" constantsDontCheck "knownVars" knownVars
 
     set argc [llength $argv]
@@ -1484,6 +1490,13 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
         set ei [expr {$i + 1}]
         if {$mod eq "*"} {
             set ei $lastOptional
+        }
+
+        # Just skip the rest if expansion is encountered
+        if {$firstExpand >= 0 && $i >= $firstExpand} {
+            #errorMsg N "Skipping $i due to expand" [lindex $indices $i]
+            set i $argc
+            break
         }
 
         # Main token interpretation
@@ -1802,7 +1815,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices {firsti 0}} {
                     if {[info exists ::syntax($sub)]} {
                         set stype [checkCommand $sub $index $argv $wordstatus \
                                 $wordtype \
-                                $indices [expr {$i + 1}]]
+                                $indices $firstExpand [expr {$i + 1}]]
                         if {$stype != ""} {
                             set type $stype
                         }
@@ -2188,7 +2201,7 @@ proc lookForCommand {cmd ns index} {
 # Returns 1 if command has been handled, 2 if fully done with command
 # This is a helper for parseStatement, it should not be called from
 # anywhere but parseStatement
-proc checkSpecial {cmd index argv wordstatus wordtype indices} {
+proc checkSpecial {cmd index argv wordstatus wordtype indices firstExpand} {
     upvar 1 "constantsDontCheck" constantsDontCheck "knownVars" knownVars
     upvar 1 "noConstantCheck" noConstantCheck "type" type
 
@@ -2199,6 +2212,12 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
         # Even widget commands should be checked.
         # Maybe in checkOptions ?
         return 2
+    }
+    # FIXA: handle {*} better?
+    # None of the handlers below can cope with expansion.
+    # FIXA: Maybe e.g. set should complain since expansion does not make sense?
+    if {$firstExpand >= 0} {
+        return 0
     }
 
     switch $cmd {
@@ -2511,7 +2530,8 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             }
 #            decho "if syntax \"$ifsyntax\""
             set ::syntax(if) $ifsyntax
-            checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+            checkCommand $cmd $index $argv $wordstatus $wordtype $indices \
+                    $firstExpand
             set ::syntax(if) $old_ifsyntax
         }
         try { # Special check of "try" command
@@ -2579,7 +2599,8 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
             }
             #decho "$argc try syntax \"$trysyntax\""
             set ::syntax(try) $trysyntax
-            checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+            checkCommand $cmd $index $argv $wordstatus $wordtype $indices \
+                    $firstExpand
             set ::syntax(try) $old_trysyntax
         }
         switch { # Special check of "switch" command
@@ -2600,7 +2621,8 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                     set old_swsyntax $::syntax(switch)
                     lappend oSyn xComm*
                     set ::syntax(switch) $oSyn
-                    checkCommand $cmd $index $argv $wordstatus $wordtype $indices
+                    checkCommand $cmd $index $argv $wordstatus $wordtype \
+                            $indices $firstExpand
                     set ::syntax(switch) $old_swsyntax
                 }
             }
@@ -2717,7 +2739,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 }
             }
             set type [checkCommand $cmd $index $argv $wordstatus \
-                    $wordtype $indices]
+                    $wordtype $indices $firstExpand]
             set noConstantCheck 1
         }
         package { # Special check of "package" command
@@ -2738,7 +2760,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 }
             }
             set type [checkCommand $cmd $index $argv $wordstatus $wordtype \
-                              $indices]
+                              $indices $firstExpand]
         }
         namespace { # Special check of "namespace" command
             if {$argc < 1} {
@@ -2834,7 +2856,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                     }
                 }
                 set type [checkCommand $cmd $index $argv $wordstatus \
-                        $wordtype $indices]
+                        $wordtype $indices $firstExpand]
             } elseif {([lindex $wordstatus 0] & 1) && \
                     [string match "pa*" [lindex $argv 0]]} {
                 # Handle namespace path
@@ -2852,7 +2874,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 }
             } else {
                 set type [checkCommand $cmd $index $argv $wordstatus \
-                                  $wordtype $indices]
+                                  $wordtype $indices $firstExpand]
             }
         }
         next { # Special check of "next" command
@@ -2871,7 +2893,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices} {
                 if {[info exists ::syntax($subCmd)]} {
                     #puts "Syntax for '$subCmd' '$::syntax($subCmd)'"
                     set type [checkCommand $subCmd $index $argv $wordstatus \
-                            $wordtype $indices]
+                            $wordtype $indices $firstExpand]
                 }
             } else {
                 errorMsg N "No superclass found for 'next'" $index
@@ -3039,17 +3061,21 @@ proc parseStatement {statement index knownVarsName} {
         }
     }
 
-    set argv [lrange $words2 1 end]
-    set wordtype   [lrange $wordtype 1 end]
+    # Extract the argument parts
+    set argv       [lrange $words2     1 end]
+    set wordtype   [lrange $wordtype   1 end]
     set wordstatus [lrange $wordstatus 1 end]
-    set indices [lrange $indices2 1 end]
+    set indices    [lrange $indices2   1 end]
     set argc [llength $argv]
 
-    # FIXA: handle {*} better
+    set firstExpand -1
+    set i 0
     foreach ws $wordstatus {
         if {$ws & 8} {
-            return
+            set firstExpand $i
+            break
         }
+        incr i
     }
 
     # The parsing below can pass information to the constants checker
@@ -3066,8 +3092,14 @@ proc parseStatement {statement index knownVarsName} {
     # checkSpecial is coded as if inline, might affect these vars:
     # noConstantCheck constantsDontCheck type
     set thisCmdHasBeenHandled [checkSpecial $cmd $index $argv $wordstatus \
-                                       $wordtype $indices]
+                                       $wordtype $indices $firstExpand]
     if {$thisCmdHasBeenHandled == 2} return
+
+    # FIXA: handle {*} better?
+    # If the first argument is expanded there is not much we can do?
+    if {$firstExpand == 0} {
+        return
+    }
 
     # Fallthrough
     if {!$thisCmdHasBeenHandled} {
@@ -3075,7 +3107,7 @@ proc parseStatement {statement index knownVarsName} {
         if {$ns eq "" && [info exists ::syntax($cmd)]} {
 #                decho "Checking '$cmd' in '$ns' res"
             set type [checkCommand $cmd $index $argv $wordstatus \
-                    $wordtype $indices]
+                    $wordtype $indices $firstExpand]
         } else {
             # Resolve commands in namespace
             set rescmd [lookForCommand $cmd $ns $index]
@@ -3104,7 +3136,7 @@ proc parseStatement {statement index knownVarsName} {
                     set indices [concat $preindices $indices]
                 }
                 set type [checkCommand $cmd $index $argv $wordstatus \
-                        $wordtype $indices]
+                        $wordtype $indices $firstExpand]
             } elseif {$::Nagelfar(dbpicky)} {
                 errorMsg N "DB: Missing syntax for command \"$cmd\"" 0
             }
