@@ -11,13 +11,12 @@ how to generate your own.
 
 REQUIREMENTS
 
-Nagelfar requires Tcl 8.4 or higher.
-If you do not have 8.4, you can run Nagelfar as a Starkit
-using a 8.4 based Tclkit. http://wiki.tcl.tk/tclkit
+Nagelfar requires Tcl 8.5 or higher.
+If you do not have 8.5, you can run Nagelfar as a Starkit
+using a 8.5 based Tclkit. http://wiki.tcl.tk/tclkit
 
 Generally it is good to run Nagelfar in a Tcl at least as new the script
-is targeted for.  In particular, to check 8.5 code with {*} syntax, Nagelfar
-must be run with at least 8.5.
+is targeted for.
 
 
 USAGE
@@ -102,4 +101,3 @@ Option to enforce not using "then".
 
 Make a GUI to help working with the database builder.  It should
 be possible to add packages that should be included in the db.
-

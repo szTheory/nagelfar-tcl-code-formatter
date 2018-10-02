@@ -1,8 +1,10 @@
 Changes
 ========
 
-Changes in v1.3 (not released):
+Changes in v1.3 (2018-10-03):
 
+* Handle argument expansion with lappend.
+* Use type varName to silince note about upvar usage. [Bug #15]
 * Support multiple plugins.
 * Added -pluginpath option.
 * New plugin hooks, "writeHeader" and "syntaxComment".
@@ -14,6 +16,7 @@ Changes in v1.3 (not released):
 * Added syntax data for text widget.
 * Added syntax data for many dict sub commands. [Bug #13]
 * Fixed a bad check on constant array index. [Bug #1]
+* Thanks to Tobias Mark for contributions.
 
 Changes in v1.2.5 (2017-01-09):
 

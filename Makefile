@@ -3,9 +3,9 @@
 #----------------------------------------------------------------------
 
 # This string is used to generate release file names
-VERSION = 126
+VERSION = 130
 # This string is used to show the version number in the source
-DOTVERSION = 1.2.6
+DOTVERSION = 1.3.0
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/$(USER)/tclkit
@@ -82,13 +82,15 @@ nagelfar.tcl: $(SRCFILES)
 spell:
 	@cat doc/*.txt | ispell -d british -l | sort -u
 
+# Note: Nagelfar promises to run in 8.5 so that database is used for check.
+
 # Create a common "header" file for all source files.
 nagelfar_h.syntax: nagelfar.tcl nagelfar.syntax $(SRCFILES)
 	@echo Creating syntax header file...
-	@./nagelfar.tcl -header nagelfar_h.syntax nagelfar.syntax $(SRCFILES)
+	@./nagelfar.tcl -s $(DB2NAME) -header nagelfar_h.syntax nagelfar.syntax $(SRCFILES)
 
 check: nagelfar.tcl nagelfar_h.syntax
-	@./nagelfar.tcl -strictappend -plugin nfplugin.tcl nagelfar_h.syntax $(SRCFILES)
+	@./nagelfar.tcl -s $(DB2NAME) -strictappend -plugin nfplugin.tcl nagelfar_h.syntax $(SRCFILES)
 
 test: clean base
 	@$(TCLSH86) ./tests/all.tcl -notfile gui.test $(TESTFLAGS)
