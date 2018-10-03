@@ -9,7 +9,7 @@ DOTVERSION = 1.3.0
 
 # Path to the TclKits used for creating StarPacks.
 TCLKIT = /home/$(USER)/tclkit
-TCLKIT85_LINUX = $(TCLKIT)/v85/tclkit-linux-x86
+TCLKIT85_LINUX = $(TCLKIT)/v85/tclkit-linux
 TCLKIT85_WIN   = $(TCLKIT)/v85/tclkit-win32.upx.exe
 TCLKITSH85_WIN = $(TCLKIT)/v85/tclkitsh-win32.upx.exe
 
