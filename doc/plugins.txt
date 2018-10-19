@@ -433,7 +433,7 @@ Deprecation Notice
 Add deprecation warning to proc, and save info to Header.
 
    ##Nagelfar Plugin : Deprecation Notice
-   set deprecated {}
+   set ::deprecated {}
    proc syntaxComment {type opts} {
        if {$type eq "deprecated"} {
            lappend ::deprecated [lindex $opts 0]
@@ -449,8 +449,42 @@ Add deprecation warning to proc, and save info to Header.
    }
    proc writeHeader {} {
       set res {}
-      foreach cmd [lsort -unique $deprecated] {
+      foreach cmd [lsort -unique $::deprecated] {
           lappend res "##nagelfar deprecated $cmd"
       }
       return $res
+   }
+
+
+Detect proc overwrite
+---------------------
+
+Warn if a procedure is defined twice.
+
+   ##Nagelfar Plugin : Detect proc redefinition
+   proc statementWords {words info} {
+       set res {}
+       # Skip the first pass
+       if {[dict get $info firstpass]} {
+           return $res
+       }
+       # We are only interested in calls to "proc"
+       if {[lindex $words 0] ne "proc"} {
+           return $res
+       }
+       # Quick and dirty namespace resolve. Might need work.
+       set ns [dict get $info namespace]
+       set name [lindex $words 1]
+       if {[string match ::* $name]} {
+           set fullName $name
+       } else {
+           set fullName ${ns}::$name
+       }
+       if {[info exists ::seen($fullName)]} {
+           lappend res warning
+           lappend res "Redefined proc \"$name\""
+       } else {
+           set ::seen($fullName) [dict get $info file]
+       }
+       return $res
    }

@@ -599,6 +599,56 @@ test plugin-5.5 {
 } -result {%%Line  11: W Writing hej without variable call
 Line  13: W Writing huga without variable call}
 
+test plugin-5.6 {
+    Plugin for words statement check
+} -body {
+    createTestFile {##Nagelfar Plugin : Detect proc redefinition
+        proc statementWords {words info} {
+            set res {}
+            # Skip the first pass
+            if {[dict get $info firstpass]} {
+                return $res
+            }
+            # We are only interested in calls to "proc"
+            if {[lindex $words 0] ne "proc"} {
+                return $res
+            }
+            # Quick and dirty namespace resolve. Might need work.
+            set ns [dict get $info namespace]
+            set name [lindex $words 1]
+            if {[string match ::* $name]} {
+                set fullName $name
+            } else {
+                set fullName ${ns}::$name
+            }
+            if {[info exists ::seen($fullName)]} {
+                lappend res warning
+                lappend res "Redefined proc \"$name\""
+            } else {
+                set ::seen($fullName) [dict get $info file]
+            }
+            return $res
+        }
+    } 2
+    createTestFile {
+        proc apa {x} { set x }
+        proc apa {x} { set x }
+        proc xy::bepa {x} { set x }
+        namespace eval xy {
+            proc bepa {x} { set x }
+            proc cepa {x} { set x }
+            proc cepa {x} { set x }
+            proc depa {x} { set x }
+        }
+        proc xy::depa {x} { set x }
+    }
+
+    execTestFile -plugin _testfile_.plugin.tcl
+} -result {%%Line   3: W Redefined proc "apa"
+Line   6: W Redefined proc "bepa"
+Line   8: W Redefined proc "cepa"
+Line  11: W Redefined proc "xy::depa"}
+
 test plugin-6.1 {
     Plugin finalize, used for a call graph
 } -body {
