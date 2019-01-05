@@ -309,137 +309,149 @@ proc CopyCmdInDatabase {from to {map {}}} {
 proc checkComment {str index knownVarsName} {
     upvar $knownVarsName knownVars
 
-    if {[string match "##nagelfar *" $str]} {
-        set rest [string range $str 11 end]
-        if {[catch {llength $rest}]} {
-            errorMsg N "Bad list in ##nagelfar comment" $index 1
-            return
-        }
-        if {[llength $rest] == 0} return
-        set cmd [lindex $rest 0]
-        set first [lindex $rest 1]
-
-        # let plugins see comments and define additional ones
-        set pluginComment [pluginHandleComment $cmd [lrange $rest 1 end]]
-        if {$pluginComment} {
-            # plugin Specific action
-            return
-        }
-
-        set rest [lrange $rest 2 end]
-
-        switch -- $cmd {
-            syntax {
-#                decho "Syntax for '$first' : '$rest'"
-                set ::syntax($first) $rest
-                lappend ::knownCommands $first
-            }
-            implicitvarns {
-                set ::implicitVarNs($first) $rest
-            }
-            implicitvarcmd {
-                set ::implicitVarCmd($first) $rest
-            }
-            return {
-                set ::return($first) $rest
-            }
-            subcmd {
-                set ::subCmd($first) $rest
-            }
-            subcmd+ {
-                eval [list lappend "::subCmd($first)"] $rest
-            }
-            package {
-                if {$first eq "known"} {
-                    eval lappend ::knownPackages $rest
-                } elseif {$first eq "require"} {
-                    lookForPackageDb $rest $index
-                } else {
-                    errorMsg N "Bad type in ##nagelfar comment" $index 1
-                }
-            }
-            option {
-                set ::option($first) $rest
-            }
-            option+ {
-                eval [list lappend "::option($first)"] $rest
-            }
-            variable {
-                set type [join $rest]
-                markVariable $first 1 "" 1n $index unknown knownVars type
-            }
-            vartype {
-                # Just mark the type on an existing variable
-                # This cannot be done during the first pass when variables
-                # are not fully handled
-                if {!$::Nagelfar(firstpass)} {
-                    set type [join $rest]
-                    setVariableType $first $type $index knownVars
-                }
-            }
-            alias {
-                set ::knownAliases($first) $rest
-            }
-            nspath {
-                if {$first eq "current"} {
-                    set first [currentNamespace]
-                }
-                eval [list lappend "::namespacePath($first)"] $rest
-            }
-            copy {
-                #echo "Copy in $::Nagelfar(firstpass) $first [lindex $rest 0]"
-                CopyCmdInDatabase $first [lindex $rest 0] [lrange $rest 1 end]
-            }
-            nocover {
-                set ::instrumenting(no,$index) 1
-            }
-            cover {
-                if {$first ne "variable"} {
-
-                } else {
-                    set varname [lindex $rest 0]
-                    set ::instrumenting($index) [list var $varname]
-                }
-            }
-            ignore -
-            filter {
-                set line [calcLineNo $index]
-                if {[regexp {^\+\d+$} $first]} {
-		    # Allow an offset to ignore a line further down
-                    incr line $first
-                    incr line_to $line
-                    set first [lindex $rest 0]
-                    set rest [lrange $rest 1 end]
-		} elseif {[regexp {^\#(\d+)$} $first dummy range]} {
-		    # Allow a range of lines to ignore
-		    incr line
-		    incr line_to [expr {$line + $range - 1}]
-                    set first [lindex $rest 0]
-                    set rest [lrange $rest 1 end]
-                } else {
-                    incr line
-                    incr line_to $line
-                }
-                switch -- $first {
-                    N { addFilter "N *[join $rest]*" $line $line_to }
-                    W { addFilter "\[NW\] *[join $rest]*" $line $line_to }
-                    E { addFilter "*[join $rest]*" $line $line_to }
-                    default { addFilter "*$first [join $rest]*" $line $line_to }
-                }
-            }
-	    varused {
-		setVarUsed knownVars $first
-	    }
-            default {
-                errorMsg N "Bad type in ##nagelfar comment" $index 1
-                return
-            }
-        }
-    } elseif {[regexp {\#\s*(FRINK|PRAGMA):\s*nocheck} $str -> keyword]} {
-        # Support Frink's inline comment
+    # Support Frink's inline comment
+    if {[regexp {\#\s*(FRINK|PRAGMA):\s*nocheck} $str -> keyword]} {
         set line [calcLineNo $index]
         incr line
         addFilter "*" $line $line
+        return
+    }
+
+    # We only care about this pattern
+    if {![string match "##nagelfar *" $str]} {
+        return
+    }
+
+    set commentList [string range $str 11 end]
+    if {[catch {llength $commentList}]} {
+        errorMsg N "Bad list in ##nagelfar comment" $index 1
+        return
+    }
+    if {[llength $commentList] == 0} return
+    set cmd [lindex $commentList 0]
+
+    # Let plugins see comments and define additional ones
+    set pluginComment [pluginHandleComment $cmd [lrange $commentList 1 end]]
+    if {$pluginComment} {
+        # Plugin specific action
+        return
+    }
+
+    set first [lindex $commentList 1]
+    set rest  [lrange $commentList 2 end]
+
+    switch -- $cmd {
+        syntax {
+            #                decho "Syntax for '$first' : '$rest'"
+            set ::syntax($first) $rest
+            lappend ::knownCommands $first
+        }
+        implicitvarns {
+            set ::implicitVarNs($first) $rest
+        }
+        implicitvarns+ {
+            lappend ::implicitVarNs($first) {*}$rest
+        }
+        implicitvarcmd {
+            set ::implicitVarCmd($first) $rest
+        }
+        implicitvarcmd+ {
+            lappend ::implicitVarCmd($first) {*}$rest
+        }
+        return {
+            set ::return($first) $rest
+        }
+        subcmd {
+            set ::subCmd($first) $rest
+        }
+        subcmd+ {
+            lappend ::subCmd($first) {*}$rest
+        }
+        package {
+            if {$first eq "known"} {
+                lappend ::knownPackages {*}$rest
+            } elseif {$first eq "require"} {
+                lookForPackageDb $rest $index
+            } else {
+                errorMsg N "Bad type in ##nagelfar comment" $index 1
+            }
+        }
+        option {
+            set ::option($first) $rest
+        }
+        option+ {
+            lappend ::option($first) {*}$rest
+        }
+        variable {
+            set type [join $rest]
+            markVariable $first 1 "" 1n $index unknown knownVars type
+        }
+        vartype {
+            # Just mark the type on an existing variable
+            # This cannot be done during the first pass when variables
+            # are not fully handled
+            if {!$::Nagelfar(firstpass)} {
+                set type [join $rest]
+                setVariableType $first $type $index knownVars
+            }
+        }
+        alias {
+            set ::knownAliases($first) $rest
+        }
+        nspath {
+            if {$first eq "current"} {
+                set first [currentNamespace]
+            }
+            lappend ::namespacePath($first) {*}$rest
+        }
+        copy {
+            #echo "Copy in $::Nagelfar(firstpass) $first [lindex $rest 0]"
+            CopyCmdInDatabase $first [lindex $rest 0] [lrange $rest 1 end]
+        }
+        nocover {
+            set ::instrumenting(no,$index) 1
+        }
+        cover {
+            if {$first ne "variable"} {
+
+            } else {
+                set varname [lindex $rest 0]
+                set ::instrumenting($index) [list var $varname]
+            }
+        }
+        ignore -
+        filter {
+            set line [calcLineNo $index]
+            if {[regexp {^\+\d+$} $first]} {
+                # Allow an offset to ignore a line further down
+                incr line $first
+                incr line_to $line
+                set first [lindex $rest 0]
+                set rest [lrange $rest 1 end]
+            } elseif {[regexp {^\#(\d+)$} $first dummy range]} {
+                # Allow a range of lines to ignore
+                incr line
+                incr line_to [expr {$line + $range - 1}]
+                set first [lindex $rest 0]
+                set rest [lrange $rest 1 end]
+            } else {
+                incr line
+                incr line_to $line
+            }
+            switch -- $first {
+                N { addFilter "N *[join $rest]*" $line $line_to }
+                W { addFilter "\[NW\] *[join $rest]*" $line $line_to }
+                E { addFilter "*[join $rest]*" $line $line_to }
+                default { addFilter "*$first [join $rest]*" $line $line_to }
+            }
+        }
+        varused {
+            setVarUsed knownVars $first
+        }
+        default {
+            errorMsg N "Bad type in ##nagelfar comment" $index 1
+            return
+        }
     }
 }
 
@@ -2942,18 +2954,20 @@ proc parseStatement {statement index knownVarsName} {
     addImplicitVariablesCmd [join $words] $index knownVars
 
     if {$::Nagelfar(firstpass)} {
-        if {[lindex $words 0] eq "proc"} {
+        set cmd [lindex $words 0]
+        if {$cmd eq "proc"} {
             # OK
-        } elseif {[lindex $words 0] eq "namespace" && \
+        } elseif {$cmd eq "namespace" && \
                 [lindex $words 1] eq "eval" && \
                 [llength $words] == 4 && \
                 ![regexp {[][$\\]} [lindex $words 2]] && \
                 ![regexp {^[{"]?\s*["}]?$} [lindex $words 3]]} {
             # OK
-        } elseif {[lindex $words 0] eq "oo::class"} {
+        } elseif {$cmd eq "oo::class"} {
+            # OK
+        } elseif {$cmd eq "package"} {
             # OK
         } else {
-            set cmd [lindex $words 0]
             set ns [currentNamespace]
             set syn ""
             if {$ns eq "" && [info exists ::syntax($cmd)]} {
@@ -2967,10 +2981,10 @@ proc parseStatement {statement index knownVarsName} {
                 }
             }
             if {[lsearch -glob $syn d*] >= 0} {
-                #echo "Firstpass '[lindex $words 0]'"
+                #echo "Firstpass '[lindex $words 0]' '$syn'"
                 # OK
             } else {
-                #echo "Firstpass block1 '[lindex $words 0]'"
+                #echo "Firstpass block1 '[lindex $words 0]' '$syn'"
                 return ""
             }
         }
