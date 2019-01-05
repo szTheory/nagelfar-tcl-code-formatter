@@ -19,6 +19,7 @@ Contents:
    inlinecomments
    messages
    codecoverage
+   oo
    changes
 
 
