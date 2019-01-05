@@ -4,6 +4,8 @@
 # The generic definitions needed for Snit are now handled centrally
 ##############################################################################
 
+package require snit
+
 ##############################################################################
 # This is the annotation needed for this object definition:
 # pdf4tcl::pdf4tcl
@@ -18,7 +20,7 @@
 
 snit::type pdf4tcl::pdf4tcl {
     variable pdf
-    option -file      -default "" -readonly 1
+    option -file -default "" -readonly 1
     constructor {args} {
         $self configurelist $args
     }

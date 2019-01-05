@@ -101,7 +101,7 @@ Raw Statement Hook
 
 ``proc statementRaw {stmt info} { }``
 
-If declared, this receives each statement unparsed.
+If declared, this receives each statement unparsed (backslash-newline removed).
 
 Statement Words Hook
 ^^^^^^^^^^^^^^^^^^^^

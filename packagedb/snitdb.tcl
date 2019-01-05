@@ -12,7 +12,7 @@
 ##nagelfar syntax snit::type::method dm
 ##nagelfar syntax snit::type::constructor cv
 ##nagelfar syntax snit::type::destructor cl
-##nagelfar syntax snit::type::option x p*
+##nagelfar syntax snit::type::option x x*
 ##nagelfar syntax snit::type::component x
 ##nagelfar syntax snit::type::delegate x*
 ##nagelfar syntax snit::type::install s x*
