@@ -3,7 +3,7 @@ USING ANNOTATIONS
 The first and easiest step to fix some false negatives is to add inline
 annotations to give Nagelfar information that it needs.
 
-This can be done directly in the source code or in a seprate file.
+This can be done directly in the source code or in a separate file.
 In this example one annotation is done next to the proc it belongs to,
 and one is done in the myproj.syntax file.
 
