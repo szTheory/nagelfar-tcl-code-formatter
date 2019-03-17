@@ -313,6 +313,7 @@ tcl::string::wordend
 tcl::string::wordstart
 tcl::tm::path
 tcl::unsupported::disassemble
+tcl::unsupported::timerate
 tclListValidFlags
 tclLog
 tclParseConfigSpec
@@ -327,6 +328,7 @@ tcl_wordBreakBefore
 tell
 text
 time
+timerate
 tk
 tk::button
 tk::canvas

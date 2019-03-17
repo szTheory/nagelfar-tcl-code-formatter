@@ -1,6 +1,6 @@
 # Automatically generated syntax database.
 
-lappend ::dbInfo {Tcl 8.6.8 unix, Tk 8.6.8 x11}
+lappend ::dbInfo {Tcl 8.6.9 unix, Tk 8.6.9 x11}
 set ::dbTclVersion 8.6
 set ::knownGlobals {argc argv argv0 auto_index auto_path env errorCode errorInfo tcl_interactive tcl_library tcl_nonwordchars tcl_patchLevel tcl_pkgPath tcl_platform tcl_rcFileName tcl_version tcl_wordchars tk_library tk_patchLevel tk_strictMotif tk_version}
 set ::knownCommands {
@@ -427,6 +427,7 @@ tcl::unsupported::disassemble
 tcl::unsupported::getbytecode
 tcl::unsupported::inject
 tcl::unsupported::representation
+tcl::unsupported::timerate
 tclListValidFlags
 tclLog
 tclParseConfigSpec
@@ -442,6 +443,7 @@ tell
 text
 throw
 time
+timerate
 tk
 tk::appname
 tk::busy
@@ -809,7 +811,7 @@ set ::syntax(auto_mkindex_parser::slavehook) 1
 set ::syntax(auto_qualify) 2
 set ::syntax(auto_reset) 0
 set ::syntax(bell) {o* x*}
-set ::syntax(bgerror) 1
+set ::syntax(bgerror) {r 1 2}
 set ::syntax(binary) {s x*}
 set {::syntax(binary decode)} {s x*}
 set {::syntax(binary decode base64)} {o* x}
@@ -1251,7 +1253,7 @@ set ::syntax(tk::classic::restore_scrollbar) {r 0}
 set ::syntax(tk::classic::restore_text) {r 0}
 set ::syntax(tk::dialog::color::mc) {r 1}
 set ::syntax(tk::dialog::color::mcmax) {r 0}
-set ::syntax(tk::dialog::error::bgerror) 1
+set ::syntax(tk::dialog::error::bgerror) {r 1 2}
 set ::syntax(tk::dialog::file::chooseDir::mc) {r 1}
 set ::syntax(tk::dialog::file::chooseDir::mcmax) {r 0}
 set ::syntax(tk::dialog::file::mc) {r 1}

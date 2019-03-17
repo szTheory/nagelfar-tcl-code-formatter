@@ -96,6 +96,7 @@ llength
 lmap
 load
 lower
+lpop
 lrange
 lrepeat
 lreplace
@@ -457,7 +458,7 @@ tcl::zipfs::mkzip
 tcl::zipfs::mount
 tcl::zipfs::mount_data
 tcl::zipfs::root
-tcl::zipfs::tcl_library
+tcl::zipfs::tcl_library_init
 tcl::zipfs::unmount
 tclListValidFlags
 tclLog
@@ -474,6 +475,7 @@ tell
 text
 throw
 time
+timerate
 tk
 tk::appname
 tk::busy
@@ -817,7 +819,13 @@ set ::syntax(after) {r 1}
 set ::syntax(append) {n x*}
 set ::syntax(apply) {x x*}
 set ::syntax(array) {s v x?}
+set {::syntax(array default)} {s l x?}
+set {::syntax(array default exists)} l=array
+set {::syntax(array default get)} v=array
+set {::syntax(array default set)} {v=array x}
+set {::syntax(array default unset)} v=array
 set {::syntax(array exists)} l=array
+set {::syntax(array for)} {nl v=array c}
 set {::syntax(array names)} {v=array x? x?}
 set {::syntax(array set)} {n=array x}
 set {::syntax(array size)} v=array
@@ -841,7 +849,7 @@ set ::syntax(auto_mkindex_parser::slavehook) 1
 set ::syntax(auto_qualify) 2
 set ::syntax(auto_reset) 0
 set ::syntax(bell) {o* x*}
-set ::syntax(bgerror) 1
+set ::syntax(bgerror) {r 1 2}
 set ::syntax(binary) {s x*}
 set {::syntax(binary decode)} {s x*}
 set {::syntax(binary decode base64)} {o* x}
@@ -982,6 +990,7 @@ set ::syntax(image) {s x*}
 set ::syntax(incr) {n x?}
 set ::syntax(info) {s x*}
 set {::syntax(info class)} {s x x*}
+set {::syntax(info cmdtype)} x
 set {::syntax(info coroutine)} 0
 set {::syntax(info default)} {x x n}
 set {::syntax(info exists)} l
@@ -1002,6 +1011,7 @@ set ::syntax(llength) 1
 set ::syntax(lmap) {n x c}
 set ::syntax(load) {r 1 3}
 set ::syntax(lower) {x x?}
+set ::syntax(lpop) {v x*}
 set ::syntax(lrange) 3
 set ::syntax(lrepeat) {r 1}
 set ::syntax(lreplace) {r 3}
@@ -1255,6 +1265,11 @@ set ::syntax(tcl::prefix) {s x*}
 set {::syntax(tcl::prefix all)} {x x}
 set {::syntax(tcl::prefix longest)} {x x}
 set {::syntax(tcl::prefix match)} {o* x x}
+set ::syntax(tcl::process) {s x*}
+set {::syntax(tcl::process autoperge)} x?
+set {::syntax(tcl::process list)} 0
+set {::syntax(tcl::process purge)} x?
+set {::syntax(tcl::process status)} {o* x?}
 set ::syntax(tcl::zipfs::find) 1
 set ::syntax(tclListValidFlags) 1
 set ::syntax(tclLog) 1
@@ -1271,6 +1286,7 @@ set ::syntax(tell) 1
 set ::syntax(text) {x p*}
 set ::syntax(throw) 2
 set ::syntax(time) {c x?}
+set ::syntax(timerate) {o* c x? x?}
 set ::syntax(tk) {s x*}
 set ::syntax(tk::button) {x p*}
 set ::syntax(tk::canvas) {x p*}
@@ -1289,7 +1305,7 @@ set ::syntax(tk::classic::restore_scrollbar) {r 0}
 set ::syntax(tk::classic::restore_text) {r 0}
 set ::syntax(tk::dialog::color::mc) {r 0}
 set ::syntax(tk::dialog::color::mcmax) {r 0}
-set ::syntax(tk::dialog::error::bgerror) 1
+set ::syntax(tk::dialog::error::bgerror) {r 1 2}
 set ::syntax(tk::dialog::file::chooseDir::mc) {r 0}
 set ::syntax(tk::dialog::file::chooseDir::mcmax) {r 0}
 set ::syntax(tk::dialog::file::mc) {r 0}
@@ -1422,6 +1438,20 @@ set ::syntax(winfo) {s x x*}
 set ::syntax(wm) {s x x*}
 set ::syntax(yield) x?
 set ::syntax(yieldto) {x x*}
+set ::syntax(zipfs) {s x*}
+set {::syntax(zipfs canonical)} {r 1 3}
+set {::syntax(zipfs exists)} 1
+set {::syntax(zipfs find)} 1
+set {::syntax(zipfs info)} 1
+set {::syntax(zipfs list)} {o* x?}
+set {::syntax(zipfs lmkimg)} {r 2 4}
+set {::syntax(zipfs lmkzip)} {r 2 3}
+set {::syntax(zipfs mkimg)} {r 2 5}
+set {::syntax(zipfs mkkey)} 1
+set {::syntax(zipfs mkzip)} {r 2 4}
+set {::syntax(zipfs mount)} {r 0 3}
+set {::syntax(zipfs root)} 0
+set {::syntax(zipfs unmount)} 1
 set ::syntax(zlib) {s x*}
 set {::syntax(zlib adler32)} {x x?}
 set {::syntax(zlib compress)} {x x?}
@@ -1566,6 +1596,7 @@ set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
 set ::subCmd(_stdclass_oo) {create new destroy variable varname}
 set ::subCmd(array) {anymore default donesearch exists for get names nextelement set size startsearch statistics unset}
+set {::subCmd(array default)} {exists get set unset}
 set ::subCmd(binary) {decode encode format scan}
 set {::subCmd(binary decode)} {base64 hex uuencode}
 set {::subCmd(binary encode)} {base64 hex uuencode}
@@ -1580,7 +1611,7 @@ set ::subCmd(font) {actual configure create delete families measure metrics name
 set ::subCmd(history) {add change clear event info keep nextid redo}
 set ::subCmd(image) {create delete height inuse names type types width}
 set ::subCmd(info) {args body class cmdcount cmdtype commands complete coroutine default errorstack exists frame functions globals hostname level library loaded locals nameofexecutable object patchlevel procs script sharedlibextension tclversion vars}
-set {::subCmd(info class)} {call constructor definition destructor filters forward instances methods methodtype mixins subclasses superclasses variables}
+set {::subCmd(info class)} {call constructor definition definitionnamespace destructor filters forward instances methods methodtype mixins subclasses superclasses variables}
 set {::subCmd(info object)} {call class creationid definition filters forward isa methods methodtype mixins namespace variables vars}
 set ::subCmd(interp) {alias aliases bgerror cancel create debug delete eval exists expose hidden hide invokehidden issafe limit marktrusted recursionlimit share slaves target transfer}
 set ::subCmd(namespace) {children code current delete ensemble eval exists export forget import inscope origin parent path qualifiers tail unknown upvar which}
@@ -1591,8 +1622,9 @@ set ::subCmd(package) {files forget ifneeded names prefer present provide requir
 set ::subCmd(selection) {clear get handle own}
 set ::subCmd(self) {call caller class filter method namespace next object target}
 set ::subCmd(string) {bytelength cat compare equal first index is last length map match range repeat replace reverse tolower totitle toupper trim trimleft trimright wordend wordstart}
-set {::subCmd(string is)} {alnum alpha ascii boolean control digit double entier false graph integer list lower print punct space true upper wideinteger wordchar xdigit}
+set {::subCmd(string is)} {alnum alpha ascii boolean control dict digit double entier false graph integer list lower print punct space true upper wideinteger wordchar xdigit}
 set ::subCmd(tcl::prefix) {all longest match}
+set ::subCmd(tcl::process) {autopurge list purge status}
 set ::subCmd(tk) {appname busy caret fontchooser inactive scaling useinputmethods windowingsystem}
 set ::subCmd(tkwait) {variable visibility window}
 set ::subCmd(trace) {add info remove variable vdelete vinfo}
@@ -1606,6 +1638,7 @@ set {::subCmd(ttk::style theme)} {create names settings use}
 set ::subCmd(update) idletasks
 set ::subCmd(winfo) {atom atomname cells children class colormapfull containing depth exists fpixels geometry height id interps ismapped manager name parent pathname pixels pointerx pointerxy pointery reqheight reqwidth rgb rootx rooty screen screencells screendepth screenheight screenmmheight screenmmwidth screenvisual screenwidth server toplevel viewable visual visualid visualsavailable vrootheight vrootwidth vrootx vrooty width x y}
 set ::subCmd(wm) {aspect attributes client colormapwindows command deiconify focusmodel forget frame geometry grid group iconbitmap iconify iconmask iconname iconphoto iconposition iconwindow manage maxsize minsize overrideredirect positionfrom protocol resizable sizefrom stackorder state title transient withdraw}
+set ::subCmd(zipfs) {canonical exists find info list lmkimg lmkzip mkimg mkkey mkzip mount mount_data root unmount}
 set ::subCmd(zlib) {adler32 compress crc32 decompress deflate gunzip gzip inflate push stream}
 set {::subCmd(zlib push)} {compress decompress deflate gunzip gzip inflate}
 set {::subCmd(zlib stream)} {compress decompress deflate gunzip gzip inflate}
@@ -1798,6 +1831,7 @@ set {::option(listbox -listvariable)} n
 set ::option(lsearch) {-all -ascii -bisect -decreasing -dictionary -exact -glob -increasing -index -inline -integer -nocase -not -real -regexp -sorted -start -stride -subindices}
 set {::option(lsearch -index)} 1
 set {::option(lsearch -start)} 1
+set {::option(lsearch -stride)} 1
 set ::option(lsort) {-ascii -command -decreasing -dictionary -increasing -index -indices -integer -nocase -real -stride -unique}
 set {::option(lsort -command)} 1
 set {::option(lsort -index)} 1
@@ -1824,6 +1858,7 @@ set {::option(radiobutton -variable)} n
 set ::option(regexp) {-- -about -all -expanded -indices -inline -line -lineanchor -linestop -nocase -start}
 set {::option(regexp -start)} 1
 set ::option(regsub) {-- -all -command -expanded -line -lineanchor -linestop -nocase -start}
+set {::option(regsub -command)} 1
 set {::option(regsub -start)} 1
 set ::option(scale) {-activebackground -background -bigincrement -bd -bg -borderwidth -command -cursor -digits -fg -font -foreground -from -highlightbackground -highlightcolor -highlightthickness -label -length -orient -relief -repeatdelay -repeatinterval -resolution -showvalue -sliderlength -sliderrelief -state -takefocus -tickinterval -to -troughcolor -variable -width}
 set {::option(scale -variable)} n
@@ -1848,7 +1883,10 @@ set {::option(switch -matchvar)} n
 set {::option(tcl::prefix match)} {-error -exact -message}
 set {::option(tcl::prefix match -error)} x
 set {::option(tcl::prefix match -message)} x
+set {::option(tcl::process status)} {-- -wait}
 set ::option(text) {-autoseparators -background -bd -bg -blockcursor -borderwidth -cursor -endline -exportselection -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -inactiveselectbackground -insertbackground -insertborderwidth -insertofftime -insertontime -insertunfocussed -insertwidth -maxundo -padx -pady -relief -selectbackground -selectborderwidth -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -startline -state -tabs -tabstyle -takefocus -undo -width -wrap -xscrollcommand -yscrollcommand}
+set ::option(timerate) {-direct -calibrate -overhead}
+set {::option(timerate -overhead)} 1
 set ::option(tk::button) {-activebackground -activeforeground -anchor -background -bd -bg -bitmap -borderwidth -command -compound -cursor -default -disabledforeground -fg -font -foreground -height -highlightbackground -highlightcolor -highlightthickness -image -justify -overrelief -padx -pady -relief -repeatdelay -repeatinterval -state -takefocus -text -textvariable -underline -width -wraplength}
 set {::option(tk::button -textvariable)} n
 set ::option(tk::canvas) {-background -bd -bg -borderwidth -closeenough -confine -cursor -height -highlightbackground -highlightcolor -highlightthickness -insertbackground -insertborderwidth -insertofftime -insertontime -insertwidth -offset -relief -scrollregion -selectbackground -selectborderwidth -selectforeground -state -takefocus -width -xscrollcommand -xscrollincrement -yscrollcommand -yscrollincrement}
@@ -1915,6 +1953,7 @@ set {::option(ttk::style theme create)} {-parent -settings}
 set ::option(ttk::treeview) {-columns -displaycolumns -show -selectmode -height -padding -xscrollcommand -yscrollcommand -takefocus -cursor -style -class}
 set ::option(unload) {-- -keeplibrary -nocomplain}
 set ::option(unset) {-nocomplain --}
+set {::option(zipfs list)} {-glob -regexp}
 set {::option(zlib gunzip)} {-buffersize -headerVar}
 set {::option(zlib gzip)} {-header -level}
 set {::option(zlib push)} {-dictionary -header -level}

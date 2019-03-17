@@ -69,6 +69,18 @@ if 1 { # Not working yet?
 proc getSubCmds {args} {
     catch {uplevel 1 $args} err
 
+    # Some commands show their available options in this message
+    if {[regexp "wrong \# args:" $err]} {
+        #puts "$args"
+        #puts "  $err"
+        set result {}
+        foreach {_ x} [regexp -all -inline {\?(-\w+)} $err] {
+            lappend result $x
+        }
+        #puts "  $result"
+        return $result
+    }        
+
     lappend regexps {option .* must be (.*)$}
     lappend regexps {option .* should be one of (.*)$}
     lappend regexps {bad .* must be (.*)$}
@@ -598,6 +610,47 @@ proc buildDb {ch} {
         set option(lsort\ -stride) 1
     }
 
+    # Things added in 8.7
+    if {[info commands lpop] ne ""} {
+        set syntax(lpop) "v x*"
+        set syntax(timerate) "o* c x? x?"
+        set option(timerate\ -overhead) 1
+
+        set syntax(zipfs) "s x*"
+        set syntax(zipfs\ canonical) "r 1 3"
+        set syntax(zipfs\ exists)  1
+        set syntax(zipfs\ find)    1
+        set syntax(zipfs\ info)    1
+        set syntax(zipfs\ list) "o* x?"
+        set option(zipfs\ list) "-glob -regexp"
+        set syntax(zipfs\ lmkimg)  "r 2 4"
+        set syntax(zipfs\ lmkzip)  "r 2 3"
+        set syntax(zipfs\ mkimg)   "r 2 5"
+        set syntax(zipfs\ mkkey)   1
+        set syntax(zipfs\ mkzip)   "r 2 4"
+        set syntax(zipfs\ mount)   "r 0 3"
+        set syntax(zipfs\ root)    0
+        set syntax(zipfs\ unmount) 1
+
+        set syntax(tcl::process) "s x*"
+        set syntax(tcl::process\ autoperge) "x?"
+        set syntax(tcl::process\ list)      "0"
+        set syntax(tcl::process\ purge)     "x?"
+        set syntax(tcl::process\ status)    "o* x?"
+
+        set syntax(array\ default) "s l x?"
+        set syntax(array\ default\ exists) "l=array"
+        set syntax(array\ default\ get)    "v=array"
+        set syntax(array\ default\ set)    "v=array x"
+        set syntax(array\ default\ unset)  "v=array"
+
+        set syntax(array\ for) "nl v=array c"
+
+        set syntax(info\ cmdtype) "x"
+
+        set option(lsearch\ -stride) 1
+        set option(regsub\ -command) 1
+    }
 
     # Some special Tcl commands
     set syntax(dde)             "o? s x*"  ;# FIXA: is this correct?
@@ -873,14 +926,6 @@ proc buildDb {ch} {
         }
     }
 
-    # A fix since puts still gives an unhelpful error
-    if {![info exists option(puts)] || [lsearch $option(puts) "-nonewline"] < 0} {
-        set option(puts) [list -nonewline]
-        # Also chan puts if present
-        if {[info exists syntax(chan\ puts)]} {
-            set option(chan\ puts) [list -nonewline]
-        }            
-    }
     # Send cannot return info in some versions
     if {![info exists option(send)]} {
         set option(send) "-- -async -displayof"
