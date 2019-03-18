@@ -56,8 +56,7 @@ Specifying variables
 This will make "name" a known variable and optionally set its type.
 Types are still experimental in Nagelfar. The type "varName" can
 be used to tell Nagelfar that a variable contains a variable name,
-which suppresses some warnings. Another type is "script" which also
-suppresses some warnings.
+which suppresses some warnings.
 
 Example:
 
@@ -88,6 +87,22 @@ the called command:
 .. code:: tcl
 
  ##nagelfar return somethingThatReturnsAVarName varName
+
+Special variable types
+^^^^^^^^^^^^^^^^^^^^^^
+
+Some variable types are recognised as special by Nagelfar. E.g. "varName" as
+described above.  Another type is "script" which also suppresses some warnings,
+as well as "option".
+
+.. code:: tcl
+
+ set mode -real
+ ##nagelfar vartype mode option
+ set hejsan [lsort $mode $lst]
+
+ ##nagelfar return miffo script
+ trace add variable apa write [miffo x y]
 
 Specifying implicit variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

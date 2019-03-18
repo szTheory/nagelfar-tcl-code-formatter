@@ -80,3 +80,42 @@ test types-4.3 {
     execTestFile
 } -result {%%Line   3: E Unknown variable "apa"
 Line   4: E Unknown variable "apa"}
+
+test types-5.1 {
+    Types, option
+} -body {
+    createTestFile {
+        set lst "hej hopp"
+        set apa -decreasing
+        ##nagelfar vartype apa option
+        lsort -real $apa $lst
+        lsort $apa       $lst
+        lsort $apa -real $lst
+        lsort -real $apa $lst $lst
+        lsort $apa       $lst $lst
+        lsort $apa -real $lst $lst
+    }
+    execTestFile
+} -result {%%Line   8: E Wrong number of arguments (4) to "lsort"
+Line   9: E Wrong number of arguments (3) to "lsort"
+Line  10: E Wrong number of arguments (4) to "lsort"}
+
+test types-5.2 {
+    Types, option
+} -body {
+    createTestFile {
+        set lst "hej hopp"
+        set apa -decreasing
+        ##nagelfar vartype apa option
+        lsort -real {*}$apa $lst
+        lsort {*}$apa       $lst
+        lsort {*}$apa -real $lst
+        # These should be detected
+        lsort -real {*}$apa $lst $lst
+        lsort {*}$apa       $lst $lst
+        lsort {*}$apa -real $lst $lst
+    }
+    execTestFile
+} -result {%%Line   9: E Wrong number of arguments (4) to "lsort"
+Line  10: E Wrong number of arguments (3) to "lsort"
+Line  11: E Wrong number of arguments (4) to "lsort"}
