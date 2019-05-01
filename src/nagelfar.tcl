@@ -2105,8 +2105,6 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
             } else {
                 dict set knownVars $varBase namespace [currentNamespace]
             }
-            # FIXA: Should an array base get a type?
-            dict set knownVars $varBase "type" $type
             if {$check == 1} {
                 if {$isArray eq "known"} {
                     dict set knownVars $varBase array $varArray
@@ -2120,8 +2118,18 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
         }
         # A non-type cannot override a known type
         if {$type ne ""} {
-            # Warn if changed?? FIXA
-            dict set knownVars $varBase "type" $type
+            if {$varArray} {
+                set oldType [dict get $knownVars $varBase "type"]
+                if {$oldType ne "" && $type ne $oldType} {
+                    # Inconsistent types. Mark base as unknown.
+                    dict set knownVars $varBase "type" _unknown
+                } else {
+                    dict set knownVars $varBase "type" $type
+                }
+            } else {
+                # Warn if changed in a scalar?? FIXA
+                dict set knownVars $varBase "type" $type
+            }
         }
         if {$check == 1} {
             dict set knownVars $varBase set 1

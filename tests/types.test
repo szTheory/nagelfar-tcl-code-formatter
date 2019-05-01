@@ -45,6 +45,53 @@ test types-3.1 {
     execTestFile
 } -result {%%}
 
+test types-3.2 {
+    Types in arrays
+} -body {
+    createTestFile {
+        set x canvas
+        set w .t
+        set data(sbar)   [scrollbar $w.sbar]
+        set data(canvas) [canvas $w.canvas]
+        # There is no reasonable way to guess this type,
+        # so this should be silent.
+        $data($x) configureApa xxx
+    }
+    execTestFile
+} -result {%%}
+
+test types-3.3 {
+    Types in arrays
+} -body {
+    createTestFile {
+        set x canvas
+        set w .t
+        set data(sbar)   [scrollbar $w.sbar]
+        set data(canvas) [text $w.canvas]
+        # An explicit type declaration for an array is valid for the base.
+        # Though it must be set after any inconsistent assignements were made.
+        ##nagelfar vartype data _obj,canvas
+        $data($x) configureApa xxx
+    }
+    execTestFile
+} -result {%%Line   9: E Unknown subcommand "configureApa" to "_obj,canvas"}
+
+test types-3.4 {
+    Types in arrays
+} -body {
+    createTestFile {
+        set w .t
+        for {set t 0} {$t < 5} {incr t} {
+            set data($t) [canvas $w.canvas$t]
+        }
+        for {set t 0} {$t < 5} {incr t} {
+            # Since data() has a consistent type above this can be detected
+            $data($t) configureApa xxx
+        }
+    }
+    execTestFile
+} -result {%%Line   8: E Unknown subcommand "configureApa" to "_obj,canvas"}
+
 test types-4.1 {
     Types in inline comments
 } -body {

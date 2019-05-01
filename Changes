@@ -1,4 +1,5 @@
 2019-05-01
+ Do not try to guess types in arrays unless consistent or explicit. [Bug #22]
  Apply filters to normal message, even when formatting as HTML. [Bug #21]
  Handle declared types for some global variables.
  More consistent handling of newline in command substitutions.
