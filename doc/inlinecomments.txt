@@ -26,7 +26,8 @@ level and down is ignored. If the string is preceded by an offset like
 “+2”, a line further down is marked for filtering. No given offset
 corresponds to “+1”. If the string is preceeded by a count like “#2”,
 multiple following lines are marked for filtering. No given range
-corresponds to “#1”.
+corresponds to “#1”. Note: All Inline Comments are lists, and *string*
+is formed by joining that list. Thus special chars may need quoting.
 
 Examples:
 
@@ -50,7 +51,6 @@ Specifying variables
 This will make “name” a known variable and optionally set its type.
 Types are still experimental in Nagelfar. The type “varName” can be
 used to tell Nagelfar that a variable contains a variable name, which
-suppresses some warnings. Another type is “script” which also
 suppresses some warnings.
 
 Example:
@@ -76,6 +76,21 @@ The latter can also be achieved by specifying the return type for the
 called command:
 
    ##nagelfar return somethingThatReturnsAVarName varName
+
+
+Special variable types
+======================
+
+Some variable types are recognised as special by Nagelfar. E.g.
+“varName” as described above.  Another type is “script” which also
+suppresses some warnings, as well as “option”.
+
+   set mode -real
+   ##nagelfar vartype mode option
+   set hejsan [lsort $mode $lst]
+
+   ##nagelfar return miffo script
+   trace add variable apa write [miffo x y]
 
 
 Specifying implicit variables

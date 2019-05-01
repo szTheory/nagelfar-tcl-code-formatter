@@ -1,3 +1,7 @@
+2019-05-01
+ Handle declared types for some global variables.
+ More consistent handling of newline in command substitutions.
+
 2019-03-18
  New variable type "option". Annotates things that provides switches/options.
 

@@ -3,7 +3,7 @@ Changes
 
 Changes in vX.X (not released):
 
-* TBD
+* New variable type "option". Annotates things that provides switches/options.
 
 Changes in v1.3 (2018-10-03):
 

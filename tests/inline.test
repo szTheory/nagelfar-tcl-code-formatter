@@ -252,6 +252,18 @@ test inline-6.7 {
     execTestFile
 } -result {%%Line   5: E Unknown variable "unknown3"}
 
+test inline-6.8 {
+    ignore lines within command subst
+} -body {
+    createTestFile {
+        set v x
+        set c [##nagelfar ignore +2
+               array names %%
+                       $v]
+    }
+    execTestFile
+} -result {%%}
+
 test inline-7.1 {
     Inline in syntax file
 } -body {

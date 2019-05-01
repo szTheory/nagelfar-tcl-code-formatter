@@ -1032,6 +1032,18 @@ test nagelfar-24.2 {
     execTestFile
 } -result {%%Line   3: N Newline in command substitution}
 
+test nagelfar-24.3 {
+    New line in subst body, allow comment
+} -body {
+    createTestFile {
+        set apa [list x;list y]
+        set apa [# Muhaha
+                 list x
+                 list y]
+    }
+    execTestFile
+} -result {%%Line   4: N Newline in command substitution}
+
 test nagelfar-25.1 {
     tailcall
 } -body {

@@ -21,6 +21,8 @@
 # gui.tcl
 #----------------------------------------------------------------------
 
+##nagelfar variable ::Nagelfar(resultWin) _obj,text
+
 proc busyCursor {} {
     if {![info exists ::oldcursor]} {
         set ::oldcursor  [. cget -cursor]
@@ -28,12 +30,12 @@ proc busyCursor {} {
     }
 
     . config -cursor watch
-    $::Nagelfar(resultWin) config -cursor watch
+    $::Nagelfar(resultWin) configure -cursor watch
 }
 
 proc normalCursor {} {
     . config -cursor $::oldcursor
-    $::Nagelfar(resultWin) config -cursor $::oldcursor2
+    $::Nagelfar(resultWin) configure -cursor $::oldcursor2
 }
 
 proc exitApp {} {

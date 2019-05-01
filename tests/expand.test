@@ -22,7 +22,7 @@ test expand-1.2 {
         {*}$apa hej hopp apa
     }
     execTestFile
-} -result {%%}
+} -result {%%Line   3: W Found constant "apa" which is also a variable.}
 
 test expand-2.1 {
     Simple errors
@@ -32,7 +32,8 @@ test expand-2.1 {
         {*}$bepa hej hopp apa
     }
     execTestFile
-} -result {%%Line   3: E Unknown variable "bepa"}
+} -result {%%Line   3: E Unknown variable "bepa"
+Line   3: W Found constant "apa" which is also a variable.}
 
 test expand-2.2 {
     Simple errors
@@ -42,7 +43,8 @@ test expand-2.2 {
         {*}$bepa hej hopp apa
     }
     execTestFile
-} -result {%%Line   3: E Unknown variable "bepa"}
+} -result {%%Line   3: E Unknown variable "bepa"
+Line   3: W Found constant "apa" which is also a variable.}
 
 test expand-2.3 {
     Simple errors
@@ -57,10 +59,10 @@ test expand-2.3 {
 test expand-2.4 {
     Simple errors, this was a bug with line numbers
 } -body {
-    createTestFile "
-        {*}\[list \\
-                    \$bepa\]
-    "
+    createTestFile {
+        {*}[list %%
+                    $bepa]
+    }
     execTestFile
 } -result {%%Line   3: E Unknown variable "bepa"}
 

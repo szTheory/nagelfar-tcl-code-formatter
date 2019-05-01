@@ -21,6 +21,9 @@
 # nagelfar.tcl
 #----------------------------------------------------------------------
 
+# TODO: Make it possible to put a global var type in syntax file.
+##nagelfar variable ::Nagelfar(resultWin) _obj,text
+
 #####################
 # Syntax check engine
 #####################
@@ -2094,6 +2097,7 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
             } else {
                 dict set knownVars $varBase namespace [currentNamespace]
             }
+            # FIXA: Should an array base get a type?
             dict set knownVars $varBase "type" $type
             if {$check == 1} {
                 if {$isArray eq "known"} {
@@ -2118,11 +2122,13 @@ proc markVariable {var ws wordtype check index isArray knownVarsName typeName} {
         if {$varArray && ($varIndexWs & 1)} {
             if {![dict exists $knownVars $var]} {
                 knownVar knownVars $var
-                dict set knownVars $var "type" $type
                 if {[dict get $knownVars $varBase local]} {
                     dict set knownVars $var local 1
                 }
                 dict set knownVars $var array 0
+            }
+            if {$type ne ""} {
+                dict set knownVars $var "type" $type
             }
             if {$check == 1} {
                 dict set knownVars $var set 1
@@ -3077,15 +3083,16 @@ proc parseStatement {statement index knownVarsName} {
     set cmdws [lindex $wordstatus 0]
 
     # Expanded command, nothing to check...
+    set thisCmdHasBeenHandled 0
     if {($cmdws & 8)} {
-        return
+        set thisCmdHasBeenHandled 1
     }
 
     # If the command contains substitutions we can not determine
     # which command it is, so we skip it, unless the type is known
     # to be an object.
 
-    if {($cmdws & 1) == 0} {
+    if {$thisCmdHasBeenHandled == 0 && ($cmdws & 1) == 0} {
         if {[string match "_obj,*" $cmdtype]} {
             set cmd $cmdtype
         } else {
@@ -3097,7 +3104,7 @@ proc parseStatement {statement index knownVarsName} {
             if {[llength $words2] == 1 && [string index $cmd 0] eq "\["} {
                 errorMsg N "Suspicious brackets around command" $index
             }
-            return
+            set thisCmdHasBeenHandled 1
         }
     }
 
@@ -3131,8 +3138,10 @@ proc parseStatement {statement index knownVarsName} {
 
     # checkSpecial is coded as if inline, might affect these vars:
     # noConstantCheck constantsDontCheck type
-    set thisCmdHasBeenHandled [checkSpecial $cmd $index $argv $wordstatus \
-                                       $wordtype $indices $expandWords]
+    if {$thisCmdHasBeenHandled == 0} {
+        set thisCmdHasBeenHandled [checkSpecial $cmd $index $argv $wordstatus \
+                                           $wordtype $indices $expandWords]
+    }
     if {$thisCmdHasBeenHandled == 2} return
 
     # Fallthrough
@@ -3503,8 +3512,11 @@ proc parseBody {body index knownVarsName {warnCommandSubst 0}} {
         foreach statement [lrange $statements 0 end-1] \
                 stmtIndex [lrange $indices 0 end-1] {
             if {[string index $statement end] eq "\n"} {
-                errorMsg N "Newline in command substitution" $stmtIndex
-                break
+                # Comment is ok
+                if {[string index $statement 0] ne "\#"} {
+                    errorMsg N "Newline in command substitution" $stmtIndex
+                    break
+                }
             }
         }
     }
@@ -3805,6 +3817,16 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
     }
     addImplicitVariablesNs $definingCmd [lindex $indices 0] knownVars
 
+    # Look in the calling environment for known globals with types.
+    # TODO: Better handling of known globals.
+    upvar 1 "knownVars" envKnownVars
+    dict for {var i} $envKnownVars {
+        set type [dict get $i type]
+        if {![dict get $i local] && $type ne ""} {
+            dict set knownVars $var $i
+        }
+    }
+    
 #    decho "Note: parsing procedure $name"
     if {!$::Nagelfar(firstpass)} {
         if {$isProc} {
@@ -4051,6 +4073,7 @@ proc parseScript {script} {
         }
     }
     # Update known globals.
+    # FIXA: This should transfer any known types
     foreach var [dict keys $knownVars] {
         if {[dict get $knownVars $var namespace] != ""} continue
         if {[dict get $knownVars $var local]} continue

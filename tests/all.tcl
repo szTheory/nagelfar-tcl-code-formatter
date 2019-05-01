@@ -23,6 +23,8 @@ if {$argc > 0} {
 }
 
 proc createTestFile {scr {filetype 0}} {
+    # Trick to allow body to include backslash-newline
+    set scr [string map [list "%%\n" "\\\n"] $scr]
     if {$filetype == 2} {
         set ch [open _testfile_.plugin.tcl w]
     } elseif {$filetype == 3} {

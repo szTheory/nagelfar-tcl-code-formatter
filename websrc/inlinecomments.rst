@@ -30,6 +30,8 @@ If the string is preceded by an offset like "+2", a line further
 down is marked for filtering. No given offset corresponds to "+1".
 If the string is preceeded by a count like "#2", multiple following lines
 are marked for filtering. No given range corresponds to "#1".
+Note: All Inline Comments are lists, and *string* is formed by joining that
+list. Thus special chars may need quoting.
 
 Examples:
 
