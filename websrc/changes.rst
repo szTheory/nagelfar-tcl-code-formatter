@@ -4,6 +4,7 @@ Changes
 Changes in vX.X (not released):
 
 * New variable type "option". Annotates things that provides switches/options.
+* Apply filters to normal message, even when formatting as HTML. [Bug #21]
 
 Changes in v1.3 (2018-10-03):
 

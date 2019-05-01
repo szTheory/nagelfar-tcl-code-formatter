@@ -135,9 +135,9 @@ proc errorMsgLinePrefix {line appendStr} {
 proc errorMsg {severity msg i {notAllowedinFirst 0}} {
     #echo "$msg"
     if {$::Prefs(html)} {
-        set msg [Text2Html $msg]
+        set htmlMsg [Text2Html $msg]
         if {$msg == "Expr without braces"} {
-            append msg " (see <a href=\"http://tclhelp.net/unb/194\" target=\"_tclforum\">http://tclhelp.net/unb/194</a>)"
+            append htmlMsg " (see <a href=\"http://tclhelp.net/unb/194\" target=\"_tclforum\">http://tclhelp.net/unb/194</a>)"
         }
     }
 
@@ -163,15 +163,15 @@ proc errorMsg {severity msg i {notAllowedinFirst 0}} {
     }
 
     set line [calcLineNo $i]
+    set pre [errorMsgLinePrefix $line "$severity "]
     if {$::Prefs(html)} {
 	switch $severity {
 	    E { set color "#DD0000"; set severityMsg "ERROR" }
 	    W { set color "#FFAA00"; set severityMsg "WARNING" }
 	    N { set color "#66BB00"; set severityMsg "NOTICE" }
 	}
-        set pre "<a href=#$::Prefs(htmlprefix)$line>Line [format %3d $line]</a>: <font color=$color><strong>$severityMsg</strong></font>: "
-    } else {
-	set pre [errorMsgLinePrefix $line "$severity "]
+        set htmlPre "<a href=#$::Prefs(htmlprefix)$line>Line [format %3d $line]</a>: <font color=$color><strong>$severityMsg</strong></font>: "
+        set ::Nagelfar(currentHtmlMessage) $htmlPre$htmlMsg
     }
 
     set ::Nagelfar(indent) [string repeat " " [string length $pre]]
@@ -187,12 +187,16 @@ proc contMsg {msg {i {}}} {
         regsub -all {%L} $msg [calcLineNo $i] msg
     }
     append ::Nagelfar(currentMessage) $msg
+    if {$::Prefs(html)} {
+        append ::Nagelfar(currentHtmlMessage) [Text2Html $msg]
+    }
 }
 
 # Initialize message handling.
 proc initMsg {} {
     set ::Nagelfar(messages) {}
     set ::Nagelfar(currentMessage) ""
+    set ::Nagelfar(currentHtmlMessage) ""
     set ::Nagelfar(commentbrace) {}
 }
 
@@ -201,7 +205,7 @@ proc flushMsg {} {
     if {[info exists ::Nagelfar(currentMessage)] && \
             $::Nagelfar(currentMessage) != ""} {
         lappend ::Nagelfar(messages) [list $::Nagelfar(currentMessageLine) \
-                $::Nagelfar(currentMessage)]
+                $::Nagelfar(currentMessage) $::Nagelfar(currentHtmlMessage)]
     }
 
     set msgs [lsort -integer -index 0 $::Nagelfar(messages)]
@@ -230,7 +234,11 @@ proc flushMsg {} {
         }
         if {$print} {
             incr ::Nagelfar(messageCnt)
-            echo [lindex $msg 1] message$::Nagelfar(messageCnt)
+            if {$::Prefs(html)} {
+                echo [lindex $msg 2] message$::Nagelfar(messageCnt)
+            } else {
+                echo [lindex $msg 1] message$::Nagelfar(messageCnt)
+            }
             if {$::Nagelfar(exitstatus) < 2 && [string match "*: E *" $msg]} {
                 set ::Nagelfar(exitstatus) 2
             } elseif {$::Nagelfar(exitstatus) < 1 && [string match "*: W *" $msg]} {
