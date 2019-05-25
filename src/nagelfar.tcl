@@ -144,10 +144,11 @@ proc errorMsg {severity msg i {notAllowedinFirst 0}} {
     if {[info exists ::Nagelfar(currentMessage)] && \
             $::Nagelfar(currentMessage) != ""} {
         lappend ::Nagelfar(messages) [list $::Nagelfar(currentMessageLine) \
-                $::Nagelfar(currentMessage)]
+                $::Nagelfar(currentMessage) $::Nagelfar(currentHtmlMessage)]
     }
 
     set ::Nagelfar(currentMessage) ""
+    set ::Nagelfar(currentHtmlMessage) ""
     # Stop some messages in first pass
     if {$::Nagelfar(firstpass) && $notAllowedinFirst} {
         return

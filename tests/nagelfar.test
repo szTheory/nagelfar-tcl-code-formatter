@@ -1010,6 +1010,19 @@ test nagelfar-23.1 {
     execTestFile -flags -html
 } -result {%%<a href=#4>Line   4</a>: <font color=#DD0000><strong>ERROR</strong></font>: Wrong number of arguments (2) to &quot;hej&quot;}
 
+test nagelfar-23.2 {
+    HTML generation, bug #23
+} -body {
+    createTestFile {
+        proc hej {a b c} {
+            lsearch apa bepa cepa
+            lsearch apa bepa cepa
+        }
+    }
+    execTestFile -flags -html
+} -result {%%<a href=#3>Line   3</a>: <font color=#DD0000><strong>ERROR</strong></font>: Wrong number of arguments (3) to &quot;lsearch&quot;
+<a href=#4>Line   4</a>: <font color=#DD0000><strong>ERROR</strong></font>: Wrong number of arguments (3) to &quot;lsearch&quot;}
+
 test nagelfar-24.1 {
     New line in subst body
 } -body {
