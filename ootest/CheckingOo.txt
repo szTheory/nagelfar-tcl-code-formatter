@@ -1,26 +1,4 @@
 --------------------------------------------------------------------------
-A class defintion is resolved in a virtual namespace denoted by the
-"cn" syntax token. The virtual namespace is named after the calling
-command and its arguments.  Examples:
-##nagelfar syntax itcl::class do cn
-itcl::class Test { ... }
-Virtual namespace: itcl::class::Test
-##nagelfar syntax snit::type do cn
-snit::type pdf4tcl::pdf4tcl { ... }
-Virtual namespace: snit::type::pdf4tcl::pdf4tcl
-##nagelfar syntax oo:class\ create do cn
-oo::class create Account { ... }
-Virtual namespace: oo::class\ create::Account
---------------------------------------------------------------------------
-Since name resolution works up the namespaces, class definition subcommands
-can be defined in the top virtual namespace for the class definition:
-##nagelfar syntax itcl::class::constructor cv
-##nagelfar syntax itcl::class::method dm
-##nagelfar syntax snit::type::constructor cv
-##nagelfar syntax snit::type::method dm
-##nagelfar syntax oo::class\ create::constructor cv
-##nagelfar syntax oo::class\ create::method dm
---------------------------------------------------------------------------
 The properties of the defined class command varies with the system involved.
 Itcl:
 ##nagelfar syntax Test dc=_obj,Test
@@ -37,45 +15,12 @@ TclOO:
 ##nagelfar syntax Account\ new x?
 ##nagelfar return Account\ new _obj,Account
 --------------------------------------------------------------------------
-An instantiated object is handled by a name starting with the magic
-marker "_obj,".  Most systems give an object command similar to this:
-##nagelfar syntax _obj,Account s x*
-##nagelfar subcmd _obj,Account deposit withdraw transfer dump destroy variable
-##nagelfar syntax _obj,Account\ deposit x
---------------------------------------------------------------------------
 Commands that are available in a class' methods need to be defined
 within its virtual namespace.
 Example: method m2 in class Test, for itcl where methods are directly visible
 ##nagelfar syntax itcl::class::Test::m2 0
 Example: method my in TclOO, that is always the same as on object
 ##nagelfar copy _obj,Account oo::class\ create::Account::my
---------------------------------------------------------------------------
-If return types has been set up properly, an object is tracked in code
-like this:
-set a [Account new "John Doe"]
-$a deposit 200
-The critical definitions are:
-##nagelfar return Account\ new _obj,Account
-##nagelfar syntax _obj,Account s x*
---------------------------------------------------------------------------
-If syntax definitions has been set up properly, when an explicitely named
-instance is made, it is defined
-Test t1
-t1 dostuff
-The critical definition is:
-##nagelfar syntax Test dc=_obj,Test
-Defining it manually is also possible:
-##nagelfar copy _obj,Test t1
---------------------------------------------------------------------------
-Sometimes it is necessary to declare a variable as an object:
-proc testingwithproc {ob} {
-    ##nagelfar variable ob _obj,mystuff
-    $ob dostuff
-}
-##nagelfar syntax testingwithproc2 x(_obj,mystuff)
-proc testingwithproc2 {ob} {
-    $ob dostuff
-}
 --------------------------------------------------------------------------
 Implicitely available variables needs to be defined in each virtual namespace
 ##nagelfar implicitvarns itcl::class::Test::proc   c1
@@ -108,6 +53,8 @@ Needed stuff:
 Delay copy operation until second pass.
 Or, set up copy as an alias.
 --------------------------------------------------------------------------
+
+
 --------------------------------------------------------------------------
 This rest of this file contains notes collected over time about OO checking.
 Some of it has been implemented but maybe not as mentioned here.
