@@ -231,6 +231,27 @@ Forbid operator
      return {}
  }
 
+Check coding standard
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: tcl
+
+ ##Nagelfar Plugin : Check coding rule
+ proc statementWords {words info} {
+     set res {}
+     # We require space around ! in if { ! []}
+     if {[lindex $words 0] eq "if"} {
+         set e [lindex $words 1]
+         if {[regexp {\{(\s*)!(\s*)\[} $e -> pre post]} {
+            if {$pre ne " " || $post ne " "} {
+                lappend res warning
+                lappend res "Not (!) should be surrounded by one space"
+            }
+        }
+     }
+     return $res
+ }
+
 Allow custom operator
 ^^^^^^^^^^^^^^^^^^^^^
 
