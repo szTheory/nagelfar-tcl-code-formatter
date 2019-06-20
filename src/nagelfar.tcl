@@ -4270,12 +4270,18 @@ proc dumpInstrumenting {filename} {
     puts $ch { namespace eval ::_instrument_ {}}
     puts $ch [info body _instrumentProlog1]
     # Insert file specific info
+    # This is only initialised first time a file is sourced
+    puts $ch "if {!\[[list info exists doneFile($tail)]\]} \{"
+    puts $ch [list set doneFile($tail) 1]
+
     puts $ch "# Initialise list of lines"
     puts $ch "namespace eval ::_instrument_ \{"
     puts $ch [join $init \n]
     puts $ch "\}"
     # More common prolog for file specific stuff
     puts $ch [info body _instrumentProlog2]
+
+    puts $ch "\}"
 
     puts $ch "\#instrumented source goes here"
     puts $ch $iscript
@@ -4347,6 +4353,8 @@ proc _instrumentProlog1 {} {
             variable dumpList
             foreach {src logFile} $dumpList {
                 flock $logFile {
+                    # The log consists of incr/lappend commands so eval:ing it
+                    # merges those results with current data
                     if {[file exists $logFile]} {
                         # Avoid source command
                         set ch [open $logFile r]
