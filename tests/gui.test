@@ -97,6 +97,8 @@ proc GetTextLines {} {
     return [split [string trim $str] \n]
 }
 
+puts "Running GUI test! Do not touch any windows!"
+
 test gui-1.1 {Run check without file} -body {
     RestartClient 1
 

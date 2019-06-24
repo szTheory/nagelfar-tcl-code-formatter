@@ -111,6 +111,7 @@ testoo: base
 # Source files for code coverage
 IFILES   = $(SRCFILES:.tcl=.tcl_i)
 LOGFILES = $(SRCFILES:.tcl=.tcl_log)
+LOCKFILES = $(SRCFILES:.tcl=.tcl_log.lck)
 MFILES   = $(SRCFILES:.tcl=.tcl_m)
 
 # Instrument source file for code coverage
@@ -149,7 +150,8 @@ icheck: $(MFILES)
 
 # Remove code coverage files
 clean:
-	@rm -f $(LOGFILES) $(IFILES) $(MFILES) nagelfar.tcl_* nagelfar_dummy*
+	@rm -f $(LOGFILES) $(IFILES) $(MFILES) $(LOCKFILES)
+	@rm -f nagelfar.tcl_* nagelfar_dummy* _testfile_*
 
 #----------------------------------------------------------------
 # Generating test examples
