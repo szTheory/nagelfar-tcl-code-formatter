@@ -423,6 +423,7 @@ tcl::string::wordend
 tcl::string::wordstart
 tcl::tm::path
 tcl::unsupported::assemble
+tcl::unsupported::corotype
 tcl::unsupported::disassemble
 tcl::unsupported::getbytecode
 tcl::unsupported::inject
@@ -1528,7 +1529,7 @@ set ::subCmd(_obj,ttk::scale) {cget configure coords get identify instate set st
 set ::subCmd(_obj,ttk::scrollbar) {cget configure delta fraction get identify instate set state}
 set ::subCmd(_obj,ttk::separator) {cget configure identify instate state}
 set ::subCmd(_obj,ttk::sizegrip) {cget configure identify instate state}
-set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
+set ::subCmd(_obj,ttk::treeview) {bbox cget children column configure delete detach drag drop exists focus heading identify index insert instate item move next parent prev see selection set state tag xview yview}
 set ::subCmd(_stdclass_oo) {create new destroy variable varname}
 set ::subCmd(array) {anymore donesearch exists get names nextelement set size startsearch statistics unset}
 set ::subCmd(binary) {decode encode format scan}
