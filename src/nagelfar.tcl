@@ -4334,9 +4334,12 @@ proc _instrumentProlog1 {} {
                 incr i
                 after 250
                 if {$i > 9} {
-                    # Could use throw in 8.6
-                    return -code error -errorcode LOCK \
-                            "Could not acquire lock '$lck' in $i tries!"
+                    # Warn about this but continue with next file.
+                    # Since we are in instrumented code we only have access
+                    # to stdout for this warning.
+                    puts "Warning: Could not acquire lock '$lck' in $i tries!"
+                    puts "Warning: Results from '$filename' will be lost!"
+                    return
                 }
             }
             # Should use try in 8.6

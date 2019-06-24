@@ -1,3 +1,6 @@
+2019-06-26
+ Just warn if coverage log file locking fails. [FR #27]
+
 2019-06-19
  Handle if a file is sourced twice during coverage. [Bug #26]
 
