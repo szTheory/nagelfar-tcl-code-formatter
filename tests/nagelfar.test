@@ -768,6 +768,20 @@ test nagelfar-12.5 {
     execTestFile
 } -result {%%}
 
+test nagelfar-12.6 {
+    Comments, bad in continued command
+} -body {
+    createTestFile {
+        set apa [list hej hopp %%
+                         more list elements %%
+                         # A bad comment %%
+                         elem2 val2]
+        # A good comment %%
+        # With both backslash and hash
+    }
+    execTestFile
+} -result "%%Line   4: N Suspicious \# char. Possibly a bad comment."
+
 test nagelfar-13.1 {
     Syntax database, multiple ?
 } -body {

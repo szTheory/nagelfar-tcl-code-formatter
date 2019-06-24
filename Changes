@@ -1,4 +1,5 @@
 2019-06-26
+ Note suspicious comments in continued lines.
  Just warn if coverage log file locking fails. [FR #27]
 
 2019-06-19

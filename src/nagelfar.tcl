@@ -3980,6 +3980,7 @@ proc buildLineDb {str} {
     set sp [string range " " 0 0]
     set nl [string range \n 0 0]
     set lineNo 0
+    set lastCmdLine ""
 
     foreach line $lines {
         incr lineNo
@@ -3991,9 +3992,20 @@ proc buildLineDb {str} {
                 errorMsg W "Too long line" [string length $result]
             }
         }
+        if {!$previousWasEscaped} {
+            set lastCmdLine $line
+        }
         # Check for comments.
         if {[string index $line 0] eq "#"} {
+            # Make notes about unbalanced braces in comments
             checkPossibleComment $line $lineNo
+            # A # in the middle of backslash-newline rows is suspicious.
+            if {$previousWasEscaped} {
+                if {[string index $lastCmdLine 0] ne "#"} {
+                    errorMsg N "Suspicious \# char. Possibly a bad comment." \
+                            [string length $result]
+                }
+            }
         }
         # Keep track of the leading comment lines (header) to preserve them
         # when instrumenting for coverage.
