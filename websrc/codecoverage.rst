@@ -46,6 +46,21 @@ diff tool, like `eskil <http://eskil.tcl.tk>`_:
 The directory where _i, _log and _m files are stored can be redirected with
 ``-idir <dir>``.
 
+Pragmas
+^^^^^^^
+
+A branch can be ignored using the nocover pragma.
+
+You can also collect variable usage, which reports all unique values that
+variable has had.
+
+.. code:: tcl
+
+    if {![file exists $file]} { ##nagelfar nocover
+        ...
+    }
+    ##nagelfar cover variable y
+
 Example
 ^^^^^^^
 
