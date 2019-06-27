@@ -4281,6 +4281,8 @@ proc dumpInstrumenting {filename} {
     # The first line is indented with one space to make it detectable when
     # looking for an instrumented file
     puts $ch { namespace eval ::_instrument_ {}}
+    puts $ch [list set ::_instrument_::replaceSource \
+                      [expr {!$::Nagelfar(nosource)}]]
     puts $ch [info body _instrumentProlog1]
     # Insert file specific info
     # This is only initialised first time a file is sourced
@@ -4311,26 +4313,28 @@ proc dumpInstrumenting {filename} {
 proc _instrumentProlog1 {} {
     # Defining help procedures should be done once even if multiple
     # instrumented files are loaded, so check if it has been done.
-    if {[info commands ::_instrument_::source] == ""} {
-        rename ::source ::_instrument_::source
-        ##nagelfar ignore does not match previous
-        proc ::source {args} {
-            set fileName [lindex $args end]
-            set args [lrange $args 0 end-1]
-            set newFileName $fileName
-            set altFileNames [list ${fileName}_i]
-            if {$::_instrument_::idir ne ""} {
-                lappend altFileNames [file join $::_instrument_::idir \
-                                              [file tail $fileName]_i]
-            }
-            foreach altFileName $altFileNames {
-                if {[file exists $altFileName]} {
-                    set newFileName $altFileName
+    if {[info commands ::_instrument_::flock] == ""} {
+        if {$::_instrument_::replaceSource} {
+            rename ::source ::_instrument_::source
+            ##nagelfar ignore does not match previous
+            proc ::source {args} {
+                set fileName [lindex $args end]
+                set args [lrange $args 0 end-1]
+                set newFileName $fileName
+                set altFileNames [list ${fileName}_i]
+                if {$::_instrument_::idir ne ""} {
+                    lappend altFileNames [file join $::_instrument_::idir \
+                                                  [file tail $fileName]_i]
                 }
+                foreach altFileName $altFileNames {
+                    if {[file exists $altFileName]} {
+                        set newFileName $altFileName
+                    }
+                }
+                set args [linsert $args 0 ::_instrument_::source]
+                lappend args $newFileName
+                uplevel 1 $args
             }
-            set args [linsert $args 0 ::_instrument_::source]
-            lappend args $newFileName
-            uplevel 1 $args
         }
         rename ::exit ::_instrument_::exit
         ##nagelfar ignore does not match previous

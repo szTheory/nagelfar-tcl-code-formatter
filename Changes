@@ -1,3 +1,6 @@
+2019-06-27
+ New option -nosource, to stop overloading source in instrumented files.
+
 2019-06-26
  Note suspicious comments in continued lines.
  Just warn if coverage log file locking fails. [FR #27]

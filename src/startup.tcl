@@ -51,6 +51,7 @@ proc usage {} {
  -markup           : Markup source file with code coverage result.
  -markupfull       : Like -markup, but includes stats for covered blocks.
  -idir <dir>       : Store code coverage files in this dir.
+ -nosource         : When instrumenting, do not overload source.
  -quiet            : Suppress non-syntax output.
  -glob <pattern>   : Add matching files to scriptfiles to check.
  -plugin <plugin>  : Run with this plugin.
@@ -78,6 +79,7 @@ proc StartUp {} {
     set ::Nagelfar(pkgpicky) 0
     set ::Nagelfar(withCtext) 0
     set ::Nagelfar(instrument) 0
+    set ::Nagelfar(nosource) 0
     set ::Nagelfar(markup) 0
     set ::Nagelfar(idir) ""
     set ::Nagelfar(header) ""
@@ -308,6 +310,9 @@ if {![info exists gurka]} {
                     noVar 1
                     severity E
                 }
+            }
+            -nosource {
+                set ::Nagelfar(nosource) 1
             }
             -markup* {
                 set ::Nagelfar(markup) [expr {1 + ($arg eq "-markupfull")}]

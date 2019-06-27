@@ -16,7 +16,8 @@ from the test, if all other files are accessed through source.
 
 You do not need to keep the instrumented name. You can rename them back
 to the original if you cannot use _i or the automatic "source" redirection
-for some reason.
+for some reason.  Use the command line option -nosource to stop overloading
+of source in the instrumented file.
 
 The source under test must terminate using the "exit" command.  The
 instrumentation uses the exit command to produce the result, thus it needs
