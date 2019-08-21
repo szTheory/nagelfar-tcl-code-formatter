@@ -138,14 +138,15 @@ test types-5.1 {
         lsort -real $apa $lst
         lsort $apa       $lst
         lsort $apa -real $lst
+        # These should be detected
         lsort -real $apa $lst $lst
         lsort $apa       $lst $lst
         lsort $apa -real $lst $lst
     }
     execTestFile
-} -result {%%Line   8: E Wrong number of arguments (4) to "lsort"
-Line   9: E Wrong number of arguments (3) to "lsort"
-Line  10: E Wrong number of arguments (4) to "lsort"}
+} -result {%%Line   9: E Wrong number of arguments (4) to "lsort"
+Line  10: E Wrong number of arguments (3) to "lsort"
+Line  11: E Wrong number of arguments (4) to "lsort"}
 
 test types-5.2 {
     Types, option
@@ -161,6 +162,12 @@ test types-5.2 {
         lsort -real {*}$apa $lst $lst
         lsort {*}$apa       $lst $lst
         lsort {*}$apa -real $lst $lst
+        # These are ok. We consider expansion a valid pair.
+        button .b {*}$lst
+        ttk::style configure My.Toolbutton {*}[ttk::style configure Toolbutton] \
+                -padding {1 1}
+        ttk::style map My.Toolbutton {*}[ttk::style map Toolbutton] \
+                -relief {disabled flat selected sunken pressed sunken active raised}
     }
     execTestFile
 } -result {%%Line   9: E Wrong number of arguments (4) to "lsort"

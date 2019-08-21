@@ -661,25 +661,25 @@ proc checkOptions {cmd argv wordstatus indices wordtype startI max pair} {
     }
 
     # How many is the limit imposed by the number of arguments?
-    set maxa [expr {[llength $argv] - $startI}]
+    set maxArgs [expr {[llength $argv] - $startI}]
 
     # Pairs swallow an even number of args.
     set extraAfterPair 0
-    if {$pair && ($maxa % 2) == 1} {
+    if {$pair && ($maxArgs % 2) == 1} {
         # If the odd one is "--", it may continue
-        if {[lindex $argv [expr {$startI + $maxa - 1}]] == "--" && \
+        if {[lindex $argv [expr {$startI + $maxArgs - 1}]] == "--" && \
                 [lsearch -exact $option($cmd) --] >= 0} {
             # Nothing
         } else {
             set extraAfterPair 1
-            incr maxa -1
+            incr maxArgs -1
         }
     }
 
-    if {$max == 0 || $maxa < $max} {
-        set max $maxa
+    if {$max == 0 || $maxArgs < $max} {
+        set max $maxArgs
     }
-    if {$maxa == 0} {
+    if {$maxArgs == 0} {
         return {}
     }
     set check [info exists option($cmd)]
@@ -761,7 +761,23 @@ proc checkOptions {cmd argv wordstatus indices wordtype startI max pair} {
                 break
             }
         } else { # If not -*
-            if {$wType eq "option"} {
+            if {$pair && ($ws & 8)} {
+                # We accept an argument expansion were a pair is expected.
+                # Communicate using a special token
+                lappend replaceSyn X
+                # Adjust since we ate an odd argument
+                if {$extraAfterPair} {
+                    set extraAfterPair 0
+                    incr max
+                } else {
+                    set extraAfterPair 1
+                    incr max -1
+                }
+                continue
+            } elseif {$max == 1 && ($ws & 8)} {
+                # Special case to allow expansion with "o."
+                lappend replaceSyn x
+            } elseif {$wType eq "option"} {
                 if {$ws & 8} {
                     # Communicate using a special token
                     lappend replaceSyn X

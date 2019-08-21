@@ -1,9 +1,15 @@
 Changes
 ========
 
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+   <br />
+
 Changes in vX.X (not released):
 
-* New variable type "option". Annotates things that provides switches/options.
+* New variable type "option". Annotates things that provides switches/options. |br|
+  Expansions are considered valid option pairs without "option" type.
 * Apply filters to normal message, even when formatting as HTML. [Bug #21]
 * Do not try to guess types in arrays unless consistent or explicit. [Bug #22]
 

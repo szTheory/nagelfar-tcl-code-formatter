@@ -1,3 +1,7 @@
+2019-08-22
+ Consider expansion to be a valid option-pair without needing
+ variable type "option".
+
 2019-06-27
  New option -nosource, to stop overloading source in instrumented files.
 
