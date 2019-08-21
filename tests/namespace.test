@@ -68,6 +68,8 @@ test namespace-2.1 {
         proc apa::bepa {hej hopp} {
             set apa $hej
         }
+        # There was a bug in nagelfar that didn't handle lonely import
+        namespace import
         namespace import apa::bepa
         proc cepa {hej hopp} {
             set apa [bepa $hej $hopp]

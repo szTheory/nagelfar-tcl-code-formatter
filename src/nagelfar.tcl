@@ -2864,7 +2864,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices expandWords} {
                     [string match "im*" [lindex $argv 0]]} {
                 # Handle namespace import
                 if {$argc < 2} {
-                    WA
+                    # Import without args is not interesting
                     return 2
                 }
                 set ns [currentNamespace]
