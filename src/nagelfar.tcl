@@ -4229,8 +4229,9 @@ proc dumpInstrumenting {filename} {
     if {$::instrumenting(already)} {
         echo "Warning: Instrumenting already instrumented file $tail"
     }
-    set ifile ${base}_i
-    echo "Writing file $ifile" 1
+    set iFile ${base}_i
+    set logFile ${base}_log
+    echo "Writing file $iFile" 1
     set iscript $::instrumenting(script)
     set indices {}
     foreach item [array names ::instrumenting] {
@@ -4261,6 +4262,7 @@ proc dumpInstrumenting {filename} {
     set init {}
     lappend init [list set current $idString]
     lappend init [list set idir $::Nagelfar(idir)]
+    lappend init [list set "logFile" $logFile]
     set headerIndex $::instrumenting(header)
     foreach ix $indices {
         # Indices goes backwards here, so when reaching headerIndex we are done
@@ -4316,7 +4318,7 @@ proc dumpInstrumenting {filename} {
 
         lappend init [list set log($item) $default]
     }
-    set ch [open $ifile w]
+    set ch [open $iFile w]
     if {[info exists ::Nagelfar(encoding)] && \
             $::Nagelfar(encoding) ne "system"} {
         fconfigure $ch -encoding $::Nagelfar(encoding)
@@ -4352,7 +4354,7 @@ proc dumpInstrumenting {filename} {
     close $ch
 
     # Copy permissions to instrumented file.
-    catch {file attributes $ifile -permissions \
+    catch {file attributes $iFile -permissions \
             [file attributes $filename -permissions]}
 }
 
@@ -4455,14 +4457,9 @@ proc _instrumentProlog1 {} {
 # syntax checking.
 # Variables dumpList and current are known where this code is run, this is
 # emulated by making them arguments.
-proc _instrumentProlog2 {dumpList current} {
+proc _instrumentProlog2 {dumpList current logFile} {
     # Store information about this particular file for later use in cleanup
     namespace eval ::_instrument_ {
-        set thisScript [file normalize [file join [pwd] [info script]]]
-        if {[string match "*_i" $thisScript]} {
-            set thisScript [string range $thisScript 0 end-2]
-        }
-        set logFile ${thisScript}_log
         lappend dumpList $current $logFile
     }
 }
@@ -4470,11 +4467,11 @@ proc _instrumentProlog2 {dumpList current} {
 # Add Code Coverage markup to a file according to measured coverage
 proc instrumentMarkup {filename full} {
     instrumentId $filename tail idString base
-    set logfile ${base}_log
-    set mfile ${base}_m
+    set logFile ${base}_log
+    set mFile ${base}_m
 
     namespace eval ::_instrument_ {}
-    source $logfile
+    source $logFile
     set covered 0
     set noncovered 0
     foreach item [array names ::_instrument_::log $idString,*] {
@@ -4517,15 +4514,15 @@ proc instrumentMarkup {filename full} {
     }
     set stats [format "(%d/%d %4.1f%%)" \
             $covered $total $coverage]
-    echo "Writing file $mfile $stats" 1
+    echo "Writing file $mFile $stats" 1
     if {[array size lines] == 0} {
         echo "All lines covered in $tail"
-        file copy -force $filename $mfile
+        file copy -force $filename $mFile
         return
     }
 
     set chi [open $filename r]
-    set cho [open $mfile w]
+    set cho [open $mFile w]
     if {[info exists ::Nagelfar(encoding)] && \
             $::Nagelfar(encoding) ne "system"} {
         fconfigure $chi -encoding $::Nagelfar(encoding)
@@ -4537,7 +4534,7 @@ proc instrumentMarkup {filename full} {
             echo "File $filename is instrumented, aborting markup"
             close $chi
             close $cho
-            file delete $mfile
+            file delete $mFile
             return
         }
         if {[info exists lines($lineNo)]} {

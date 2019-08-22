@@ -8,7 +8,7 @@ Changes
 
 Changes in vX.X (not released):
 
-* TBW
+* Handle log files in idir better. [Bug #30]
 * TBW
 
 Changes in v1.3.1 (2019-08-23):
