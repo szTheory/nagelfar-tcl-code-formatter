@@ -137,7 +137,7 @@ nagelfar.tcl_i: nagelfar_dummy.tcl_i
 # Run tests to create log file.
 testcover $(LOGFILES): nagelfar.tcl_i
 	@./tests/all.tcl $(TESTFLAGS)
-	@$(TCLSH86) ./tests/all.tcl -match expand-*
+	@$(TCLSH86) ./tests/all.tcl -notfile gui.test -match expand-*
 
 # Create markup file for better view of result
 %.tcl_m: %.tcl_log 

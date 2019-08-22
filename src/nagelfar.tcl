@@ -4206,17 +4206,30 @@ proc instrumentL {indices argv i} {
     instrument [lindex $indices $i] 1 [lindex $argv $i]
 }
 
+# Decide for an identifying name for a file.
+# TODO: Maybe use whole path? Does it matter?
+proc instrumentId {filename tailName idStringName baseName} {
+    upvar 1 $tailName tail $idStringName idString $baseName base
+    set fullname [file normalize [file join [pwd] $filename]]
+    set tail [file tail $fullname]
+    set parts [file split $fullname]
+    set lastParts [lrange $parts end-2 end]
+    set idString [file join {*}$lastParts]
+    set base $filename
+    if {$::Nagelfar(idir) ne ""} {
+        file mkdir $::Nagelfar(idir)
+        # TODO: Should any part of file's path be included under idir?
+        set base [file join $::Nagelfar(idir) $tail]
+    }
+}
+
 # Write source instrumented for code coverage
 proc dumpInstrumenting {filename} {
-    set tail [file tail $filename]
+    instrumentId $filename tail idString base
     if {$::instrumenting(already)} {
         echo "Warning: Instrumenting already instrumented file $tail"
     }
-    set ifile ${filename}_i
-    if {$::Nagelfar(idir) ne ""} {
-        file mkdir $::Nagelfar(idir)
-        set ifile [file join $::Nagelfar(idir) ${tail}_i]
-    }
+    set ifile ${base}_i
     echo "Writing file $ifile" 1
     set iscript $::instrumenting(script)
     set indices {}
@@ -4246,17 +4259,17 @@ proc dumpInstrumenting {filename} {
         set indices [lreplace $indices $iEnd $i]
     }
     set init {}
-    lappend init [list set current $tail]
+    lappend init [list set current $idString]
     lappend init [list set idir $::Nagelfar(idir)]
     set headerIndex $::instrumenting(header)
     foreach ix $indices {
         # Indices goes backwards here, so when reaching headerIndex we are done
         if {$ix <= $headerIndex} break
         set line [calcLineNo $ix]
-        set item "$tail,$line"
+        set item "$idString,$line"
         set i 2
         while {[info exists done($item)]} {
-            set item "$tail,$line,$i"
+            set item "$idString,$line,$i"
             incr i
         }
         set done($item) 1
@@ -4322,8 +4335,8 @@ proc dumpInstrumenting {filename} {
     puts $ch [info body _instrumentProlog1]
     # Insert file specific info
     # This is only initialised first time a file is sourced
-    puts $ch "if {!\[[list info exists doneFile($tail)]\]} \{"
-    puts $ch [list set doneFile($tail) 1]
+    puts $ch "if {!\[[list info exists doneFile($idString)]\]} \{"
+    puts $ch [list set doneFile($idString) 1]
 
     puts $ch "# Initialise list of lines"
     puts $ch "namespace eval ::_instrument_ \{"
@@ -4456,11 +4469,7 @@ proc _instrumentProlog2 {dumpList current} {
 
 # Add Code Coverage markup to a file according to measured coverage
 proc instrumentMarkup {filename full} {
-    set tail [file tail $filename]
-    set base $filename
-    if {$::Nagelfar(idir) ne ""} {
-        set base [file join $::Nagelfar(idir) $tail]
-    }
+    instrumentId $filename tail idString base
     set logfile ${base}_log
     set mfile ${base}_m
 
@@ -4468,7 +4477,7 @@ proc instrumentMarkup {filename full} {
     source $logfile
     set covered 0
     set noncovered 0
-    foreach item [array names ::_instrument_::log $tail,*] {
+    foreach item [array names ::_instrument_::log $idString,*] {
         if {[string match "*,var" $item]} {
             set values [lsort -dictionary -unique $::_instrument_::log($item)]
             # FIXA: Maybe support expected values check

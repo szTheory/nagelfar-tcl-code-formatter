@@ -1,4 +1,5 @@
 2019-08-22
+ Include partial dirname in id of instrumented code. [Bug #32]
  Nocover pragma should cover the entire block. [Bug #31]
 
 2019-08-22

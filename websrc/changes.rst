@@ -13,6 +13,7 @@ Changes in vX.X (not released):
 * Apply filters to normal message, even when formatting as HTML. [Bug #21]
 * Do not try to guess types in arrays unless consistent or explicit. [Bug #22]
 * Nocover pragma now covers the entire block. [Bug #31]
+* Allow multiple source files with the same nume during code coverage. [Bug #32]
 
 Changes in v1.3 (2018-10-03):
 
