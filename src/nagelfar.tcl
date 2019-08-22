@@ -1771,7 +1771,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices \
                     }
                     # A virtual namespace should not be instrumented.
                     if {$tok ne "cn"} {
-                        set ::instrumenting([lindex $indices $i]) 1
+                        instrumentL $indices $argv $i
                     }
                     if {$tok eq "cg"} {
                         # Check in global context
@@ -1831,7 +1831,7 @@ proc checkCommand {cmd index argv wordstatus wordtype indices \
                     if {$tokCount ne ""} {
                         append body [string repeat " x" $tokCount]
                     }
-                    set ::instrumenting([lindex $indices $i]) 1
+                    instrumentL $indices $argv $i
 
                     # Check in local context
                     #puts "Cmd '$cmd' NS '[currentNamespace]'"
@@ -2515,7 +2515,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices expandWords} {
                 errorMsg W "No braces around body in foreach\
                         statement." $index
             }
-            set ::instrumenting([lindex $indices end]) 1
+            instrumentL $indices $argv end
             set type [parseBody [lindex $argv end] [lindex $indices end] \
                               knownVars]
             # Clean up
@@ -2603,7 +2603,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices expandWords} {
                 return 2
             } elseif {$state eq "else"} {
                 # Mark the missing else for instrumenting
-                set ::instrumenting([expr {$index + [string length $arg]}]) 2
+                instrument [expr {$index + [string length $arg]}] 2 ""
             }
 #            decho "if syntax \"$ifsyntax\""
             set ::syntax(if) $ifsyntax
@@ -2767,7 +2767,7 @@ proc checkSpecial {cmd index argv wordstatus wordtype indices expandWords} {
                     errorMsg N "Switch pattern \"others\" could be a mistaken\
                             \"default\"" $i1
                 }
-                set ::instrumenting($i2) 1
+                instrument $i2 1 $body
                 parseBody $body $i2 knownVars
             }
         }
@@ -3530,8 +3530,6 @@ proc splitScript {script index statementsName indicesName} {
 proc parseBody {body index knownVarsName {warnCommandSubst 0}} {
     upvar $knownVarsName knownVars
 
-    #set ::instrumenting($index) 1
-
     # Cache the splitScript result to optimise 2-pass checking.
     if {[info exists ::Nagelfar(cacheBody)] && \
             [info exists ::Nagelfar(cacheBody,$body)]} {
@@ -3876,7 +3874,7 @@ proc parseProc {argv indices isProc isMethod definingCmd} {
             popNamespace
         }
     }
-    set ::instrumenting([lindex $indices 2]) 1
+    instrumentL $indices $argv 2
 
     set newSyn [parseArgsToSyn $name $argList [lindex $indices 1] \
             $syn $knownVars]
@@ -4196,9 +4194,20 @@ proc binSearch {sortedList ix} {
     return $last
 }
 
+# Store information for instrumenting
+# TODO: Maybe replace these with dummies when instrumenting is off?
+proc instrument {index value body} {
+    set ::instrumenting($index) $value
+    # Remember the end of block
+    set ::instrumenting(end,$index) [expr {$index + [string length $body] -1}]
+}
+# List version of instrument, since many callers need this structure.
+proc instrumentL {indices argv i} {
+    instrument [lindex $indices $i] 1 [lindex $argv $i]
+}
+
 # Write source instrumented for code coverage
 proc dumpInstrumenting {filename} {
-
     set tail [file tail $filename]
     if {$::instrumenting(already)} {
         echo "Warning: Instrumenting already instrumented file $tail"
@@ -4221,9 +4230,20 @@ proc dumpInstrumenting {filename} {
     foreach item [array names ::instrumenting no,*] {
         set index [lindex [split $item ","] end]
         set i [binSearch $indices $index]
-        if {$i >= 0} {
-            set indices [lreplace $indices $i $i]
+        if {$i < 0} continue
+        # Default range to delete is one item
+        set iEnd $i
+        # Any end to extend range to?
+        set indexStart [lindex $indices $i]
+        if {[info exists ::instrumenting(end,$indexStart)]} {
+            set indexEnd $::instrumenting(end,$indexStart)
+            set i2 [binSearch $indices $indexEnd]
+            if {$i2 >= 0 && $i2 <= $i} {
+                set iEnd $i2
+            }
         }
+        # Indices are decreasing so iEnd is first
+        set indices [lreplace $indices $iEnd $i]
     }
     set init {}
     lappend init [list set current $tail]

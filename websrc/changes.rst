@@ -12,6 +12,7 @@ Changes in vX.X (not released):
   Expansions are considered valid option pairs without "option" type.
 * Apply filters to normal message, even when formatting as HTML. [Bug #21]
 * Do not try to guess types in arrays unless consistent or explicit. [Bug #22]
+* Nocover pragma now covers the entire block. [Bug #31]
 
 Changes in v1.3 (2018-10-03):
 

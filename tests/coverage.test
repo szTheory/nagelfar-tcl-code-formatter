@@ -299,3 +299,36 @@ test coverage-7.2 {
                                {_testfile__i _testfile__log} \
                                {Writing file */_tdir_/_testfile__m (*)} \
                                {_testfile__i _testfile__log _testfile__m}]
+test coverage-8.1 {
+    Nocover, should cover all subblocks
+} -body {
+    createTestFile {
+        set apa [list hej hopp]
+        proc x {y z} {
+            set apa [list hej hopp]
+            if {$y} { ##nagelfar nocover
+                puts $z
+                if {$z} {
+                    set apa [list hej hopp]
+                } else {
+                    set apa [list hej hopp]
+                }
+            }   ;# The implicit else should still be covered, for statistics
+            if {$z} break
+            switch $y {
+                1 {
+                    if {$x} {
+                        set x y
+                    }
+                }
+                default { ##nagelfar nocover
+                    set x y
+                    if {$x} {
+                        list y
+                    }
+                }
+            }
+        }
+    }
+    execTestFileInstrument
+} -result [list {%%Writing file _testfile__i} 18 16 15 13 13 12 3 3 12 13 13 15 16 18]
