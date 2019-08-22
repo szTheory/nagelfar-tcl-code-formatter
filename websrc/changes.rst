@@ -8,12 +8,19 @@ Changes
 
 Changes in vX.X (not released):
 
+* TBW
+* TBW
+
+Changes in v1.3.1 (2019-08-23):
+
 * New variable type "option". Annotates things that provides switches/options. |br|
   Expansions are considered valid option pairs without "option" type.
-* Apply filters to normal message, even when formatting as HTML. [Bug #21]
+* Apply filters to normal message, even when formatting as HTML. [Bug #21, #23]
 * Do not try to guess types in arrays unless consistent or explicit. [Bug #22]
+* Handle if a file is sourced twice during coverage. [Bug #26]
 * Nocover pragma now covers the entire block. [Bug #31]
 * Allow multiple source files with the same nume during code coverage. [Bug #32]
+* New option -nosource, to stop overloading source in instrumented files.
 
 Changes in v1.3 (2018-10-03):
 
