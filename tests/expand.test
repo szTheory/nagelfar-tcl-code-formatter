@@ -88,3 +88,16 @@ test expand-4.1 {
     }
     execTestFile
 } -result {%%}
+
+test expand-5.1 {
+    Expand in foreach
+} -body {
+    createTestFile {
+        set apa [list hej hopp]
+        # As long as last arg is fixed, it should be checked as code
+        foreach {*}$apa {
+            set apa bepa cepa
+        }
+    }
+    execTestFile
+} -result {%%Line   5: E Wrong number of arguments (3) to "set"}

@@ -34,7 +34,7 @@ Tokens
 * E Expression that should be in braces
 * re Regular expression like regexp/regsub
 *
-* n, v and l all marks variable names.  Those arguments will not be
+* n, v and l all mark variable names.  Those arguments will not be
   checked against known variables to detect missing $.
 * n The variable does not have to exist, and is set by the command.
   (out parameter)
@@ -131,7 +131,7 @@ to a known list "option+" is used.
 
 .. code:: tcl
 
- ##nagelfar option send -- async -displayof
+ ##nagelfar option send -- -async -displayof
  ##nagelfar option string\ is -failindex -strict
 
 The syntax for the parameter of an option is set like this.

@@ -34,7 +34,8 @@
 ##nagelfar return snit::widgetadaptor::myvar varName
 ##nagelfar syntax snit::widgetadaptor::component x
 ##nagelfar syntax snit::widgetadaptor::install s x*
-##nagelfar syntax snit::widgetadaptor::option x p*
+##nagelfar syntax snit::widgetadaptor::option 1: x 2: x x : x p*
+##nagelfar syntax snit::widgetadaptor::onconfigure x cv
 
 ##nagelfar syntax snit::widget do=_stdclass_snit cn
 ##nagelfar syntax snit::widget::method dm
